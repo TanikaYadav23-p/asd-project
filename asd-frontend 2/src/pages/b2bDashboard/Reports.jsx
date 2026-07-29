@@ -1,29 +1,51 @@
-import React from 'react';
+import React,{ useState,useEffect }from 'react';
+import {
+  getDashboard,
+  getOverview,
+  getRecentReports,
+  getPopularReports,
+  getInsights,
+  generateReport,
+  downloadReport,
+  exportData,
+  getFilterOptions
+} from '../../api/ReportsApi';
 import { 
   FileText, Download, MoreVertical, Plus, Calendar, ArrowRight,
-  ChevronDown, BarChart2, TrendingUp, Users, MapPin, 
+  ChevronDown, BarChart2, TrendingUp, Users, MapPin,
   Briefcase, ShoppingCart, HelpCircle, CheckCircle2, Info, AlertCircle
 } from 'lucide-react';
 
 // Data Arrays
-const recentReports = [
+/*const recentReports = [
   { name: "Trade Summary Report - Apr 2025", type: "Summary", mod: "Trade", date: "24 Apr 2025, 09:15 AM", by: "Abhishek B.", fmt: "PDF", isPdf: true },
   { name: "Shipment Performance Report", type: "Operational", mod: "Shipments", date: "24 Apr 2025, 08:45 AM", by: "Abhishek B.", fmt: "Excel", isPdf: false },
   { name: "Top Suppliers Report", type: "Analytics", mod: "Suppliers", date: "23 Apr 2025, 07:30 PM", by: "Neha Sharma", fmt: "PDF", isPdf: true },
   { name: "Invoice Aging Report", type: "Financial", mod: "Invoices", date: "23 Apr 2025, 06:20 PM", by: "Neha Sharma", fmt: "Excel", isPdf: false },
   { name: "Contracts Expiry Report", type: "Compliance", mod: "Contracts", date: "23 Apr 2025, 05:10 PM", by: "Amit Verma", fmt: "PDF", isPdf: true },
-];
+];*/
 
-const popularReports = [
+/*const popularReports = [
   { title: "Trade Summary Report", desc: "Summary of import & export trade activities.", icon: FileText, iconColor: "text-blue-500", bgColor: "bg-blue-50" },
   { title: "Shipment Performance Report", desc: "Detailed shipment volume and performance.", icon: MapPin, iconColor: "text-indigo-500", bgColor: "bg-indigo-50" },
   { title: "Supplier Performance Report", desc: "Analyze supplier contribution and reliability.", icon: Users, iconColor: "text-purple-500", bgColor: "bg-purple-50" },
   { title: "Buyer Performance Report", desc: "Analyze buyer activity and trends.", icon: Briefcase, iconColor: "text-sky-500", bgColor: "bg-sky-50" },
   { title: "Invoice Aging Report", desc: "Track outstanding invoices and aging details.", icon: TrendingUp, iconColor: "text-blue-500", bgColor: "bg-blue-50" },
   { title: "Contract Expiry Report", desc: "Contracts nearing expiry and renewal insights.", icon: FileText, iconColor: "text-indigo-500", bgColor: "bg-indigo-50" }
-];
+];*/
 
 // Tailwind classes mapping configuration to bypass dynamic class constraints
+
+const reportIcons = {
+  "Shipment Reports": {icon: FileText, iconColor: "text-blue-500", bgColor: "bg-blue-50",},
+  "Cost & Finance Reports": {icon: TrendingUp, iconColor: "text-emerald-500", bgColor: "bg-emerald-50",},
+  "Vendor Reports": {icon: Users, iconColor: "text-purple-500", bgColor: "bg-purple-50",},
+  "Compliance Reports": {icon: Briefcase, iconColor: "text-orange-500", bgColor: "bg-orange-50",},
+  "Document Reports": {icon: FileText, iconColor: "text-red-500", bgColor: "bg-red-50",},
+  "Performance Reports": {icon: TrendingUp, iconColor: "text-indigo-500", bgColor: "bg-indigo-50",},
+  "Analytics & Trends": {icon: MapPin, iconColor: "text-sky-500", bgColor: "bg-sky-50",},
+};
+
 const colorMapping = {
   blue: { bg: "bg-blue-50", text: "text-blue-600" },
   emerald: { bg: "bg-emerald-50", text: "text-emerald-600" },
@@ -33,6 +55,91 @@ const colorMapping = {
 };
 
 export default function ReportsDashboard() {
+
+  const [dashboard, setDashboard] = useState({});
+  const [overview, setOverview] = useState({tradeTrend: [], countries: [],});
+  const [recentReports, setRecentReports] = useState([]);
+  const [popularReports, setPopularReports] = useState([]);
+  const [insights, setInsights] = useState({});
+  const [filterOptions, setFilterOptions] = useState({categories: [], modules: [], status: [], frequency: [],});
+  const [loading, setLoading] = useState(false);
+
+  const fetchDashboard = async () => {
+    try {
+      const res = await getDashboard();
+      setDashboard(res.data.data || {});
+    } catch (err) {
+        console.error(err);
+      }
+  };
+  const fetchOverview = async () => {
+    try {
+      const res = await getOverview();
+      setOverview(res.data.data || {});
+    } catch (err) {
+        console.error(err);
+      }
+  };
+  const fetchRecentReports = async () => {
+    try {
+      const res = await getRecentReports();
+      setRecentReports(res.data.data || []);
+    } catch (err) {
+        console.error(err);
+      }
+  };
+  const fetchPopularReports = async () => {
+    try {
+      const res = await getPopularReports();
+      setPopularReports(res.data.data || []);
+    } catch (err) {
+        console.error(err);
+      }
+  };
+  const fetchInsights = async () => {
+    try {
+      const res = await getInsights();
+      setInsights(res.data.data || {});
+    } catch (err) {
+        console.error(err);
+      }
+  };
+  const fetchFilterOptions = async () => {
+    try {
+      const res = await getFilterOptions();
+      setFilterOptions(res.data.data || {});
+    } catch (err) {
+        console.error(err);
+      }
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+    fetchOverview();
+    fetchRecentReports();
+    fetchPopularReports();
+    fetchInsights();
+    fetchFilterOptions();
+  }, []);
+
+  const tradeTrend = overview.tradeTrend || [];
+  const countries = overview.countries || [];
+  const maxCountryValue = Math.max(...countries.map((item) => item.tradeValue),1);
+  const maxTradeValue = Math.max(...tradeTrend.map((i) => i.tradeValue), 1);
+  const linePath = tradeTrend.map((item, index) => {
+    const x = (index / (tradeTrend.length - 1 || 1)) * 100;
+    const y = 100 - (item.tradeValue / maxTradeValue) * 80;
+    return `${index === 0 ? "M" : "L"}${x},${y}`;
+  }).join(" ");
+  const areaPath = linePath + " L100,100 L0,100 Z";
+  const shipmentTrend = overview.tradeTrend || [];
+  const maxShipment = Math.max(...shipmentTrend.map((item) => item.shipments), 1);
+  const shipmentLinePath = shipmentTrend.map((item, index) => {const x = shipmentTrend.length > 1 ? (index * 100) / (shipmentTrend.length - 1) : 0;
+    const y = 100 - (item.shipments / maxShipment) * 70;
+    return `${index === 0 ? "M" : "L"}${x},${y}`;
+  }).join(" ");
+  const shipmentAreaPath = shipmentLinePath + " L100,100 L0,100 Z";
+
   return (
     <div className="overflow-y-auto bg-slate-50 text-slate-800 font-sans p-6 selection:bg-blue-100">
       
@@ -62,12 +169,12 @@ export default function ReportsDashboard() {
       {/* STATS CARDS */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
         {[
-          { title: "Total Trade Value (INR)", value: "₹2,845.60 Cr", trend: "14.8% vs last month", color: "blue", icon: BarChart2 },
-          { title: "Total Shipments", value: "2,521", trend: "11.8% vs last month", color: "emerald", icon: TrendingUp },
-          { title: "Total Invoices", value: "268", trend: "11.6% vs last month", color: "purple", icon: FileText },
-          { title: "Active Suppliers", value: "1,892", trend: "11.8% vs last month", color: "red", icon: Briefcase },
-          { title: "Total Contract Value (INR)", value: "₹2,845.60 Cr", trend: "20.4% vs last month", color: "orange", icon: ShoppingCart },
-          { title: "Active Buyers", value: "2,521", trend: "3.2% vs last month", color: "blue", icon: Users },
+          { title: "Total Trade Value (INR)", value: `₹${((dashboard.totalTradeValue || 0) / 10000000).toFixed(2)} Cr`, trend: "-", color: "blue", icon: BarChart2 },
+          { title: "Total Shipments", value: dashboard.totalShipments || 0, trend: "-", color: "emerald", icon: TrendingUp },
+          { title: "Total Invoices", value: dashboard.totalInvoices || 0, trend: "-", color: "purple", icon: FileText },
+          { title: "Active Suppliers", value: dashboard.activeSuppliers || 0, trend: "-", color: "red", icon: Briefcase },
+          { title: "Total Contract Value (INR)", value: `₹${((dashboard.totalContractValue || 0) / 10000000).toFixed(2)} Cr`, trend: "-", color: "orange", icon: ShoppingCart },
+          { title: "Active Buyers", value: dashboard.activeBuyers || 0, trend: "-", color: "blue", icon: Users },
         ].map((card, idx) => {
           const colors = colorMapping[card.color] || { bg: "bg-slate-100", text: "text-slate-600" };
           return (
@@ -95,31 +202,39 @@ export default function ReportsDashboard() {
       <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm mb-6 flex flex-wrap items-end gap-4">
         <div className="flex-1 min-w-[150px]">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Report Type</label>
-          <div className="flex items-center justify-between border border-slate-200 rounded-lg px-3 py-2 text-xs bg-slate-50 text-slate-700 cursor-pointer">
-            <span>All Reports</span>
-            <ChevronDown size={14} className="text-slate-400" />
-          </div>
+          <select className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs bg-slate-50">
+            <option value="">All Reports</option>
+            {filterOptions.categories?.map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
         </div>
         <div className="flex-1 min-w-[150px]">
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Module</label>
-          <div className="flex items-center justify-between border border-slate-200 rounded-lg px-3 py-2 text-xs bg-slate-50 text-slate-700 cursor-pointer">
-            <span>All Modules</span>
-            <ChevronDown size={14} className="text-slate-400" />
-          </div>
+          <select className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs bg-slate-50">
+            <option value="">All Modules</option>
+            {filterOptions.modules?.map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
         </div>
         <div className="flex-1 min-w-[150px]">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Country / Region</label>
-          <div className="flex items-center justify-between border border-slate-200 rounded-lg px-3 py-2 text-xs bg-slate-50 text-slate-700 cursor-pointer">
-            <span>All Countries</span>
-            <ChevronDown size={14} className="text-slate-400" />
-          </div>
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Status</label>
+          <select className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs bg-slate-50">
+            <option value="">All Status</option>
+            {filterOptions.status?.map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
         </div>
         <div className="flex-1 min-w-[180px]">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Date Range</label>
-          <div className="flex items-center justify-between border border-slate-200 rounded-lg px-3 py-2 text-xs bg-white text-slate-700 cursor-pointer">
-            <span>01 Apr 2025 - 24 Apr 2025</span>
-            <Calendar size={14} className="text-slate-400" />
-          </div>
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Frequency</label>
+          <select className="w-full border border-slate-200 rounded-lg px-3 py-2 text-xs bg-slate-50">
+            <option value="">All Frequency</option>
+            {filterOptions.frequency?.map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
+          </select>
         </div>
         <div className="flex items-center gap-2">
           <button className="px-4 py-2 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">Reset</button>
@@ -164,14 +279,15 @@ export default function ReportsDashboard() {
             <div className="h-40 relative flex items-end justify-between px-2 pt-4 border-b border-l border-slate-200">
               {/* Fake Line Chart paths recreated using vectors */}
               <svg className="absolute inset-0 w-full h-full p-2" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0,70 Q25,40 50,65 T100,30" fill="none" stroke="#2563eb" strokeWidth="2" />
-                <path d="M0,85 Q25,70 50,80 T100,60" fill="none" stroke="#2dd4bf" strokeWidth="2" />
-                <path d="M0,70 Q25,40 50,65 T100,30 L100,100 L0,100 Z" fill="#2563eb" fillOpacity="0.05" />
+                <path d={areaPath} fill="#2563eb" fillOpacity="0.05" />
+                <path d={linePath} fill="none" stroke="#2563eb" strokeWidth="2" />
               </svg>
-              <span className="text-[8px] text-slate-400 absolute left-1 top-2">1,000 Cr</span>
-              <span className="text-[8px] text-slate-400 absolute left-1 top-1/2">500 Cr</span>
+              <span className="text-[8px] text-slate-400 absolute left-1 top-2">₹ {(maxTradeValue / 10000000).toFixed(1)} Cr</span>
+              <span className="text-[8px] text-slate-400 absolute left-1 top-1/2">₹ {(maxTradeValue / 2 / 10000000).toFixed(1)} Cr</span>
               <div className="w-full flex justify-between text-[8px] text-slate-400 translate-y-4">
-                <span>01 Apr</span><span>08 Apr</span><span>15 Apr</span><span>22 Apr</span>
+                {tradeTrend.map((item) => (
+                  <span key={item._id.month}>{new Date(2025, item._id.month - 1).toLocaleString("default", { month: "short",})}</span>
+                ))}
               </div>
             </div>
           </div>
@@ -186,13 +302,15 @@ export default function ReportsDashboard() {
             </div>
             <div className="h-40 relative flex items-end justify-between px-2 pt-4 border-b border-l border-slate-200">
               <svg className="absolute inset-0 w-full h-full p-2" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d="M0,60 L20,45 L40,35 L60,55 L80,30 L100,40" fill="none" stroke="#3b82f6" strokeWidth="2" />
-                <path d="M0,60 L20,45 L40,35 L60,55 L80,30 L100,40 L100,100 L0,100 Z" fill="#3b82f6" fillOpacity="0.1" />
+                <path d={shipmentLinePath} fill="none" stroke="#3b82f6" strokeWidth="2" />
+                <path d={shipmentAreaPath} fill="#3b82f6" fillOpacity="0.1" />
               </svg>
-              <span className="text-[8px] text-slate-400 absolute left-1 top-2">1,000</span>
-              <span className="text-[8px] text-slate-400 absolute left-1 top-1/2">500</span>
+              <span className="text-[8px] text-slate-400 absolute left-1 top-2">{maxShipment}</span>
+              <span className="text-[8px] text-slate-400 absolute left-1 top-1/2">{Math.round(maxShipment / 2)}</span>
               <div className="w-full flex justify-between text-[8px] text-slate-400 translate-y-4">
-                <span>01 Apr</span><span>08 Apr</span><span>15 Apr</span><span>22 Apr</span>
+                {shipmentTrend.map((item) => (
+                  <span key={item._id.month}>{new Date(2025, item._id.month - 1).toLocaleString("default", {month: "short",})}</span>
+                ))}
               </div>
             </div>
             <div className="flex justify-center gap-1 items-center text-[10px] text-slate-500 mt-4">
@@ -207,19 +325,13 @@ export default function ReportsDashboard() {
               <span className="text-[10px] text-slate-400 border px-1.5 py-0.5 rounded bg-white">This Month</span>
             </div>
             <div className="space-y-3 mt-4">
-              {[
-                { name: "China", value: "₹ 1,245.60 Cr", width: "w-[85%]" },
-                { name: "India", value: "₹ 842.30 Cr", width: "w-[65%]" },
-                { name: "Germany", value: "₹ 456.70 Cr", width: "w-[45%]" },
-                { name: "USA", value: "₹ 325.80 Cr", width: "w-[30%]" },
-                { name: "UAE", value: "₹ 215.20 Cr", width: "w-[20%]" },
-              ].map((c, i) => (
+              {countries.map((c, i) => (
                 <div key={i} className="flex items-center justify-between text-xs">
-                  <span className="w-16 text-slate-600 font-medium shrink-0">{c.name}</span>
+                  <span className="w-16 text-slate-600 font-medium shrink-0">{c._id}</span>
                   <div className="flex-1 mx-3 bg-slate-200 h-2 rounded-full overflow-hidden">
-                    <div className={`bg-blue-600 h-full ${c.width} rounded-full`}></div>
+                    <div  className="bg-blue-600 h-full rounded-full" style={{width: `${(c.tradeValue / maxCountryValue) * 100}%`,}}></div>
                   </div>
-                  <span className="font-semibold text-slate-700 text-right w-24 shrink-0">{c.value}</span>
+                  <span className="font-semibold text-slate-700 text-right w-24 shrink-0">₹ {(c.tradeValue / 10000000).toFixed(2)} Cr</span>
                 </div>
               ))}
             </div>
@@ -249,30 +361,22 @@ export default function ReportsDashboard() {
             </thead>
             <tbody className="divide-y divide-slate-100 text-slate-600">
               {recentReports.map((row, idx) => (
-                <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="p-3 pl-5 text-blue-600 font-medium cursor-pointer hover:underline">{row.name}</td>
+                <tr key={row._id} className="hover:bg-slate-50/50 transition-colors">
+                  <td className="p-3 pl-5 text-blue-600 font-medium cursor-pointer hover:underline">{row.reportName}</td>
                   <td className="p-3 text-slate-500">{row.type}</td>
-                  <td className="p-3 text-blue-500 cursor-pointer hover:underline">{row.mod}</td>
-                  <td className="p-3 text-slate-500">{row.date}</td>
-                  <td className="p-3 text-slate-700">{row.by}</td>
+                  <td className="p-3 text-blue-500 cursor-pointer hover:underline">{row.module}</td>
+                  <td className="p-3 text-slate-500">{new Date(row.createdAt).toLocaleString()}</td>
+                  <td className="p-3 text-slate-700">{row.userId?.name || "-"}</td>
                   <td className="p-3">
                     <span className="inline-flex items-center gap-1.5 font-semibold">
-                      {row.isPdf ? (
-                        <>
-                          <span className="w-2 h-2 bg-red-500 rounded-sm inline-block"></span>
-                          <span className="text-slate-700 text-[11px]">PDF</span>
-                        </>
-                      ) : (
-                        <>
-                          <span className="w-2 h-2 bg-emerald-500 rounded-sm inline-block"></span>
-                          <span className="text-slate-700 text-[11px]">Excel</span>
-                        </>
-                      )}
+                      <span className={`w-2 h-2 rounded-sm inline-block ${ row.format === "PDF" ? "bg-red-500"
+                       : row.format === "Excel" ? "bg-emerald-500" : "bg-blue-500"}`}></span>
+                       <span className="text-slate-700 text-[11px]">{row.format}</span>
                     </span>
                   </td>
                   <td className="p-3 pr-5 text-right">
                     <div className="flex items-center justify-end gap-3 text-blue-500">
-                      <Download size={15} className="cursor-pointer hover:text-blue-700 transition-colors" />
+                      <Download size={15} className="cursor-pointer hover:text-blue-700 transition-colors" onClick={() => downloadReport(row._id)}/>
                       <MoreVertical size={15} className="text-slate-400 cursor-pointer hover:text-slate-600 transition-colors" />
                     </div>
                   </td>
@@ -293,20 +397,23 @@ export default function ReportsDashboard() {
             <span className="text-xs font-semibold text-blue-600 cursor-pointer hover:underline">View All</span>
           </div>
           <div className="space-y-1">
-            {popularReports.map((item, i) => (
-              <div key={i} className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50/80 cursor-pointer group transition-all duration-200">
+            {popularReports.map((item) => {
+              const config = reportIcons[item.category] || {icon: FileText, iconColor: "text-slate-500", bgColor: "bg-slate-100",};
+              const Icon = config.icon; 
+              return (
+              <div key={item._id} className="flex items-center justify-between p-2 rounded-xl hover:bg-slate-50/80 cursor-pointer group transition-all duration-200">
                 <div className="flex items-center gap-3">
-                  <div className={`p-2 ${item.bgColor} ${item.iconColor} rounded-lg`}>
+                  <div className={`p-2 ${config.bgColor} ${config.iconColor} rounded-lg`}>
                     <item.icon size={16} />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-700 group-hover:text-blue-600 transition-colors">{item.title}</h4>
-                    <p className="text-[10px] text-slate-400 mt-0.5">{item.desc}</p>
+                    <h4 className="text-xs font-bold text-slate-700 group-hover:text-blue-600 transition-colors">{item.reportName}</h4>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{item.description || "No description available"}</p>
                   </div>
                 </div>
                 <ArrowRight size={14} className="text-blue-500 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
-              </div>
-            ))}
+              </div>);
+            })}
           </div>
         </div>
 
@@ -320,7 +427,7 @@ export default function ReportsDashboard() {
                   <CheckCircle2 size={16} />
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Total trade value increased by <span className="text-blue-600 font-bold">20.4%</span> compared to previous period.
+                   A total of{" "} <span className="text-blue-600 font-bold">{insights.totalReports || 0}</span> reports have been generated across all modules.
                 </p>
               </div>
               <div className="flex gap-3 items-start">
@@ -328,7 +435,7 @@ export default function ReportsDashboard() {
                   <Info size={16} />
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  China contributes <span className="text-blue-600 font-bold">38.3%</span> of total trade value.
+                  Reports have been downloaded{" "}<span className="text-blue-600 font-bold">{insights.totalDownloads || 0}</span>{" "} times by users.
                 </p>
               </div>
               <div className="flex gap-3 items-start">
@@ -336,7 +443,7 @@ export default function ReportsDashboard() {
                   <Info size={16} />
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  Average shipment value increased by <span className="text-blue-600 font-bold">12.7%</span>.
+                   Reports have received{" "} <span className="text-blue-600 font-bold">{insights.totalViews || 0}</span>{" "} total views.
                 </p>
               </div>
               <div className="flex gap-3 items-start">
@@ -344,7 +451,7 @@ export default function ReportsDashboard() {
                   <AlertCircle size={16} />
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed">
-                  <span className="text-red-500 font-bold">642</span> invoices are still pending for payment.
+                  More insights will be available soon.
                 </p>
               </div>
             </div>
