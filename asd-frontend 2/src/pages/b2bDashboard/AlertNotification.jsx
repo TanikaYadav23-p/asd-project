@@ -1,4 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import {
+  getDashboard,
+  getAlerts,
+  getAlertFilters,
+  resolveAlert,
+  deleteAlert,
+  getNotifications,
+  getNotificationFilters,
+  markNotificationsRead,
+  markAllNotificationsRead,
+  deleteNotification
+} from '../../api/AlertNotificationApi';
 import { 
   Settings, Check, Search, ChevronDown, MoreVertical, ChevronLeft, 
   ChevronRight, AlertTriangle, Clock, ShieldAlert, Mail, FileText, 
@@ -10,112 +22,81 @@ export default function AlertsNotificationsDashboard() {
   // --- STATE FOR TABS (For interactivity if needed) ---
   const [activeAlertTab, setActiveAlertTab] = useState('All');
   const [activeNotifTab, setActiveNotifTab] = useState('All');
+  const [dashboard, setDashboard] = useState({});
+  const [alerts, setAlerts] = useState([]);
 
-  // --- ALERTS COLUMN DATA (Left Side) ---
-  const alertsData = [
-    {
-      id: 1,
-      type: "Overdue Invoice",
-      desc: "Invoice INV-2025-1041 from Uflex Ltd. is overdue by 2 days.",
-      date: "24 Apr 2025, 09:15 AM",
-      severity: "Critical",
-      tags: ["Invoice", "Overdue"],
-      icon: ShieldAlert,
-      iconColor: "text-rose-500 bg-rose-50 border-rose-100",
-      severityColor: "text-rose-600 bg-rose-50"
-    },
-    {
-      id: 2,
-      type: "Payment Due Soon",
-      desc: "Payment for INV-2025-1044 of ₹ 98,76,000 is due in 2 days.",
-      date: "24 Apr 2025, 08:40 AM",
-      severity: "Warning",
-      tags: ["Invoice", "Payment"],
-      icon: AlertTriangle,
-      iconColor: "text-amber-500 bg-amber-50 border-amber-100",
-      severityColor: "text-amber-600 bg-amber-50"
-    },
-    {
-      id: 3,
-      type: "New Shipment Update",
-      desc: "Shipment SHP-2025-2048 status updated to 'In Transit'.",
-      date: "24 Apr 2025, 08:20 AM",
-      severity: "Info",
-      tags: ["Shipment"],
-      icon: Clock,
-      iconColor: "text-emerald-500 bg-emerald-50 border-emerald-100",
-      severityColor: "text-emerald-600 bg-emerald-50"
-    },
-    {
-      id: 4,
-      type: "High Risk Partner",
-      desc: "Pacific Exports has been flagged as high risk based on recent activities.",
-      date: "24 Apr 2025, 07:55 AM",
-      severity: "Critical",
-      tags: ["Risk", "Partner"],
-      icon: ShieldAlert,
-      iconColor: "text-rose-500 bg-rose-50 border-rose-100",
-      severityColor: "text-rose-600 bg-rose-50"
-    }
-  ];
+  const [alertFilters, setAlertFilters] = useState({categories: [], severity: [], status: [],});
+  const [selectedCategories, setSelectedCategories] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [search, setSearch] = useState("");
 
-  // --- NOTIFICATIONS COLUMN DATA (Right Side) ---
-  const notificationsData = [
-    {
-      id: 1,
-      title: "Invoice INV-2025-1045 created successfully",
-      meta: "Shenzhen Tech Co. • ₹ 1,25,45,000",
-      date: "24 Apr 2025, 09:20 AM",
-      icon: Mail,
-      iconBg: "bg-blue-50 text-blue-500",
-      unread: true
-    },
-    {
-      id: 2,
-      title: "Payment received for INV-2025-1043",
-      meta: "Reliance Industries • ₹ 76,32,000",
-      date: "24 Apr 2025, 08:50 AM",
-      icon: Check,
-      iconBg: "bg-emerald-50 text-emerald-500",
-      unread: true
-    },
-    {
-      id: 3,
-      title: "New document uploaded",
-      meta: "Bill of Lading for • SHP-2025-2047",
-      date: "24 Apr 2025, 08:15 AM",
-      icon: FileText,
-      iconBg: "bg-purple-50 text-purple-500",
-      unread: true
-    },
-    {
-      id: 4,
-      title: "New user added to your organization",
-      meta: "Neha Sharma has been added as Finance Manager",
-      date: "24 Apr 2025, 07:50 AM",
-      icon: UserPlus,
-      iconBg: "bg-orange-50 text-orange-500",
-      unread: true
-    },
-    {
-      id: 5,
-      title: "Export shipment created",
-      meta: "SHP-2025-2048 to Germany",
-      date: "24 Apr 2025, 07:30 AM",
-      icon: UploadCloud,
-      iconBg: "bg-teal-50 text-teal-500",
-      unread: true
-    },
-    {
-      id: 6,
-      title: "Weekly market report is ready",
-      meta: "View latest insights and trends",
-      date: "24 Apr 2025, 06:30 AM",
-      icon: BarChart3,
-      iconBg: "bg-slate-50 text-slate-500",
-      unread: false
+  const [notifications, setNotifications] = useState([]);
+
+  const [notificationFilters, setNotificationFilters] = useState({category: [], urgency: [],});
+  const [notificationSearch, setNotificationSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedUrgency, setSelectedUrgency] = useState("");
+  
+  const fetchDashboard = async () => {
+    try {
+      const res = await getDashboard();
+      console.log("Dashboard:", res.data);
+      setDashboard(res.data.data || {});
+   } catch (err) {
+      console.error(err);
     }
-  ];
+  };
+  const fetchAlerts = async () => {
+    try {
+      const res = await getAlerts();
+      console.log("Alerts:", res.data);
+      setAlerts(res.data.data || []);
+    } catch (err) {
+        console.error(err);
+      }
+  };
+  const fetchAlertFilters = async () => {
+    try {
+      const res = await getAlertFilters();
+      console.log("Alert Filters:", res.data);
+      setAlertFilters(res.data.data || {});
+    } catch (err) {
+        console.error(err);
+      }
+  };
+  const fetchNotifications = async () => {
+    try {
+      const res = await getNotifications();
+      console.log("Notifications:", res.data);
+      setNotifications(res.data.data || []);
+    } catch (err) {
+       console.error(err);
+      }
+  };
+  const fetchNotificationFilters = async () => {
+    try {
+      const res = await getNotificationFilters();
+      console.log("Notification Filters:", res.data);
+      setNotificationFilters(res.data.data || {});
+    } catch (err) {
+        console.error(err);
+      }
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+    fetchAlerts();
+    fetchAlertFilters();
+    fetchNotifications();
+    fetchNotificationFilters();
+  }, []);
+
+  const notificationIcons = {
+    Shipment: {icon: UploadCloud, bg: "bg-teal-50 text-teal-500",},
+    Finance: {icon: Check, bg: "bg-emerald-50 text-emerald-500",},
+    Compliance: {icon: FileText, bg: "bg-purple-50 text-purple-500",},
+    System: {icon: BarChart3, bg: "bg-slate-50 text-slate-500",},
+  };
 
   return (
     <div className="  overflow-y-auto bg-[#f8fafc] p-6 text-slate-700 font-sans text-xs antialiased selection:bg-blue-100">
@@ -140,16 +121,16 @@ export default function AlertsNotificationsDashboard() {
           {/* Pill Filters */}
           <div className="flex items-center gap-2 mb-4">
             <button className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg font-semibold shadow-sm">
-              All Alerts <span className="px-1.5 py-0.2 bg-blue-600 text-white text-[10px] rounded-full font-bold">24</span>
+              All Alerts <span className="px-1.5 py-0.2 bg-blue-600 text-white text-[10px] rounded-full font-bold">{dashboard.alerts?.totalAlerts || 0}</span>
             </button>
             <button className="flex items-center gap-2 px-3 py-1.5 bg-white text-slate-600 border border-slate-200 rounded-lg font-medium hover:bg-slate-50">
-              Critical <span className="px-1.5 py-0.2 bg-rose-50 text-rose-600 text-[10px] rounded-full font-bold">6</span>
+              Critical <span className="px-1.5 py-0.2 bg-rose-50 text-rose-600 text-[10px] rounded-full font-bold">{dashboard.alerts?.critical || 0}</span>
             </button>
             <button className="flex items-center gap-2 px-3 py-1.5 bg-white text-slate-600 border border-slate-200 rounded-lg font-medium hover:bg-slate-50">
-              Warning <span className="px-1.5 py-0.2 bg-amber-50 text-amber-600 text-[10px] rounded-full font-bold">10</span>
+              Warning <span className="px-1.5 py-0.2 bg-amber-50 text-amber-600 text-[10px] rounded-full font-bold">{dashboard.alerts?.warning || 0}</span>
             </button>
             <button className="flex items-center gap-2 px-3 py-1.5 bg-white text-slate-600 border border-slate-200 rounded-lg font-medium hover:bg-slate-50">
-              Info <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-600 text-[10px] rounded-full font-bold">8</span>
+              Info <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-600 text-[10px] rounded-full font-bold">{dashboard.alerts?.info || 0}</span>
             </button>
           </div>
 
@@ -157,48 +138,44 @@ export default function AlertsNotificationsDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             <div className="relative">
               <Search size={13} className="absolute right-2.5 top-2.5 text-slate-400" />
-              <input type="text" placeholder="Search alerts..." className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none placeholder:text-slate-400 focus:border-blue-500" />
+              <input type="text" placeholder="Search alerts..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none placeholder:text-slate-400 focus:border-blue-500"/>
             </div>
-            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-600 cursor-pointer hover:bg-slate-50">
-              <span>All Categories</span>
-              <ChevronDown size={13} className="text-slate-400" />
-            </div>
-            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-600 cursor-pointer hover:bg-slate-50">
-              <span>All Status</span>
-              <ChevronDown size={13} className="text-slate-400" />
-            </div>
+           <select value={selectedCategories} onChange={(e) => setSelectedCategories(e.target.value)} className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none">
+              <option value="">All Categories</option>{alertFilters.categories.map((item) => (
+                <option key={item} value={item}>{item}</option>))}
+           </select>
+           <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none">
+             <option value="">All Status</option>{alertFilters.status.map((item) => (
+              <option key={item} value={item}>{item}</option>))}
+           </select>
           </div>
 
           {/* Alerts White Main Container Box */}
           <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
             <div className="divide-y divide-slate-100">
-              {alertsData.map((alert) => (
-                <div key={alert.id} className="p-4 flex items-start gap-3 hover:bg-slate-50/40 transition-colors">
-                  <div className={`p-1.5 rounded-lg border shrink-0 ${alert.iconColor}`}>
-                    <alert.icon size={15} />
-                  </div>
-                  
+              {alerts.map((alert) => (
+                <div key={alert._id} className="p-4 flex items-start gap-3 hover:bg-slate-50/40 transition-colors">
+                 <div  className={`p-1.5 rounded-lg border shrink-0 ${alert.severity === "Critical" ? "text-rose-500 bg-rose-50 border-rose-100"
+                  : alert.severity === "Warning" ? "text-amber-500 bg-amber-50 border-amber-100"
+                  : "text-emerald-500 bg-emerald-50 border-emerald-100"}`}>{alert.severity === "Critical" ? (<ShieldAlert size={15} />) : alert.severity === "Warning" ? ( <AlertTriangle size={15} />) : (<Clock size={15} />)}
+                 </div> 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h4 className="font-bold text-slate-900 text-xs">{alert.type}</h4>
-                        <p className="text-[11px] text-slate-500 mt-1 leading-normal font-medium">{alert.desc}</p>
+                        <h4 className="font-bold text-slate-900 text-xs">{alert.title}</h4>
+                        <p className="text-[11px] text-slate-500 mt-1 leading-normal font-medium">{alert.description}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="text-[10px] text-slate-400 font-medium block">{alert.date}</span>
+                        <span className="text-[10px] text-slate-400 font-medium block">{new Date(alert.createdAt).toLocaleString()}</span>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between mt-3">
                       <div className="flex items-center gap-1.5">
-                        {alert.tags.map((tag, idx) => (
-                          <span key={idx} className="px-2 py-0.5 border border-blue-100 bg-blue-50/40 rounded text-blue-600 text-[10px] font-semibold tracking-wide">
-                            {tag}
-                          </span>
-                        ))}
+                        <span className="px-2 py-0.5 border border-blue-100 bg-blue-50/40 rounded text-blue-600 text-[10px] font-semibold tracking-wide">{alert.category}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase ${alert.severityColor}`}>
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase ${alert.severity === "Critical" ? "text-rose-600 bg-rose-50" : alert.severity === "Warning" ? "text-amber-600 bg-amber-50" : "text-emerald-600 bg-emerald-50"}`}>
                           {alert.severity}
                         </span>
                         <MoreVertical size={13} className="text-slate-400 cursor-pointer hover:text-slate-600" />
@@ -211,7 +188,7 @@ export default function AlertsNotificationsDashboard() {
 
             {/* Pagination Segment */}
             <div className="p-3 border-t border-slate-100 bg-[#f8fafc]/40 flex items-center justify-between text-[11px] text-slate-400 font-medium">
-              <span>Showing 1 to 7 of 24 alerts</span>
+              <span>Showing 1 to {alerts.length} of {alerts.length} alerts</span>
               <div className="flex items-center gap-1">
                 <button className="p-1 rounded border border-slate-200 bg-white text-slate-400 cursor-not-allowed opacity-50"><ChevronLeft size={13} /></button>
                 <button className="px-2 py-0.5 rounded font-bold bg-blue-600 text-white shadow-sm">1</button>
@@ -242,13 +219,13 @@ export default function AlertsNotificationsDashboard() {
           {/* Pill Filters */}
           <div className="flex items-center gap-2 mb-4">
             <button className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg font-semibold shadow-sm">
-              All <span className="px-1.5 py-0.2 bg-blue-600 text-white text-[10px] rounded-full font-bold">38</span>
+              All <span className="px-1.5 py-0.2 bg-blue-600 text-white text-[10px] rounded-full font-bold">{dashboard.notifications?.totalNotifications || 0}</span>
             </button>
             <button className="flex items-center gap-2 px-3 py-1.5 bg-white text-slate-600 border border-slate-200 rounded-lg font-medium hover:bg-slate-50">
-              Unread <span className="px-1.5 py-0.2 bg-slate-100 text-slate-600 text-[10px] rounded-full font-bold">6</span>
+              Unread <span className="px-1.5 py-0.2 bg-slate-100 text-slate-600 text-[10px] rounded-full font-bold">{dashboard.notifications?.unread || 0}</span>
             </button>
             <button className="flex items-center gap-2 px-3 py-1.5 bg-white text-slate-600 border border-slate-200 rounded-lg font-medium hover:bg-slate-50">
-              Read <span className="px-1.5 py-0.2 bg-slate-100 text-slate-600 text-[10px] rounded-full font-bold">32</span>
+              Read <span className="px-1.5 py-0.2 bg-slate-100 text-slate-600 text-[10px] rounded-full font-bold">{dashboard.notifications?.read || 0}</span>
             </button>
           </div>
 
@@ -256,24 +233,25 @@ export default function AlertsNotificationsDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
             <div className="relative">
               <Search size={13} className="absolute right-2.5 top-2.5 text-slate-400" />
-              <input type="text" placeholder="Search notifications..." className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none placeholder:text-slate-400 focus:border-blue-500" />
+              <input type="text" placeholder="Search notifications..." value={notificationSearch} onChange={(e) => setNotificationSearch(e.target.value)} className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none placeholder:text-slate-400 focus:border-blue-500"/>
             </div>
-            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-600 cursor-pointer hover:bg-slate-50">
-              <span>All Types</span>
-              <ChevronDown size={13} className="text-slate-400" />
-            </div>
-            <div className="flex items-center justify-between bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-600 cursor-pointer hover:bg-slate-50">
-              <span>All Time</span>
-              <ChevronDown size={13} className="text-slate-400" />
-            </div>
+            <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none">
+              <option value="">All Types</option>{notificationFilters.category.map((item) => (<option key={item} value={item}>{item}</option>))}
+            </select>
+           <select value={selectedUrgency} onChange={(e) => setSelectedUrgency(e.target.value)} className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none">
+             <option value="">All Urgency</option>{notificationFilters.urgency.map((item) => (<option key={item} value={item}>{item}</option>))}
+           </select>
           </div>
 
           {/* Notifications White Main Container Box */}
           <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
             <div className="divide-y divide-slate-100">
-              {notificationsData.map((notif) => (
-                <div key={notif.id} className="p-4 flex items-center gap-3.5 hover:bg-slate-50/40 transition-colors">
-                  <div className={`p-2 rounded-lg shrink-0 ${notif.iconBg}`}>
+              {notifications.map((notif) => {
+                const Icon = notificationIcons[notif.category]?.icon || Mail;
+                const iconBg = notificationIcons[notif.category]?.bg || "bg-blue-50 text-blue-500";
+                return (
+                <div key={notif._id} className="p-4 flex items-center gap-3.5 hover:bg-slate-50/40 transition-colors">
+                  <div className={`p-2 rounded-lg shrink-0 ${iconBg}`}>
                     <notif.icon size={15} />
                   </div>
                   
@@ -281,23 +259,24 @@ export default function AlertsNotificationsDashboard() {
                     <div className="flex items-center justify-between gap-4">
                       <div>
                         <h4 className="font-bold text-slate-900 text-xs leading-snug">{notif.title}</h4>
-                        <p className="text-[11px] text-slate-400 mt-0.5 font-semibold">{notif.meta}</p>
+                        <p className="text-[11px] text-slate-400 mt-0.5 font-semibold">{notif.message}</p>
                       </div>
                       
                       <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-[10px] text-slate-400 font-medium">{notif.date}</span>
+                        <span className="text-[10px] text-slate-400 font-medium">{new Date(notif.createdAt).toLocaleString()}</span>
                         {/* Status Blue/Gray Indicator Dot */}
-                        <span className={`w-1.5 h-1.5 rounded-full ${notif.unread ? 'bg-blue-600' : 'bg-slate-200'}`}></span>
+                        <span className={`w-1.5 h-1.5 rounded-full ${!notif.isRead ? 'bg-blue-600' : 'bg-slate-200'}`}></span>
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Pagination Segment */}
             <div className="p-3 border-t border-slate-100 bg-[#f8fafc]/40 flex items-center justify-between text-[11px] text-slate-400 font-medium">
-              <span>Showing 1 to 8 of 38 notifications</span>
+              <span> Showing {notifications.length > 0 ? 1 : 0} to {notifications.length} of{" "} {dashboard?.notifications?.totalNotifications || notifications.length} notifications</span>
               <div className="flex items-center gap-1">
                 <button className="p-1 rounded border border-slate-200 bg-white text-slate-400 cursor-not-allowed opacity-50"><ChevronLeft size={13} /></button>
                 <button className="px-2 py-0.5 rounded font-bold bg-blue-600 text-white shadow-sm">1</button>

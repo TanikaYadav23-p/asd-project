@@ -35,7 +35,7 @@ export default function InvoicesDashboard() {
     try {
       const res = await getDashboard();
       console.log("Dashboard:", res.data);
-      setDashboardData(res.data.data || {});
+      setDashboard(res.data.data || {});
     } catch (err) {
       console.error(err);
     }

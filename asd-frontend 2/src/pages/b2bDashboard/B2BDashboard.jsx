@@ -577,7 +577,6 @@ export default function B2BDashboard() {
           {activeTab === "Dashboard" && (
               <Dashboard />
           )}
-        </main>
 
           {activeTab === "Import Intelligence" &&  (
            <TradeIntelligenceImport   />
@@ -682,7 +681,7 @@ export default function B2BDashboard() {
                 {activeTab === "Audit Logs" && (
               <AuditsLogs />
             )}  
-            
+        </main>   
       </div>
     </div>
   );

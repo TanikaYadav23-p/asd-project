@@ -17,7 +17,7 @@ export const getPopularReports = async () => {
 };
 
 export const getInsights = async () => {
-    return API.get("/report-dashboard/insights");
+    return API.get("/reports-dashboard/insights");
 };
 
 export const generateReport = async (data) => {

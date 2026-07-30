@@ -126,19 +126,20 @@ export default function ReportsDashboard() {
   const countries = overview.countries || [];
   const maxCountryValue = Math.max(...countries.map((item) => item.tradeValue),1);
   const maxTradeValue = Math.max(...tradeTrend.map((i) => i.tradeValue), 1);
-  const linePath = tradeTrend.map((item, index) => {
-    const x = (index / (tradeTrend.length - 1 || 1)) * 100;
-    const y = 100 - (item.tradeValue / maxTradeValue) * 80;
+  const linePath = tradeTrend.length > 0 ? tradeTrend.map((item, index) => {
+    const x = tradeTrend.length > 1 ? (index * 100) / (tradeTrend.length - 1) : 0;
+    const y = maxTradeValue > 0 ? 100 - (item.tradeValue / maxTradeValue) * 80 : 100;
     return `${index === 0 ? "M" : "L"}${x},${y}`;
-  }).join(" ");
-  const areaPath = linePath + " L100,100 L0,100 Z";
+  }).join(" ") : "";
+  const areaPath = linePath !== "" ? `${linePath} L100,100 L0,100 Z` : "";
   const shipmentTrend = overview.tradeTrend || [];
   const maxShipment = Math.max(...shipmentTrend.map((item) => item.shipments), 1);
-  const shipmentLinePath = shipmentTrend.map((item, index) => {const x = shipmentTrend.length > 1 ? (index * 100) / (shipmentTrend.length - 1) : 0;
-    const y = 100 - (item.shipments / maxShipment) * 70;
+  const shipmentLinePath = shipmentTrend.length > 0 ? shipmentTrend.map((item, index) => {
+    const x = shipmentTrend.length > 1 ? (index * 100) / (shipmentTrend.length - 1) : 0;
+    const y = maxShipment > 0 ? 100 - (item.shipments / maxShipment) * 70 : 100;
     return `${index === 0 ? "M" : "L"}${x},${y}`;
-  }).join(" ");
-  const shipmentAreaPath = shipmentLinePath + " L100,100 L0,100 Z";
+  }).join(" ") : "";
+  const shipmentAreaPath = shipmentLinePath !== "" ? `${shipmentLinePath} L100,100 L0,100 Z` : "";
 
   return (
     <div className="overflow-y-auto bg-slate-50 text-slate-800 font-sans p-6 selection:bg-blue-100">
@@ -279,8 +280,12 @@ export default function ReportsDashboard() {
             <div className="h-40 relative flex items-end justify-between px-2 pt-4 border-b border-l border-slate-200">
               {/* Fake Line Chart paths recreated using vectors */}
               <svg className="absolute inset-0 w-full h-full p-2" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d={areaPath} fill="#2563eb" fillOpacity="0.05" />
-                <path d={linePath} fill="none" stroke="#2563eb" strokeWidth="2" />
+                {linePath && (
+                  <>
+                  <path d={areaPath} fill="#2563eb" fillOpacity="0.05" />
+                  <path d={linePath} fill="none" stroke="#2563eb" strokeWidth="2" />
+                  </>
+                )}
               </svg>
               <span className="text-[8px] text-slate-400 absolute left-1 top-2">₹ {(maxTradeValue / 10000000).toFixed(1)} Cr</span>
               <span className="text-[8px] text-slate-400 absolute left-1 top-1/2">₹ {(maxTradeValue / 2 / 10000000).toFixed(1)} Cr</span>
@@ -302,8 +307,12 @@ export default function ReportsDashboard() {
             </div>
             <div className="h-40 relative flex items-end justify-between px-2 pt-4 border-b border-l border-slate-200">
               <svg className="absolute inset-0 w-full h-full p-2" viewBox="0 0 100 100" preserveAspectRatio="none">
-                <path d={shipmentLinePath} fill="none" stroke="#3b82f6" strokeWidth="2" />
-                <path d={shipmentAreaPath} fill="#3b82f6" fillOpacity="0.1" />
+                {shipmentLinePath && (
+                  <>
+                  <path d={shipmentAreaPath} fill="#3b82f6" fillOpacity="0.1" />
+                  <path d={shipmentLinePath} fill="none" stroke="#3b82f6" strokeWidth="2" />
+                  </>
+                )}
               </svg>
               <span className="text-[8px] text-slate-400 absolute left-1 top-2">{maxShipment}</span>
               <span className="text-[8px] text-slate-400 absolute left-1 top-1/2">{Math.round(maxShipment / 2)}</span>
