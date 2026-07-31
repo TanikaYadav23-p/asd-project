@@ -1,5 +1,5 @@
 const express = require("express");
-
+const { protect } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 const {
@@ -16,7 +16,7 @@ deleteAlert,
 deleteNotification
 
 } = require("../controllers/alertsNotificationController");
-router.get("/dashboard", getDashboard);
+router.get("/dashboard",protect, getDashboard);
 router.get("/alerts", getAlerts);
 
 router.get("/alerts/filter-options", getAlertFilters);
@@ -24,14 +24,14 @@ router.get("/alerts/filter-options", getAlertFilters);
 router.patch("/alerts/resolve/:id", resolveAlert);
 
 router.delete("/alerts/:id", deleteAlert);
-router.get("/notifications", getNotifications);
+router.get("/notifications", protect, getNotifications);
 
 router.get("/notifications/filter-options", getNotificationFilters);
 
-router.patch("/notifications/read/:id", markNotificationRead);
+router.patch("/notifications/read/:id", protect, markNotificationRead);
 
-router.patch("/notifications/read-all", markAllNotificationsRead);
+router.patch("/notifications/read-all", protect, markAllNotificationsRead);
 
-router.delete("/notifications/:id", deleteNotification);
+router.delete("/notifications/:id", protect, deleteNotification);
 
 module.exports = router;

@@ -1,4 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import {
+  getAccountSummary,
+  getActivity,
+  getSettings,
+  updatePreferences,
+  updateGeneral,
+  updateNotifications,
+  updateSecurity,
+  updateTheme,
+  updateBilling,
+  changePassword
+} from '../../api/SettingsApi'; 
 import { 
   Globe, Calendar, DollarSign, Sun, LayoutGrid, Ruler, 
   MapPin, Sliders, ChevronRight, Key, Eye, Download, 
@@ -7,6 +19,98 @@ import {
 
 export default function SettingsDashboard() {
   const [activeTab, setActiveTab] = useState('General');
+  const [settings, setSettings] = useState({});
+  const [activity, setActivity] = useState([]);
+  const [accountSummary, setAccountSummary] = useState({});
+
+  const fetchSettings = async () => {
+    try {
+      const res = await getSettings();
+     console.log("Settings:", res.data);
+     setSettings(res.data.data || {});
+    } catch (err) {
+        console.error(err);
+      }
+  };
+  const fetchActivity = async () => {
+    try {
+      const res = await getActivity();
+      console.log("Activity:", res.data);
+      setActivity(res.data.data || []);
+    } catch (err) {
+        console.error(err);
+      }
+  };
+  const fetchAccountSummary = async () => {
+    try {
+      const res = await getAccountSummary();
+      console.log("Account Summary:", res.data);
+      setAccountSummary(res.data.data || {});
+    } catch (err) {
+        console.error(err);
+      }
+  };
+  
+  useEffect(() => {
+    fetchSettings();
+    fetchActivity();
+    fetchAccountSummary();
+  }, []);
+  
+  const getActivityIcon = (type) => {
+    switch (type) {
+      case "SHIPMENT_CREATED":
+        return "📦";
+      
+      case "SHIPMENT_UPDATED":
+        return "✏️";
+
+      case "SHIPMENT_SUBMITTED":
+        return "📤";
+
+      case "SHIPMENT_APPROVED":
+        return "✅";
+
+      case "SHIPMENT_REJECTED":
+        return "❌";
+
+      case "SHIPMENT_ON_HOLD":
+        return "⏸️";
+
+      case "SHIPMENT_STATUS_CHANGED":
+        return "🚚";
+
+      case "DOCUMENT_UPLOADED":
+        return "📄";
+
+      case "DOCUMENT_VERIFIED":
+        return "✔️";
+
+      case "DOCUMENT_REJECTED":
+        return "⚠️";
+
+      case "TRACKING_UPDATED":
+        return "📍";
+
+      case "PAYMENT_RECEIVED":
+        return "💰";
+
+      case "PAYMENT_FAILED":
+        return "💸";
+
+      case "AI_QUERY":
+        return "🤖";
+
+      case "INCENTIVE_CHECKED":
+        return "🎯";
+
+      case "FREIGHT_CALCULATED":
+        return "🚛";
+
+      default:
+        return "ℹ️";
+    }
+  };
   const tabs = ['General', 'Company Profile', 'Preferences', 'Notifications', 'Security', 'Integrations', 'Data & Privacy', 'Billing'];
 
   return (
@@ -51,8 +155,8 @@ export default function SettingsDashboard() {
                 title="Language" 
                 desc="Choose your preferred language for the platform."
                 control={
-                  <select className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 outline-none cursor-pointer hover:border-slate-300">
-                    <option>English (India)</option>
+                  <select value={settings.language || ""} className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 outline-none cursor-pointer hover:border-slate-300">
+                    <option value={settings.language}>{settings.language}</option>
                   </select>
                 }
               />
@@ -63,7 +167,8 @@ export default function SettingsDashboard() {
                 desc="Set your preferred date, time and time zone."
                 control={
                   <div className="flex items-center gap-1 text-xs font-semibold text-slate-700 cursor-pointer hover:text-slate-900">
-                    <span>24 Apr 2025, 09:30 AM (IST)</span>
+                    <span> {settings.updatedAt ? `${new Date(settings.updatedAt).toLocaleDateString("en-GB")}, ${new Date(settings.updatedAt).toLocaleTimeString("en-IN", {
+                      hour: "2-digit", minute: "2-digit",})} (${settings.timezone})`: settings.timezone}</span>
                     <ChevronRight size={16} className="text-slate-400" />
                   </div>
                 }
@@ -74,8 +179,8 @@ export default function SettingsDashboard() {
                 title="Currency" 
                 desc="Select the default currency for all financial data."
                 control={
-                  <select className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 outline-none cursor-pointer hover:border-slate-300">
-                    <option>INR - Indian Rupee (₹)</option>
+                  <select value={settings.currency || ""} className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 outline-none cursor-pointer hover:border-slate-300">
+                    <option value={settings.currency}>{settings.currency}</option>
                   </select>
                 }
               />
@@ -86,11 +191,12 @@ export default function SettingsDashboard() {
                 desc="Choose your preferred theme."
                 control={
                   <div className="bg-slate-100 p-1 rounded-lg flex items-center gap-1 text-xs font-medium text-slate-600">
-                    <button className="bg-white text-blue-600 px-3 py-1 rounded-md shadow-sm flex items-center gap-1 font-semibold">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full inline-block"></span> Light
-                    </button>
-                    <button className="px-3 py-1 rounded-md hover:bg-slate-200">Dark</button>
-                    <button className="px-3 py-1 rounded-md hover:bg-slate-200">System</button>
+                    <button className={`px-3 py-1 rounded-md ${settings.theme === "Light" ? "bg-white text-blue-600 shadow-sm font-semibold" 
+                    : "hover:bg-slate-200"}`}>Light</button>
+                    <button className={`px-3 py-1 rounded-md ${settings.theme === "Dark" ? "bg-white text-blue-600 shadow-sm font-semibold"
+                    : "hover:bg-slate-200"}`}>Dark</button>
+                    <button className={`px-3 py-1 rounded-md ${settings.theme === "System" ? "bg-white text-blue-600 shadow-sm font-semibold"
+                    : "hover:bg-slate-200"}`}>System</button>
                   </div>
                 }
               />
@@ -99,7 +205,12 @@ export default function SettingsDashboard() {
                 icon={<LayoutGrid className="text-purple-600" size={18} />} 
                 title="Dashboard Settings" 
                 desc="Customize your dashboard view and default widgets."
-                control={<ChevronRight size={16} className="text-slate-400 cursor-pointer hover:text-slate-600" />}
+                control={ 
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium">{settings.dashboardLayout}</span>
+                  <ChevronRight size={16} className="text-slate-400 cursor-pointer hover:text-slate-600"/>
+                </div>
+                }
               />
 
               <SettingRow 
@@ -107,8 +218,8 @@ export default function SettingsDashboard() {
                 title="Units & Formats" 
                 desc="Set measurement units and number formatting."
                 control={
-                  <select className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 outline-none cursor-pointer hover:border-slate-300">
-                    <option>Metric (kg, km)</option>
+                  <select value={settings.units || ""} className="bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-700 outline-none cursor-pointer hover:border-slate-300">
+                    <option value={settings.units}>{settings.units}</option>
                   </select>
                 }
               />
@@ -172,27 +283,27 @@ export default function SettingsDashboard() {
             <h3 className="font-bold text-sm text-slate-900 mb-5">Account Summary</h3>
             <div className="flex items-center gap-4 border-b border-slate-100 pb-5 mb-5">
               <div className="w-14 h-14 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                AB
+                {accountSummary?.user?.name ?.split(" ").map(word => word[0]).join("").toUpperCase()}
               </div>
               <div>
-                <h4 className="font-bold text-base text-slate-900">Abhishek B.</h4>
-                <p className="text-xs text-slate-400 font-medium">Admin</p>
-                <p className="text-xs text-blue-600 mt-0.5 font-medium hover:underline cursor-pointer">abhishek.b@asdcargomate.com</p>
+                <h4 className="font-bold text-base text-slate-900">{accountSummary?.user?.name}</h4>
+                <p className="text-xs text-slate-400 font-medium">{accountSummary?.user?.roleId?.name}</p>
+                <p className="text-xs text-blue-600 mt-0.5 font-medium hover:underline cursor-pointer">{accountSummary?.user?.email}</p>
               </div>
             </div>
 
             <div className="space-y-3.5 text-xs">
               <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-medium flex items-center gap-1.5"><Sliders size={14}/> User ID</span>
-                <span className="font-bold text-slate-800">ADM-0001</span>
+                <span className="font-bold text-slate-800">{accountSummary?.user?._id?.slice(-6)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-medium flex items-center gap-1.5"><ShieldAlert size={14}/> Role</span>
-                <span className="font-bold text-slate-800">Administrator</span>
+                <span className="font-bold text-slate-800">{accountSummary?.user?.roleId?.name}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-slate-400 font-medium flex items-center gap-1.5"><Calendar size={14}/> Last Login</span>
-                <span className="font-bold text-slate-800">24 Apr 2025, 09:15 AM (IST)</span>
+                <span className="font-bold text-slate-800">{accountSummary?.user?.lastLogin ? new Date(accountSummary.user.lastLogin).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short",}) : "Never Logged In"}</span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-slate-50">
                 <span className="text-slate-400 font-medium flex items-center gap-1.5"><Key size={14}/> Password</span>
@@ -212,10 +323,11 @@ export default function SettingsDashboard() {
             </div>
             
             <div className="space-y-4">
-              <ActivityItem icon="🛡️" title="Password changed successfully" time="21 Apr 2025, 04:35 PM" />
-              <ActivityItem icon="🔔" title="Notification preferences updated" time="20 Apr 2025, 11:20 AM" />
-              <ActivityItem icon="🔑" title="API key generated" time="18 Apr 2025, 02:10 PM" />
-              <ActivityItem icon="🔒" title="Two-factor authentication enabled" time="15 Apr 2025, 09:40 AM" />
+              {activity.length > 0 ? ( activity.map((item) => (
+                <ActivityItem key={item._id} icon={getActivityIcon(item.type)} title={item.message} 
+                time={new Date(item.createdAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",})}/>
+              ))
+            ) : (<p className="text-center text-slate-400 text-sm py-4">No recent activity found.</p>)}
             </div>
           </div>
 

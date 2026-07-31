@@ -252,7 +252,7 @@ export default function AlertsNotificationsDashboard() {
                 return (
                 <div key={notif._id} className="p-4 flex items-center gap-3.5 hover:bg-slate-50/40 transition-colors">
                   <div className={`p-2 rounded-lg shrink-0 ${iconBg}`}>
-                    <notif.icon size={15} />
+                    <Icon size={15} />
                   </div>
                   
                   <div className="flex-1 min-w-0">

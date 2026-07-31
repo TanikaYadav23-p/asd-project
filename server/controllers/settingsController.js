@@ -367,7 +367,7 @@ exports.getActivity=async(req,res)=>{
         
         "name email role createdAt lastLogin"
         
-        );
+        ).populate("roleId", "name");
         
         const settings=await Setting.findOne({
         
