@@ -1,4 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import {
+    getDashboard,
+    getUsers,
+    getActivity,
+    getFilterOptions,
+    getRoleDistribution,
+    getRoles,
+    searchUsers,
+    inviteUser,
+    updateUser,
+    changeStatus,
+    deleteUser,
+} from '../../api/UserRolesApi';
 import {
     Search, ChevronDown, Plus, MoreVertical, ChevronLeft,
     ChevronRight, HelpCircle, UserPlus, Users, UserCheck,
@@ -6,11 +19,108 @@ import {
 } from 'lucide-react';
 
 export default function UsersRolesDashboard() {
+    
     const [activeTab, setActiveTab] = useState('Users');
+    const [dashboard, setDashboard] = useState({});
+    const [users, setUsers] = useState([]);
+    const [roles, setRoles] = useState([]);
+    const [roleDistribution, setRoleDistribution] = useState([]);
+    const [activity, setActivity] = useState({});
+    const [filterOptions, setFilterOptions] = useState({});
+
+    const [search, setSearch] = useState("");
+    const [selectedRole, setSelectedRole] = useState("");
+    const [selectedStatus, setSelectedStatus] = useState("");
+    const [selectedDepartment, setSelectedDepartment] = useState("");
+
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    
+    const fetchDashboard = async () => {
+        try {
+            const res = await getDashboard();
+            console.log("Dashboard:", res.data);
+            setDashboard(res.data.data || {});
+        } catch (err) {
+               console.error(err);
+            }
+    };
+    const fetchUsers = async () => {
+        try {
+            const res = await getUsers({
+            page,
+            limit,
+            search,
+            role: selectedRole,
+            status: selectedStatus,
+            department: selectedDepartment,});
+            console.log("Users:", res.data);
+            setUsers(res.data.data || []);
+        } catch (err) {
+              console.error(err);
+            }
+    };
+    const fetchRoles = async () => {
+        try {
+            const res = await getRoles();
+            console.log("Roles:", res.data);
+            setRoles(res.data.data || []);
+        } catch (err) {
+              console.error(err);
+            }
+    };
+    const fetchRoleDistribution = async () => {
+        try {
+            const res = await getRoleDistribution();
+            console.log("Role Distribution:", res.data);
+            setRoleDistribution(res.data.data || []);
+        } catch (err) {
+              console.error(err);
+            }
+    };
+    const fetchActivity = async () => {
+        try {
+            const res = await getActivity();
+            console.log("Activity:", res.data);
+            setActivity(res.data.data || {});
+        } catch (err) {
+              console.error(err);
+            }
+    };
+    const fetchFilterOptions = async () => {
+        try {
+            const res = await getFilterOptions();
+            console.log("Filter Options:", res.data);
+            setFilterOptions(res.data.data || {});
+        } catch (err) {
+             console.error(err);
+            }
+    };
+    const handleSearch = async () => {
+        try {
+            const res = await searchUsers(search);
+            console.log("Search Users:", res.data);
+            setUsers(res.data.data || []);
+        } catch (err) {
+             console.error(err);
+            }
+    };
+
+    useEffect(() => {
+        fetchDashboard();
+        fetchUsers();
+        fetchRoles();
+        fetchRoleDistribution();
+        fetchActivity();
+        fetchFilterOptions();
+    }, []);
+    useEffect(() => {fetchUsers();}, [page, search, selectedRole, selectedStatus, selectedDepartment,]);
     const tabs = ['Users', 'Roles'];
+    const gcolors = ["#2563EB", "#10B981", "#FBBF24", "#EF4444", "#8B5CF6", "#06B6D4", "#64748B", "#F97316",];
+    const total = roleDistribution.reduce((sum, item) => sum + item.totalUsers, 0);
 
     // Mock Data for Users Table
-    const users = [
+    /*const users = [
         { name: "Abhishek B.", isYou: true, phone: "+91 98765 43210", email: "abhishek.b@company.com", role: "Administrator", roleColor: "bg-purple-50 text-purple-700 border-purple-200", dept: "IT", status: "Active", lastLogin: "24 Apr 2025, 09:15 AM" },
         { name: "Neha Sharma", isYou: false, phone: "+91 98765 43211", email: "neha.sharma@company.com", role: "Finance Manager", roleColor: "bg-blue-50 text-blue-700 border-blue-200", dept: "Finance", status: "Active", lastLogin: "24 Apr 2025, 08:42 AM" },
         { name: "Rohit Kumar", isYou: false, phone: "+91 98765 43212", email: "rohit.kumar@company.com", role: "Operations Manager", roleColor: "bg-emerald-50 text-emerald-700 border-emerald-200", dept: "Operations", status: "Active", lastLogin: "24 Apr 2025, 08:21 AM" },
@@ -19,7 +129,7 @@ export default function UsersRolesDashboard() {
         { name: "Sunita Shah", isYou: false, phone: "+91 98765 43215", email: "sunita.shah@company.com", role: "Viewer", roleColor: "bg-slate-100 text-slate-700 border-slate-200", dept: "Sales", status: "Active", lastLogin: "23 Apr 2025, 05:12 PM" },
         { name: "Vikram K.", isYou: false, phone: "+91 98765 43216", email: "vikram.k@company.com", role: "Support Executive", roleColor: "bg-indigo-50 text-indigo-700 border-indigo-200", dept: "Support", status: "Active", lastLogin: "23 Apr 2025, 04:40 PM" },
         { name: "Manoj Jain", isYou: false, phone: "+91 98765 43217", email: "manoj.jain@company.com", role: "Viewer", roleColor: "bg-slate-100 text-slate-700 border-slate-200", dept: "Procurement", status: "Inactive", lastLogin: "18 Apr 2025, 11:20 AM" },
-    ];
+    ];*/
 
     // Colors for Avatar matching names initials
     const avatarColors = ["bg-teal-600", "bg-emerald-600", "bg-amber-600", "bg-indigo-600", "bg-rose-500", "bg-orange-500", "bg-blue-600", "bg-slate-500"];
@@ -54,18 +164,19 @@ export default function UsersRolesDashboard() {
 
             {/* STATS CARDS */}
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-                <StatCard title="Total Users" value="128" change="▲ 12.5%" isPositive={true} icon={<Users className="text-blue-600" size={16} />} />
-                <StatCard title="Active Users" value="112" change="▲ 8.3%" isPositive={true} icon={<UserCheck className="text-green-600" size={16} />} />
-                <StatCard title="Inactive Users" value="16" change="▼ 11.1%" isPositive={false} icon={<UserX className="text-amber-500" size={16} />} />
-                <StatCard title="Total Roles" value="8" change="No change" isNeutral={true} icon={<Shield className="text-purple-600" size={16} />} />
-                <StatCard title="Admin Users" value="12" change="▲ 9.1%" isPositive={true} icon={<UserPlus className="text-teal-600" size={16} />} />
+                <StatCard title="Total Users" value={dashboard.totalUsers || 0} change="Current" isNeutral={true} icon={<Users className="text-blue-600" size={16} />} />
+                <StatCard title="Active Users" value={dashboard.activeUsers || 0} change="Current" isNeutral={true} icon={<UserCheck className="text-green-600" size={16} />} />
+                <StatCard title="Inactive Users" value={dashboard.inactiveUsers || 0} change="Current" isNeutral={true} icon={<UserX className="text-amber-500" size={16} />} />
+                <StatCard title="Total Roles" value={dashboard.totalRoles || 0} change="No change" isNeutral={true} icon={<Shield className="text-purple-600" size={16} />} />
+                <StatCard title="Admin Users" value={dashboard.adminUsers || 0} change="Current" isNeutral={true} icon={<UserPlus className="text-teal-600" size={16} />} />
             </div>
 
             {/* FILTERS BAR */}
             <div className="bg-white border border-slate-200 rounded-xl p-3 mb-6 flex flex-col md:flex-row gap-3 items-center shadow-sm">
                 <div className="relative w-full md:w-72">
                     <Search className="absolute left-3 top-2.5 text-slate-400" size={16} />
-                    <input type="text" placeholder="Search by name, email or phone..." className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-blue-500" />
+                    <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => {
+                        if (e.key === "Enter") handleSearch();}} placeholder="Search by name, email or phone..." className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-blue-500" />
                 </div>
                 <div className="flex flex-wrap items-center gap-3 w-full md:w-auto md:ml-auto">
                     <FilterDropdown label="All Roles" />
@@ -81,7 +192,7 @@ export default function UsersRolesDashboard() {
             {/* MAIN TABLE SECTION */}
             <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm mb-6">
                 <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white">
-                    <h2 className="font-bold text-slate-900 text-xs uppercase tracking-wider">Showing 1 to 8 of 128 users</h2>
+                    <h2 className="font-bold text-slate-900 text-xs uppercase tracking-wider">Showing 1 to {users.length} of {users.length} users</h2>
                     <button className="text-xs font-bold text-blue-600 border border-blue-100 px-3 py-1.5 rounded-lg bg-blue-50/50 hover:bg-blue-50 flex items-center gap-1">
                         <Sliders size={12} /> Customize Columns
                     </button>
@@ -107,7 +218,7 @@ export default function UsersRolesDashboard() {
                                     <td className="p-4"><input type="checkbox" className="rounded border-slate-300 text-blue-600 focus:ring-blue-500" /></td>
                                     <td className="p-4 flex items-center gap-3">
                                         <div className={`w-8 h-8 rounded-full ${avatarColors[index % avatarColors.length]} text-white flex items-center justify-center font-bold text-xs`}>
-                                            {user.name.split(' ').map(n => n[0]).join('')}
+                                            {user.name ? user.name.split(" ").map((n) => n[0]).join("") : "U"}
                                         </div>
                                         <div>
                                             <div className="font-bold text-slate-900 flex items-center gap-1">
@@ -120,17 +231,17 @@ export default function UsersRolesDashboard() {
                                     <td className="p-4 text-slate-600">{user.email}</td>
                                     <td className="p-4">
                                         <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold border ${user.roleColor}`}>
-                                            {user.role}
+                                            {user.roleId?.name || "-"}
                                         </span>
                                     </td>
-                                    <td className="p-4 text-slate-500">{user.dept}</td>
+                                    <td className="p-4 text-slate-500">{user.department?.name || "-"}</td>
                                     <td className="p-4">
                                         <span className="flex items-center gap-1.5 font-bold">
-                                            <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'Active' ? 'bg-green-500' : 'bg-red-500'}`} />
-                                            {user.status}
+                                            <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`} />
+                                            {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
                                         </span>
                                     </td>
-                                    <td className="p-4 text-slate-500">{user.lastLogin}</td>
+                                    <td className="p-4 text-slate-500">{user.lastLogin ? new Date(user.lastLogin).toLocaleString() : "Never"}</td>
                                     <td className="p-4 text-slate-400 cursor-pointer hover:text-slate-600"><MoreVertical size={16} /></td>
                                 </tr>
                             ))}
@@ -140,7 +251,7 @@ export default function UsersRolesDashboard() {
 
                 {/* PAGINATION */}
                 <div className="p-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-semibold bg-white">
-                    <span>Showing 1 to 8 of 128 users</span>
+                    <span>Showing 1 to {users.length} of {users.length} users</span>
                     <div className="flex items-center gap-1">
                         <button className="p-1 border border-slate-200 rounded text-slate-400 hover:bg-slate-50"><ChevronLeft size={14} /></button>
                         <button className="px-2.5 py-1 bg-blue-600 text-white rounded font-bold">1</button>
@@ -162,29 +273,32 @@ export default function UsersRolesDashboard() {
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         {/* Real SVG Ring Donut representation */}
                         <div className="relative w-28 h-28 flex-shrink-0">
-                            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                                <circle cx="18" cy="18" r="15.91" fill="none" stroke="#E2E8F0" strokeWidth="3" />
-                                <circle cx="18" cy="18" r="15.91" fill="none" stroke="#2563EB" strokeWidth="3" strokeDasharray="35 100" strokeDashoffset="0" />
-                                <circle cx="18" cy="18" r="15.91" fill="none" stroke="#10B981" strokeWidth="3" strokeDasharray="25 100" strokeDashoffset="-35" />
-                                <circle cx="18" cy="18" r="15.91" fill="none" stroke="#FBBF24" strokeWidth="3" strokeDasharray="20 100" strokeDashoffset="-60" />
-                                <circle cx="18" cy="18" r="15.91" fill="none" stroke="#EF4444" strokeWidth="3" strokeDasharray="15 100" strokeDashoffset="-80" />
-                                <circle cx="18" cy="18" r="15.91" fill="none" stroke="#8B5CF6" strokeWidth="3" strokeDasharray="5 100" strokeDashoffset="-95" />
+                           <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                            {/* Background */}
+                            <circle cx="18" cy="18" r="15.91" fill="none" stroke="#E2E8F0" strokeWidth="3"/>
+                            {(() => {let offset = 0;
+                            return roleDistribution.map((role, index) => {
+                                const percentage = (role.totalUsers / total) * 100;
+                                const circle = (
+                                <circle key={index} cx="18" cy="18" r="15.91" fill="none" stroke={gcolors[index % gcolors.length]} strokeWidth="3" strokeDasharray={`${percentage} ${100 - percentage}`} strokeDashoffset={-offset}/>
+                            );
+                            offset += percentage;
+                            return circle;
+                            });
+                            })()}
                             </svg>
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                <span className="text-base font-bold text-slate-800">2,458</span>
+                                <span className="text-base font-bold text-slate-800">{roleDistribution.reduce((sum,item)=>sum+item.totalUsers,0)}</span>
                                 <span className="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Total</span>
                             </div>
                         </div>
                         {/* Grid Legends */}
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-[10px] w-full sm:w-auto flex-1">
-                            <LegendItem color="bg-blue-600" title="Administrator" value="12 (9.4%)" />
-                            <LegendItem color="bg-emerald-500" title="Document Manager" value="14 (10.9%)" />
-                            <LegendItem color="bg-amber-400" title="Finance Manager" value="18 (14.1%)" />
-                            <LegendItem color="bg-purple-500" title="Support Executive" value="10 (7.8%)" />
-                            <LegendItem color="bg-indigo-400" title="Operations Manager" value="16 (12.5%)" />
-                            <LegendItem color="bg-slate-400" title="Viewer" value="28 (21.9%)" />
-                            <LegendItem color="bg-rose-400" title="Trade Analyst" value="20 (15.6%)" />
-                            <LegendItem color="bg-slate-300" title="Others" value="10 (7.8%)" />
+                            {roleDistribution.map((role, index) => {
+                                const colors = ["bg-blue-600", "bg-emerald-500", "bg-amber-400", "bg-purple-500", "bg-indigo-400", "bg-slate-400", "bg-rose-400", "bg-cyan-500"];
+                                return (
+                                <LegendItem key={index} color={colors[index % colors.length]} title={role._id} value={`${role.totalUsers} (${((role.totalUsers / total) * 100).toFixed(1)}%)`}/>);
+                            })}
                         </div>
                     </div>
                 </div>
@@ -204,10 +318,10 @@ export default function UsersRolesDashboard() {
                 <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col justify-between">
                     <h3 className="font-bold text-sm text-slate-900 mb-4">User Activity (Last 7 Days)</h3>
                     <div className="space-y-3">
-                        <ActivityMetricsRow icon="🟩" label="New Users Added" value="14" />
-                        <ActivityMetricsRow icon="🟦" label="Users Logged In" value="96" />
-                        <ActivityMetricsRow icon="🟧" label="Inactive Users" value="8" />
-                        <ActivityMetricsRow icon="🟥" label="Password Resets" value="5" />
+                        <ActivityMetricsRow icon="🟩" label="New Users Added" value={activity.newUsers || 0} />
+                        <ActivityMetricsRow icon="🟦" label="Users Logged In" value={activity.loggedInUsers || 0} />
+                        <ActivityMetricsRow icon="🟧" label="Inactive Users" value={activity.inactiveUsers || 0} />
+                        <ActivityMetricsRow icon="🟥" label="Password Resets" value={activity.passwordResets || 0} />
                     </div>
                 </div>
 
