@@ -1,5 +1,16 @@
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  getDashboard,
+  getFilterOptions,
+  getImportTrend,
+  getCountryDistribution,
+  getTopProducts,
+  getTopSuppliers,
+  getTopImporters,
+  getPortWiseImports,
+  getRecentShipments
+} from '../../api/ImportIntelApi';
 import {
   CalendarDays,
   Download,
@@ -26,17 +37,8 @@ import {
 // ==========================================
 // 1. RAW DATA (यह डेटा API से आ सकता है)
 // ==========================================
-const INITIAL_STATS = [
-  { title: "Total Import Shipments", value: "8,742", change: "▲ 18.6% vs last month", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
-  { title: "Total Import Value (INR)", value: "₹1,245.80 Cr", change: "▲ 18.6% vs last month", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
-  { title: "Total Importers", value: "1,865", change: "▲ 12.2% vs last month", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
-  { title: "Total Suppliers", value: "320", change: "▲ 14.7% vs last month", icon: Truck, color: "text-emerald-500", bg: "bg-emerald-50", isUp: true },
-  { title: "Countries of Origin", value: "68", change: "▲ 4.5% vs last month", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
-  { title: "Avg. Shipment Value (INR)", value: "₹14.26 L", change: "▼ 3.2% vs last month", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
-  { title: "Avg. Lead Time (Days)", value: "18.6", change: "▼ 3.2% vs last month", icon: Clock3, color: "text-red-500", bg: "bg-red-50", isUp: false },
-];
 
-const INITIAL_PRODUCTS = [
+/*const INITIAL_PRODUCTS = [
   { hsCode: "85", desc: "Electrical Machinery & Equipment", shipments: "2,145", value: 412.50, share: "33.1%", barWidth: "w-[33%]" },
   { hsCode: "84", desc: "Machinery & Mechanical Appliances", shipments: "1,745", value: 286.40, share: "23.0%", barWidth: "w-[23%]" },
   { hsCode: "90", desc: "Optical, Medical & Precision Instruments", shipments: "1,055", value: 201.20, share: "16.1%", barWidth: "w-[16%]" },
@@ -88,13 +90,24 @@ const INITIAL_SHIPMENTS = [
   { id: "EXP-2025-2843", hsCode: "90", desc: "Optical, Medical & Precision Instruments", exporter: "Prime Exports Ltd.", buyer: "Mega Traders LLC", country: "Germany", port: "Chennai", date: "22 Apr 2025", value: "₹ 28.50 Cr", status: "IN TRANSIT" },
   { id: "EXP-2025-2842", hsCode: "72", desc: "Iron & Steel", exporter: "Shiva Exports", buyer: "Euro International GmbH", country: "China", port: "Nhava Sheva (Mumbai)", date: "21 Apr 2025", value: "₹ 18.10 Cr", status: "DELIVERED" },
   { id: "EXP-2025-2841", hsCode: "39", desc: "Plastics & Articles", exporter: "Omega Exports Pvt. Ltd.", buyer: "Domestic Distributors", country: "Bangladesh", port: "Kolkata", date: "20 Apr 2025", value: "₹ 16.20 Cr", status: "PENDING" },
-];
+];*/
 
 export default function ImportIntelligence() {
+
+  const [dashboard, setDashboard] = useState({});
+  const [filterOptions, setFilterOptions] = useState({});
+  const [importTrend, setImportTrend] = useState([]);
+  const [countryDistribution, setCountryDistribution] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [topSuppliers, setTopSuppliers] = useState([]);
+  const [topImporters, setTopImporters] = useState([]);
+  const [portWiseImports, setPortWiseImports] = useState([]);
+  const [recentShipments, setRecentShipments] = useState([]);
   // ==========================================
   // 2. DYNAMIC STATES (फ़िल्टर स्टेट्स)
   // ==========================================
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedHsCode, setSelectedHsCode] = useState("All HsCode");
   const [selectedPort, setSelectedPort] = useState("All Ports");
   const [selectedCountry, setSelectedCountry] = useState("All Countries");
   const [selectedExporter, setSelectedExporter] = useState("All Exporters");
@@ -102,12 +115,93 @@ export default function ImportIntelligence() {
 
   // Filter Active State (ताकि 'Apply Filters' पर ही बड़े बदलाव दिखें)
   const [appliedFilters, setAppliedFilters] = useState({
-    search: "", port: "All Ports", country: "All Countries", exporter: "All Exporters", buyer: "All Buyers"
+    search: "", hsCode: "All", port: "All Ports", country: "All Countries", exporter: "All Exporters", buyer: "All Buyers"
   });
 
+  const fetchDashboard = async () => {
+  try {
+    const res = await getDashboard();
+    setDashboard(res.data.data || {});
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchFilterOptions = async () => {
+  try {
+    const res = await getFilterOptions();
+    setFilterOptions(res.data.data || {});
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchImportTrend = async () => {
+  try {
+    const res = await getImportTrend();
+    setImportTrend(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchCountryDistribution = async () => {
+  try {
+    const res = await getCountryDistribution();
+    setCountryDistribution(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchTopProducts = async () => {
+  try {
+    const res = await getTopProducts();
+    setTopProducts(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchTopSuppliers = async () => {
+  try {
+    const res = await getTopSuppliers();
+    setTopSuppliers(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchTopImporters = async () => {
+  try {
+    const res = await getTopImporters();
+    setTopImporters(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchPortWiseImports = async () => {
+  try {
+    const res = await getPortWiseImports();
+    setPortWiseImports(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchRecentShipments = async () => {
+  try {
+    const res = await getRecentShipments();
+    setRecentShipments(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
   const handleApplyFilters = () => {
     setAppliedFilters({
       search: searchQuery,
+      hsCode: selectedHsCode,
       port: selectedPort,
       country: selectedCountry,
       exporter: selectedExporter,
@@ -121,30 +215,118 @@ export default function ImportIntelligence() {
     setAppliedFilters({ search: "", port: "All Ports", country: "All Countries", exporter: "All Exporters", buyer: "All Buyers" });
   };
 
+  useEffect(() => {
+  fetchDashboard();
+  fetchFilterOptions();
+  fetchImportTrend();
+  fetchCountryDistribution();
+  fetchTopProducts();
+  fetchTopSuppliers();
+  fetchTopImporters();
+  fetchPortWiseImports();
+  fetchRecentShipments();
+}, []);
+const INITIAL_STATS = [
+  { title: "Total Import Shipments", value: dashboard.totalShipments || 0, change: "-", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
+  { title: "Total Import Value (INR)", value: `₹${((dashboard.totalImportValue || 0) / 10000000).toFixed(2)} Cr`, change: "-", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
+  { title: "Total Importers", value: dashboard.totalImporters || 0, change: "-", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
+  { title: "Total Suppliers", value: dashboard.totalSuppliers || 0, change: "-", icon: Truck, color: "text-emerald-500", bg: "bg-emerald-50", isUp: true },
+  { title: "Countries of Origin", value: dashboard.countries || 0, change: "-", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
+  { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "▼ 3.2% vs last month", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
+  { title: "Avg. Lead Time (Days)", value: dashboard.avgLeadTime || 0, change: "-", icon: Clock3, color: "text-red-500", bg: "bg-red-50", isUp: false },
+];
+
+const maxValue = topProducts.length > 0 ? Math.max(...topProducts.map((p) => p.value)) : 1;
+const PRODUCTS = topProducts.map((item) => ({
+  hsCode: item._id?.hsCode || "-",
+  desc: item._id?.product || "-",
+  shipments: item.shipments,
+  value: item.value,
+  share: `${((item.value / maxValue) * 100).toFixed(0)}%`,
+  barWidth: `${(item.value / maxValue) * 100}%`,
+}));
+const LINE_DATA = importTrend.map(item => ({
+  date: new Date(item._id).toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+  }),
+  value: item.totalValue / 10000000, // Crores
+}));
+const totalImportValue = importTrend.reduce(
+  (sum, item) => sum + item.totalValue,
+  0
+);
+const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A3B8", "#EC4899",];
   // ==========================================
   // 3. DYNAMIC FILTERING LOGIC (useMemo से परफॉर्मेंस बूस्ट)
   // ==========================================
   
   // Dynamic Shipments Table
   const filteredShipments = useMemo(() => {
-    return INITIAL_SHIPMENTS.filter(ship => {
-      const matchSearch = ship.desc.toLowerCase().includes(appliedFilters.search.toLowerCase()) || ship.hsCode.includes(appliedFilters.search);
-      const matchPort = appliedFilters.port === "All Ports" || ship.port.includes(appliedFilters.port);
-      const matchCountry = appliedFilters.country === "All Countries" || ship.country === appliedFilters.country;
-      const matchExporter = appliedFilters.exporter === "All Exporters" || ship.exporter.includes(appliedFilters.exporter.split(" ")[0]);
-      const matchBuyer = appliedFilters.buyer === "All Buyers" || ship.buyer.includes(appliedFilters.buyer.split(" ")[0]);
-      
-      return matchSearch && matchPort && matchCountry && matchExporter && matchBuyer;
-    });
-  }, [appliedFilters]);
+  return recentShipments.filter((ship) => {
 
+    const hsCode =
+      ship.cargo?.hsCode?.hsCode?.toString() || "";
+
+    const exporter =
+      ship.exporter?.companyName || "";
+
+    const buyer =
+      ship.buyer?.companyName || "";
+
+    const country =
+      ship.route?.destinationCountry || "";
+
+    const port =
+      ship.route?.originCity || "";
+
+    const search =
+      `${ship.sbNumber}
+       ${ship.cargo?.productName}
+       ${exporter}
+       ${buyer}
+       ${country}
+       ${port}`
+        .toLowerCase();
+
+    return (
+      (appliedFilters.search === "" ||
+        search.includes(appliedFilters.search.toLowerCase())) &&
+
+      (appliedFilters.hsCode === "All" ||
+        hsCode === appliedFilters.hsCode) &&
+
+      //(appliedFilters.port === "All Ports" ||
+       // port === appliedFilters.port) &&
+
+      (appliedFilters.country === "All Countries" ||
+        country === appliedFilters.country) &&
+
+      (appliedFilters.exporter === "All Exporters" ||
+        exporter === appliedFilters.exporter) &&
+
+      (appliedFilters.buyer === "All Buyers" ||
+        buyer === appliedFilters.buyer)
+    );
+  });
+}, [recentShipments, appliedFilters]);
   // Dynamic Pie/Donut Chart Data
   const dynamicPieData = useMemo(() => {
-    if (appliedFilters.country !== "All Countries") {
-      return INITIAL_PIE_DATA.filter(c => c.name === appliedFilters.country);
+    let data = countryDistribution.map((item, index) => 
+      ({
+        name: item.country,
+        value: item.value / 10000000, // Crores
+        percent: `${item.percentage}%`,
+        color: PIE_COLORS[index % PIE_COLORS.length],
+      }));
+
+      if (appliedFilters.country !== "All Countries") {
+        data = data.filter(
+        item => item.name === appliedFilters.country
+      );
     }
-    return INITIAL_PIE_DATA;
-  }, [appliedFilters.country]);
+    return data;
+  }, [countryDistribution, appliedFilters.country]);
 
   // Dynamic Total Pie Value Calculation
   const totalPieValue = useMemo(() => {
@@ -210,11 +392,10 @@ export default function ImportIntelligence() {
           {/* Port Dropdown */}
           <div className="w-full relative">
             <select value={selectedPort} onChange={(e) => setSelectedPort(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
-              <option>All Ports</option>
-              <option>Nhava Sheva</option>
-              <option>Mundra</option>
-              <option>Chennai</option>
-              <option>Kolkata</option>
+              <option value="All Ports">All Ports</option>
+               {filterOptions.ports?.map((port, index) => (
+                <option key={index} value={port}>{port}</option>
+               ))}
             </select>
             <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
@@ -222,8 +403,8 @@ export default function ImportIntelligence() {
           {/* Country Dropdown */}
           <div className="w-full relative">
             <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
-              <option>All Countries</option>
-              {INITIAL_PIE_DATA.map((c, i) => <option key={i}>{c.name}</option>)}
+              <option value="All Countries">All Countries</option>
+              {countryDistribution.map((item, i) => (<option key={i} value={item.country}>{item.country}</option>))}
             </select>
             <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
@@ -231,10 +412,10 @@ export default function ImportIntelligence() {
           {/* Exporters Dropdown */}
           <div className="w-full relative">
             <select value={selectedExporter} onChange={(e) => setSelectedExporter(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
-              <option>All Exporters</option>
-              <option>ABC Exports</option>
-              <option>Global Trade</option>
-              <option>Prime Exports</option>
+              <option value="All Exporters">All Exporters</option>
+               {filterOptions.exporters?.map((exporter, index) => (
+                <option key={index} value={exporter}>{exporter}</option>
+               ))}
             </select>
             <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
@@ -242,10 +423,10 @@ export default function ImportIntelligence() {
           {/* Buyers Dropdown */}
           <div className="w-full relative">
             <select value={selectedBuyer} onChange={(e) => setSelectedBuyer(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
-              <option>All Buyers</option>
-              <option>Global Retail</option>
-              <option>TechMart USA</option>
-              <option>Mega Traders</option>
+              <option value="All Buyers">All Buyers</option>
+               {filterOptions.buyers?.map((buyer, index) => (
+                <option key={index} value={buyer}>{buyer}</option>
+               ))}
             </select>
             <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
@@ -279,16 +460,16 @@ export default function ImportIntelligence() {
               <button className="text-blue-600 text-xs font-semibold">View All</button>
             </div>
             <div className="space-y-3.5">
-              {INITIAL_PRODUCTS.map((prod, i) => (
+              {PRODUCTS.map((prod, i) => (
                 <div key={i} className="text-xs">
                   <div className="flex justify-between items-start text-slate-600 mb-1.5 gap-2">
                     <span className="font-medium text-slate-400 shrink-0">{prod.hsCode}</span>
                     <span className="truncate flex-1 font-medium text-slate-700">{prod.desc}</span>
-                    <span className="font-semibold text-slate-800 shrink-0">₹ {prod.value.toFixed(2)} Cr</span>
+                    <span className="font-semibold text-slate-800 shrink-0"> ₹ {(prod.value / 10000000).toFixed(2)} Cr</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                      <div className={`bg-blue-500 h-full rounded-full ${prod.barWidth}`} />
+                      <div className="bg-blue-500 h-full rounded-full"  style={{ width: prod.barWidth }} />
                     </div>
                     <span className="text-[10px] text-slate-400 font-medium shrink-0 w-8 text-right">{prod.share}</span>
                   </div>
@@ -306,12 +487,12 @@ export default function ImportIntelligence() {
             <span className="text-[11px] font-bold text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Top Ports</span>
           </div>
           <div className="mb-4">
-            <span className="text-xl font-bold text-slate-800">₹1,245.80 Cr</span>
-            <span className="text-xs text-green-500 font-medium ml-2">▲ 18.6% vs last month</span>
+            <span className="text-xl font-bold text-slate-800">₹{(totalImportValue / 10000000).toFixed(2)} Cr</span>
+            <span className="text-xs text-green-500 font-medium ml-2"> {importTrend.length > 0 ? "-" : ""}</span>
           </div>
           <div className="h-[180px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={INITIAL_LINE_DATA}>
+              <LineChart data={LINE_DATA}>
                 <XAxis dataKey="date" tick={{ fill: '#94a3b8', fontSize: 10 }} tickLine={false} axisLine={false} />
                 <Tooltip />
                 <Line type="monotone" dataKey="value" stroke="#10B981" strokeWidth={2.5} dot={{ fill: '#10B981', r: 3 }} />
@@ -348,7 +529,7 @@ export default function ImportIntelligence() {
                       <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: country.color }} />
                       <span className="text-slate-600 font-medium truncate">{country.name}</span>
                     </div>
-                    <span className="text-slate-500 font-semibold ml-1">₹{country.value.toFixed(1)} Cr</span>
+                    <span className="text-slate-500 font-semibold ml-1">₹{country.value.toFixed(2)} Cr</span>
                   </div>
                 ))}
               </div>
@@ -364,15 +545,15 @@ export default function ImportIntelligence() {
         <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
           <h3 className="font-bold text-sm text-slate-800 mb-4">Top Suppliers</h3>
           <div className="divide-y divide-slate-100">
-            {INITIAL_SUPPLIERS.map((sup, idx) => (
+            {topSuppliers.map((sup, idx) => (
               <div key={idx} className="flex justify-between items-center py-2.5 text-xs">
                 <div>
-                  <h4 className="font-semibold text-slate-700">{sup.name}</h4>
+                  <h4 className="font-semibold text-slate-700">{sup._id || "-"}</h4>
                   <p className="text-[10px] text-slate-400 mt-0.5">{sup.shipments} Shipments</p>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-slate-800 block">{sup.value}</span>
-                  <span className="text-[10px] text-green-500 font-medium">{sup.growth}</span>
+                  <span className="font-bold text-slate-800 block">₹{(sup.value / 10000000).toLocaleString("en-IN", {maximumFractionDigits: 2,})} Cr</span>
+                  <span className="text-[10px] text-green-500 font-medium">Current</span>
                 </div>
               </div>
             ))}
@@ -388,15 +569,15 @@ export default function ImportIntelligence() {
         <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
           <h3 className="font-bold text-sm text-slate-800 mb-4">Top Importers</h3>
           <div className="divide-y divide-slate-100">
-            {INITIAL_IMPORTERS.map((imp, idx) => (
+            {topImporters.map((imp, idx) => (
               <div key={idx} className="flex justify-between items-center py-2.5 text-xs">
                 <div>
-                  <h4 className="font-semibold text-slate-700">{imp.name}</h4>
+                  <h4 className="font-semibold text-slate-700">{imp._id || "-"}</h4>
                   <p className="text-[10px] text-slate-400 mt-0.5">{imp.shipments} Shipments</p>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-slate-800 block">{imp.value}</span>
-                  <span className="text-[10px] text-green-500 font-medium">{imp.growth}</span>
+                  <span className="font-bold text-slate-800 block">₹{(imp.value / 10000000).toLocaleString("en-IN", {maximumFractionDigits: 2,})} Cr</span>
+                  <span className="text-[10px] text-green-500 font-medium">Current</span>
                 </div>
               </div>
             ))}
@@ -410,18 +591,21 @@ export default function ImportIntelligence() {
         <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm">
           <h3 className="font-bold text-sm text-slate-800 mb-4">Imports by Port of Arrival</h3>
           <div className="divide-y divide-slate-100">
-            {INITIAL_PORTS.map((port, idx) => (
+            {portWiseImports.map((port, idx) => {
+              const totalValue = portWiseImports.reduce((sum, item) => sum + item.value, 0);
+              const share = totalValue > 0 ? ((port.value / totalValue) * 100).toFixed(1) : "0.0";
+              return (
               <div key={idx} className="flex justify-between items-center py-2.5 text-xs">
                 <div>
-                  <h4 className="font-semibold text-slate-700">{port.name}</h4>
+                  <h4 className="font-semibold text-slate-700">{port._id || "-"}</h4>
                   <p className="text-[10px] text-slate-400 mt-0.5">{port.shipments} Shipments</p>
                 </div>
                 <div className="text-right">
-                  <span className="font-bold text-slate-800 block">{port.value}</span>
-                  <span className="text-[10px] text-slate-400 font-medium">{port.share} Share</span>
+                  <span className="font-bold text-slate-800 block"> ₹{(port.value / 10000000).toLocaleString("en-IN", {maximumFractionDigits: 2,})} Cr</span>
+                  <span className="text-[10px] text-slate-400 font-medium">{share}% Share</span>
                 </div>
-              </div>
-            ))}
+              </div>);
+            })}
           </div>
             <div className="text-center ">
              <button className="text-blue-600 text-xs font-semibold text-center mt-4 pt-2 border-t border-slate-50">View All Ports →</button>
@@ -459,20 +643,20 @@ export default function ImportIntelligence() {
                 {filteredShipments.length > 0 ? (
                   filteredShipments.map((ship, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/80 transition">
-                      <td className="py-3.5 text-blue-600 font-semibold">{ship.id}</td>
-                      <td className="py-3.5 text-slate-400 font-bold">{ship.hsCode}</td>
-                      <td className="py-3.5 max-w-[180px] truncate font-semibold text-slate-700">{ship.desc}</td>
-                      <td className="py-3.5 truncate text-slate-500">{ship.exporter}</td>
-                      <td className="py-3.5 truncate text-slate-500">{ship.buyer}</td>
-                      <td className="py-3.5 text-slate-700">{ship.country}</td>
-                      <td className="py-3.5 text-slate-500">{ship.port}</td>
-                      <td className="py-3.5 text-slate-400 whitespace-nowrap">{ship.date}</td>
-                      <td className="py-3.5 font-bold text-slate-800">{ship.value}</td>
+                      <td className="py-3.5 text-blue-600 font-semibold">{ship.sbNumber}</td>
+                      <td className="py-3.5 text-slate-400 font-bold">{ship.cargo?.hsCode?.hsCode || "-"}</td>
+                      <td className="py-3.5 max-w-[180px] truncate font-semibold text-slate-700">{ship.cargo?.productName || ship.cargo?.description || "-"}</td>
+                      <td className="py-3.5 truncate text-slate-500">{ship.exporter?.companyName || "-"}</td>
+                      <td className="py-3.5 truncate text-slate-500">{ship.buyer?.companyName || "-"}</td>
+                      <td className="py-3.5 text-slate-700">{ship.route?.destinationCountry || "-"}</td>
+                      <td className="py-3.5 text-slate-500">{ship.route?.destinationCity || "-"}</td>
+                      <td className="py-3.5 text-slate-400 whitespace-nowrap">{new Date(ship.shipmentDate).toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric",})}</td>
+                      <td className="py-3.5 font-bold text-slate-800">₹ {(ship.cargo?.value / 10000000).toFixed(2)} Cr</td>
                       <td className="py-3.5 text-center">
                         <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold ${
-                          ship.status === "DELIVERED" ? "bg-green-100 text-green-700" :
-                          ship.status === "IN TRANSIT" ? "bg-blue-100 text-blue-700" : "bg-orange-100 text-orange-700"
-                        }`}>{ship.status}</span>
+                          ship.shipmentStatus === "Delivered" ? "bg-green-100 text-green-700" :
+                          ship.shipmentStatus === "In Transit" ? "bg-blue-100 text-blue-700" : "bg-orange-100 text-orange-700"
+                        }`}>{ship.shipmentStatus}</span>
                       </td>
                     </tr>
                   ))

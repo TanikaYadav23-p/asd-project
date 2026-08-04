@@ -361,7 +361,7 @@ exports.getCountryDistribution = async (req, res) => {
         const countries = await Shipment.aggregate([
             {
                 $group: {
-                    _id: "$route.destination",
+                    _id: "$route.destinationCountry",
                     value: { $sum: "$cargo.value" }
                 }
             },
@@ -409,7 +409,7 @@ exports.getPortWiseImports = async (req, res) => {
         const ports = await Shipment.aggregate([
             {
                 $group: {
-                    _id: "$route.portOfLoading",
+                    _id: "$route.destinatonCity",
                     shipments: { $sum: 1 },
                     value: { $sum: "$cargo.value" }
                 }
@@ -473,9 +473,9 @@ exports.getFilterOptions = async (req, res) => {
 
         const hsCodes = await Shipment.distinct("cargo.hsCode");
 
-        const ports = await Shipment.distinct("route.portOfLoading");
+        const ports = await Shipment.distinct("route.originCity");
 
-        const countries = await Shipment.distinct("route.destination");
+        const countries = await Shipment.distinct("route.destinationCounty");
 
         const exporters = await Shipment.distinct("exporter.companyName");
 

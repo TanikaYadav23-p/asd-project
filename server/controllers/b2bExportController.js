@@ -24,11 +24,11 @@ exports.getDashboard = async (req, res) => {
             };
         }
 
-        if (origin) filter["route.origin"] = origin;
-        if (destination) filter["route.destination"] = destination;
+        if (origin) filter["route.originCountry"] = origin;
+        if (destination) filter["route.destinationCountry"] = destination;
         if (exporter) filter["exporter.companyName"] = exporter;
         if (buyer) filter["buyer.companyName"] = buyer;
-        if (status) filter.status = status;
+        if (status) filter.shipmentStatus = status;
         if (hsCode) filter["cargo.hsCode"] = hsCode;
 
         const totalExportShipments = await Shipment.countDocuments(filter);
@@ -321,7 +321,7 @@ exports.getCountryDistribution = async (req, res) => {
         const countries = await Shipment.aggregate([
             {
                 $group: {
-                    _id: "$route.destination",
+                    _id: "$route.destinationCountry",
                     value: { $sum: "$cargo.value" },
                     shipments: { $sum: 1 }
                 }
@@ -369,7 +369,7 @@ exports.getPortWiseExports = async (req, res) => {
         const ports = await Shipment.aggregate([
             {
                 $group: {
-                    _id: "$route.portOfLoading",
+                    _id: "$route.destinationCity",
                     shipments: { $sum: 1 },
                     value: { $sum: "$cargo.value" }
                 }
@@ -381,10 +381,13 @@ exports.getPortWiseExports = async (req, res) => {
             }
         ]);
 
+        const totalShipments = ports.reduce((sum, item) => sum + item.shipments, 0);
+
         const data = ports.map(item => ({
             port: item._id || "-",
             shipments: item.shipments,
-            value: item.value
+            value: item.value,
+            share: totalShipments ? ((item.shipments / totalShipments) * 100).toFixed(1) : "0.0"
         }));
 
         return res.status(200).json({
@@ -434,17 +437,18 @@ exports.getRecentShipments = async (req, res) => {
 exports.getFilterOptions = async (req, res) => {
     try {
 
-        const hsCodes = await Shipment.distinct("cargo.hsCode");
-        const ports = await Shipment.distinct("route.portOfLoading");
-        const countries = await Shipment.distinct("route.destination");
+        const hsCodes = await Shipment.find().populate("cargo.hsCode", "hsCode").select("cargo.hsCode");
+        const ports = await Shipment.distinct("route.originCity");
+        const countries = await Shipment.distinct("route.destinationCountry");
         const exporters = await Shipment.distinct("exporter.companyName");
         const buyers = await Shipment.distinct("buyer.companyName");
+        const formattedHsCodes = [...new Set(hsCodes.map(item => item.cargo?.hsCode?.hsCode).filter(Boolean))];
 
         return res.status(200).json({
             status: 1,
             message: "Filter options fetched successfully",
             data: {
-                hsCodes,
+                hsCodes: formattedHsCodes,
                 ports,
                 countries,
                 exporters,
