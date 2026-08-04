@@ -1,4 +1,16 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  getDashboard,
+  getHSCodeList,
+  getHSCodeDetails,
+  getTradeFlow,
+  getTrends,
+  getTopProducts,
+  getImporters,
+  getExporters,
+  getCountries,
+  getFilterOptions
+} from '../../api/HsCodeIntelApi';
 import {
   CalendarDays,
   Download,
@@ -43,17 +55,7 @@ const tabs = [
   "Trends & Insights",
 ];
 
-const INITIAL_STATS = [
-  { title: "Total Export Shipments", value: "8,742", change: "▲ 16.8% vs last month", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
-  { title: "Total Export Value (INR)", value: "₹1,245.80 Cr", change: "▲ 18.6% vs last month", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
-  { title: "Total Exporters", value: "1,865", change: "▲ 12.3% vs last month", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
-  { title: "Total Suppliers", value: "320", change: "▲ 14.7% vs last month", icon: Truck, color: "text-emerald-500", bg: "bg-emerald-50", isUp: true },
-  { title: "Countries of Origin", value: "68", change: "▲ 9.4% vs last month", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
-  { title: "Avg. Shipment Value (INR)", value: "₹14.26 L", change: "▼ 3.2% vs last month", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
-  { title: "Avg. Lead Time (Days)", value: "18.6", change: "▼ 3.2% vs last month", icon: Clock3, color: "text-red-500", bg: "bg-red-50", isUp: false },
-];
-
-const INITIAL_TOP_CODES_VALUE = [
+/*const INITIAL_TOP_CODES_VALUE = [
   { hsCode: "85", desc: "Electrical Machinery & Equipment", value: "₹ 320.45 Cr", share: "9.87%", width: "w-[9.87%]" },
   { hsCode: "84", desc: "Machinery & Mechanical Appliances", value: "₹ 285.70 Cr", share: "8.79%", width: "w-[8.79%]" },
   { hsCode: "84", desc: "Machinery & Mechanical Appliances", value: "₹ 285.70 Cr", share: "8.79%", width: "w-[8.79%]" },
@@ -103,9 +105,20 @@ const INITIAL_DETAILS_TABLE = [
   { hsCode: "90", desc: "Optical, Medical & Precision Instruments", heading: "Chapter 90 / Heading 9001-9033", flow: "Import", value: "₹ 168.20 Cr", shipments: "1,256", avgValue: "₹ 13.41 L", country: "USA", growth: "▲ 10.5%", isUp: true },
   { hsCode: "39", desc: "Plastics & Articles", heading: "Chapter 39 / Heading 3901-3926", flow: "Import", value: "₹ 125.35 Cr", shipments: "1,102", avgValue: "₹ 11.37 L", country: "UAE", growth: "▲ 9.8%", isUp: true },
   { hsCode: "72", desc: "Iron & Steel", heading: "Chapter 72 / Heading 7201-7229", flow: "Export", value: "₹ 98.60 Cr", shipments: "987", avgValue: "₹ 9.99 L", country: "India", growth: "▲ 8.7%", isUp: true },
-];
+];*/
 
 export default function HSCodeIntelligence() {
+
+  const [dashboard, setDashboard] = useState({});
+  const [hsCodeList, setHSCodeList] = useState([]);
+  const [hsCodeDetails, setHSCodeDetails] = useState([]);
+  const [tradeFlow, setTradeFlow] = useState({});
+  const [trendData, setTrendData] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [importers, setImporters] = useState([]);
+  const [exporters, setExporters] = useState([]);
+  const [countries, setCountries] = useState([]);
+  const [filterOptions, setFilterOptions] = useState({});
   // ==========================================
   // 2. STATE MANAGEMENT
   // ==========================================
@@ -117,14 +130,115 @@ export default function HSCodeIntelligence() {
   const [selectedCountry, setSelectedCountry] = useState("All Countries");
   const [selectedFlow, setSelectedFlow] = useState("All Flow");
 
+  const fetchDashboard = async () => {
+  try {
+    const res = await getDashboard();
+    setDashboard(res.data.data || {});
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchHSCodeList = async () => {
+  try {
+    const res = await getHSCodeList();
+    setHSCodeList(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchHSCodeDetails = async () => {
+  try {
+    const res = await getHSCodeDetails();
+    setHSCodeDetails(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchTradeFlow = async () => {
+  try {
+    const res = await getTradeFlow();
+    setTradeFlow(res.data.data || {});
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchTrendData = async () => {
+  try {
+    const res = await getTrends();
+    setTrendData(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchTopProducts = async () => {
+  try {
+    const res = await getTopProducts();
+    setTopProducts(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchImporters = async () => {
+  try {
+    const res = await getImporters();
+    setImporters(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchExporters = async () => {
+  try {
+    const res = await getExporters();
+    setExporters(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchCountries = async () => {
+  try {
+    const res = await getCountries();
+    setCountries(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchFilterOptions = async () => {
+  try {
+    const res = await getFilterOptions();
+    setFilterOptions(res.data.data || {});
+  } catch (err) {
+    console.error(err);
+  }
+};
+ useEffect(() => {
+   fetchDashboard();
+   fetchHSCodeList();
+   fetchHSCodeDetails();
+   fetchTradeFlow();
+   fetchTrendData();
+   fetchTopProducts();
+   fetchImporters();
+   fetchExporters();
+   fetchCountries();
+   fetchFilterOptions();
+  }, []);
   // Applied filter state
   const [filters, setFilters] = useState({
-    search: "", chapter: "All Chapter", heading: "All headings", country: "All Countries", flow: "All Flow"
+    search: "", chapter: "All Chapter", heading: "All headings", subheading: "All Sub-headings", country: "All Countries", flow: "All Flow"
   });
 
   const handleApply = () => {
     setFilters({
-      search: searchQuery, chapter: selectedChapter, heading: selectedHeading, country: selectedCountry, flow: selectedFlow
+      search: searchQuery, chapter: selectedChapter, heading: selectedHeading, subheading: selectedSubHeading, country: selectedCountry, flow: selectedFlow
     });
   };
 
@@ -134,18 +248,39 @@ export default function HSCodeIntelligence() {
     setFilters({ search: "", chapter: "All Chapter", heading: "All headings", country: "All Countries", flow: "All Flow" });
   };
 
+  const stats = [
+   { title: "Total Export Shipments", value: dashboard.totalShipments || 0, change: "", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
+   { title: "Total Export Value (INR)", value: `₹${((dashboard.totalTradeValue || 0) / 10000000).toFixed(2)} Cr`, change: "", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
+   { title: "Total Exporters", value: dashboard.totalExporters || 0, change: "", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
+   { title: "Total Suppliers", value: dashboard.totalSuppliers || 0, change: "", icon: Truck, color: "text-emerald-500", bg: "bg-emerald-50", isUp: true },
+   { title: "Countries of Origin", value: dashboard.countries || 0, change: "", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
+   { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
+   { title: "Avg. Lead Time (Days)", value: dashboard.avgLeadTime || 0, change: "", icon: Clock3, color: "text-red-500", bg: "bg-red-50", isUp: false },
+  ];
   // ==========================================
   // 3. DYNAMIC FILTERING LOGIC
   // ==========================================
   const filteredTableData = useMemo(() => {
-    return INITIAL_DETAILS_TABLE.filter(item => {
-      const matchSearch = item.desc.toLowerCase().includes(filters.search.toLowerCase()) || item.hsCode.includes(filters.search);
-      const matchChapter = filters.chapter === "All Chapter" || item.heading.includes(filters.chapter.replace("All ", ""));
-      const matchCountry = filters.country === "All Countries" || item.country === filters.country;
-      const matchFlow = filters.flow === "All Flow" || item.flow === filters.flow;
-      return matchSearch && matchChapter && matchCountry && matchFlow;
-    });
-  }, [filters]);
+  return hsCodeDetails.filter((item) => {
+    const matchSearch =
+      item.description?.toLowerCase().includes(filters.search.toLowerCase()) ||
+      item.hsCode?.includes(filters.search);
+
+    const matchChapter =
+      filters.chapter === "All Chapter" ||
+      item.chapter === filters.chapter.replace("Chapter ", "");
+
+    const matchCountry =
+      filters.country === "All Countries" ||
+      item.topCountry === filters.country;
+
+    const matchFlow =
+      filters.flow === "All Flow" ||
+      item.flow === filters.flow;
+
+    return matchSearch && matchChapter && matchCountry && matchFlow;
+  });
+}, [hsCodeDetails, filters]);
 
   return (
     <div className="overflow-y-auto bg-[#f8fafc] p-5 font-sans text-slate-600 antialiased flex flex-col justify-between pt-14">
@@ -168,7 +303,7 @@ export default function HSCodeIntelligence() {
 
       {/* METRICS METERS ROW */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-5">
-        {INITIAL_STATS.map((stat, i) => {
+        {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (
             <div key={i} className="bg-white border border-slate-100 p-3.5 rounded-2xl shadow-sm flex flex-col justify-between">
@@ -202,10 +337,10 @@ export default function HSCodeIntelligence() {
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">Chapter</label>
             <div className="relative">
               <select value={selectedChapter} onChange={(e) => setSelectedChapter(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none focus:border-blue-500">
-                <option>All Chapter</option>
-                <option>Chapter 85</option>
-                <option>Chapter 84</option>
-                <option>Chapter 90</option>
+                <option value="All Chapter">All Chapter</option>
+                {filterOptions.chapters?.map((chapter) => (
+                  <option key={chapter} value={chapter}>{chapter}</option>
+                ))}
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -214,9 +349,10 @@ export default function HSCodeIntelligence() {
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">Heading</label>
             <div className="relative">
               <select value={selectedHeading} onChange={(e) => setSelectedHeading(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none focus:border-blue-500">
-                <option>All headings</option>
-                <option>Heading 8501</option>
-                <option>Heading 8401</option>
+                <option value="All headings">All headings</option>
+                {filterOptions.headings?.map((heading) => (
+                  <option key={heading} value={heading}>{heading}</option>
+                ))}
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -225,7 +361,10 @@ export default function HSCodeIntelligence() {
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">Sub-heading</label>
             <div className="relative">
               <select value={selectedSubHeading} onChange={(e) => setSelectedSubHeading(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none focus:border-blue-500">
-                <option>All Sub-headings</option>
+                <option value="All Sub-headings">All Sub-headings</option>
+                {filterOptions.subHeadings?.map((sub) => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -234,11 +373,10 @@ export default function HSCodeIntelligence() {
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">Country</label>
             <div className="relative">
               <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none focus:border-blue-500">
-                <option>All Countries</option>
-                <option>China</option>
-                <option>Germany</option>
-                <option>USA</option>
-                <option>UAE</option>
+                <option value="All Countries">All Countries</option>
+                {filterOptions.countries?.map((country) => (
+                  <option key={country} value={country}>{country}</option>
+                ))}
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -247,9 +385,10 @@ export default function HSCodeIntelligence() {
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">Flow</label>
             <div className="relative">
               <select value={selectedFlow} onChange={(e) => setSelectedFlow(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none focus:border-blue-500">
-                <option>All Flow</option>
-                <option>Import</option>
-                <option>Export</option>
+                <option value="All Flow">All Flow</option>
+                {filterOptions.flows?.map((flow) => (
+                  <option key={flow} value={flow}>{flow}</option>
+                ))}
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -326,18 +465,18 @@ export default function HSCodeIntelligence() {
               <button className="text-blue-600 text-[11px] font-bold">View All</button>
             </div>
             <div className="space-y-3">
-              {INITIAL_TOP_CODES_VALUE.map((item, idx) => (
+              {hsCodeList.map((item, idx) => (
                 <div key={idx} className="text-[11px]">
                   <div className="flex justify-between text-slate-700 font-medium mb-1 gap-2">
                     <span className="text-emerald-600 font-bold shrink-0">• {item.hsCode}</span>
-                    <span className="truncate flex-1 text-slate-500">{item.desc}</span>
-                    <span className="font-bold text-slate-800 shrink-0">{item.value}</span>
+                    <span className="truncate flex-1 text-slate-500">{item.description}</span>
+                    <span className="font-bold text-slate-800 shrink-0"> ₹ {(item.tradeValue / 10000000).toFixed(2)} Cr</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-                      <div className={`bg-teal-500 h-full ${item.width}`} />
+                      <div className="bg-teal-500 h-full" style={{width: `${Math.min(Number(item.share), 100)}%`,}} />
                     </div>
-                    <span className="text-[9px] font-bold text-slate-400 w-8 text-right">{item.share}</span>
+                    <span className="text-[9px] font-bold text-slate-400 w-8 text-right">{item.share}%</span>
                   </div>
                 </div>
               ))}
@@ -354,14 +493,15 @@ export default function HSCodeIntelligence() {
               <span className="text-[9px] text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded font-medium">This Month</span>
             </div>
             <div className="mb-3">
-              <span className="text-lg font-bold text-slate-800">₹1,876.45 Cr</span>
+              <span className="text-lg font-bold text-slate-800"> ₹{(trendData.reduce((sum, item) => sum + item.tradeValue, 0) /10000000).toFixed(2)}{" "}Cr</span>
               <span className="text-[10px] text-green-500 font-semibold ml-2">▲ 17.6% vs last month</span>
             </div>
             <div className="h-[120px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={INITIAL_TREND_DATA}>
+                <LineChart data={trendData.map(item => ({date: new Date(item._id + "-01").toLocaleString("en-IN", {month: "short",year: "2-digit",}),
+                 value: Number((item.tradeValue / 10000000).toFixed(2)), shipments: item.shipments,}))}>
                   <XAxis dataKey="date" tick={{ fill: '#94a3b8', fontSize: 9 }} tickLine={false} axisLine={false} />
-                  <Tooltip />
+                  <Tooltip formatter={(value) => [`₹${value} Cr`, "Trade Value"]}/>
                   <Line type="monotone" dataKey="value" stroke="#10B981" strokeWidth={2} dot={{ fill: '#10B981', r: 2.5 }} />
                 </LineChart>
               </ResponsiveContainer>
@@ -370,11 +510,11 @@ export default function HSCodeIntelligence() {
           <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-50 text-center">
             <div className="bg-slate-50/60 p-1.5 rounded-xl border border-slate-100">
               <span className="text-[9px] text-slate-400 block font-medium">Export Value (INR)</span>
-              <span className="text-xs font-bold text-slate-700">₹1,876.45 Cr</span>
+              <span className="text-xs font-bold text-slate-700">₹{(trendData.reduce((sum, item) => sum + item.tradeValue, 0) /10000000).toFixed(2)}{" "}Cr</span>
             </div>
             <div className="bg-slate-50/60 p-1.5 rounded-xl border border-slate-100">
               <span className="text-[9px] text-slate-400 block font-medium">Export Shipments</span>
-              <span className="text-xs font-bold text-slate-700">6,240</span>
+              <span className="text-xs font-bold text-slate-700"> {trendData.reduce((sum, item) => sum + item.shipments, 0)}</span>
             </div>
           </div>
         </div>
@@ -387,24 +527,28 @@ export default function HSCodeIntelligence() {
               <div className="relative w-[110px] h-[110px] shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={INITIAL_FLOW_DATA} innerRadius={38} outerRadius={50} dataKey="value" stroke="none">
-                      {INITIAL_FLOW_DATA.map((item, index) => <Cell key={index} fill={item.color} />)}
+                    <Pie data={[{name: "Import", value: tradeFlow.import || 0, color: "#10B981",},
+                                {name: "Export", value: tradeFlow.export || 0, color: "#2563EB",},
+                              ]} innerRadius={38} outerRadius={50} dataKey="value" stroke="none">
+                      {[{ color: "#10B981" },{ color: "#2563EB" },].map((item, index) => <Cell key={index} fill={item.color} />)}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <span className="text-[8px] text-slate-400 font-bold uppercase">Total Value</span>
-                  <span className="font-bold text-[10px] text-slate-800 leading-none mt-0.5">₹3,245.80 Cr</span>
+                  <span className="font-bold text-[10px] text-slate-800 leading-none mt-0.5">₹{(((tradeFlow.import || 0) + (tradeFlow.export || 0)) /10000000).toFixed(2)}{" "}Cr</span>
                 </div>
               </div>
               <div className="space-y-2">
-                {INITIAL_FLOW_DATA.map((flow, i) => (
+                {[{name: "Import", value: tradeFlow.import || 0, percent:(((tradeFlow.import || 0) / ((tradeFlow.import || 0) + (tradeFlow.export || 1))) *100).toFixed(1) + "%",color: "#10B981",},
+                  {name: "Export", value: tradeFlow.export || 0,percent:(((tradeFlow.export || 0) / ((tradeFlow.import || 0) + (tradeFlow.export || 1))) * 100).toFixed(1) + "%",color: "#2563EB",},
+                 ].map((flow, i) => (
                   <div key={i} className="flex items-center gap-4 text-[11px]">
                     <div className="flex items-center gap-1.5 font-bold">
                       <div className="w-2 h-2 rounded-full" style={{ backgroundColor: flow.color }} />
                       <span className="text-slate-700">{flow.name}</span>
                     </div>
-                    <span className="text-slate-500 font-semibold">₹{flow.value.toLocaleString()} Cr ({flow.percent})</span>
+                    <span className="text-slate-500 font-semibold">₹{(flow.value / 10000000).toFixed(2)} Cr ({flow.percent})</span>
                   </div>
                 ))}
               </div>
@@ -422,14 +566,14 @@ export default function HSCodeIntelligence() {
             <button className="text-blue-600 text-[11px] font-bold">View All</button>
           </div>
           <div className="divide-y divide-slate-50">
-            {INITIAL_CODES_GROWTH.map((item, i) => (
+            {importers.map((item, i) => (
               <div key={i} className="flex justify-between items-center py-2 text-[11px]">
                 <div>
-                  <div className="flex items-center gap-2"><span className="font-bold text-slate-700">{item.hsCode}</span><span className="text-slate-400 font-medium truncate max-w-[150px]">{item.desc}</span></div>
+                  <div className="flex items-center gap-2"><span className="font-bold text-slate-700">{item.importer}</span></div>
                 </div>
                 <div className="text-right flex items-center gap-4">
-                  <span className="font-semibold text-slate-500">{item.value}</span>
-                  <span className="text-green-500 font-bold w-12">{item.growth}</span>
+                  <span className="font-semibold text-slate-500">₹ {(item.tradeValue / 10000000).toFixed(2)} Cr</span>
+                  <span className="text-green-500 font-bold w-12">{item.shipments} Shipments</span>
                 </div>
               </div>
             ))}
@@ -443,17 +587,17 @@ export default function HSCodeIntelligence() {
             <button className="text-blue-600 text-[11px] font-bold">View All</button>
           </div>
           <div className="space-y-2.5">
-            {INITIAL_CODES_SHIPMENTS.map((item, i) => (
+            {topProducts.map((item, i) => (
               <div key={i} className="text-[11px]">
                 <div className="flex justify-between text-slate-600 font-medium mb-1">
-                  <div className="flex items-center gap-2"><span className="font-bold text-slate-700">{item.hsCode}</span><span className="truncate max-w-[160px]">{item.desc}</span></div>
-                  <span className="font-bold text-slate-800">{item.count}</span>
+                  <div className="flex items-center gap-2"><span className="font-bold text-slate-700">{item.hsCode}</span><span className="truncate max-w-[160px]">{item.description}</span></div>
+                  <span className="font-bold text-slate-800">{item.shipments}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div className={`bg-blue-600 h-full ${item.width}`} />
+                    <div className="bg-blue-600 h-full" style={{ width: `${item.share}%` }} />
                   </div>
-                  <span className="text-[9px] font-bold text-slate-400 w-8 text-right">{item.share}</span>
+                  <span className="text-[9px] font-bold text-slate-400 w-8 text-right">{item.share}%</span>
                 </div>
               </div>
             ))}
@@ -471,24 +615,24 @@ export default function HSCodeIntelligence() {
               <div className="relative w-[100px] h-[100px] shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={INITIAL_COUNTRY_DATA} innerRadius={32} outerRadius={45} dataKey="value" stroke="none">
-                      {INITIAL_COUNTRY_DATA.map((item, index) => <Cell key={index} fill={item.color} />)}
+                    <Pie data={countries} innerRadius={32} outerRadius={45} dataKey="tradeValue" nameKey="_id" stroke="none">
+                      {countries.map((item, index) => <Cell key={index} fill={["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A3B8", "#EC4899"][index % 7]} />)}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <span className="text-[7px] uppercase text-slate-400 font-bold">Total Value</span>
-                  <span className="font-bold text-[9px] text-slate-800 leading-none">₹1,876.45 Cr</span>
+                  <span className="font-bold text-[9px] text-slate-800 leading-none">₹{(countries.reduce((sum, item) => sum + item.tradeValue, 0) / 10000000).toFixed(2)} Cr</span>
                 </div>
               </div>
               <div className="flex-1 space-y-1 pl-1 max-h-[130px] overflow-y-auto scrollbar-none">
-                {INITIAL_COUNTRY_DATA.map((country, idx) => (
+                {countries.map((country, idx) => (
                   <div key={idx} className="flex items-center justify-between text-[10px]">
                     <div className="flex items-center gap-1 truncate">
-                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: country.color }} />
-                      <span className="text-slate-600 font-semibold truncate">{country.name}</span>
+                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor:  ["#2563EB","#10B981","#8B5CF6","#F59E0B","#6366F1","#94A3B8","#EC4899",][idx % 7], }} />
+                      <span className="text-slate-600 font-semibold truncate">{country._id}</span>
                     </div>
-                    <span className="text-slate-500 font-bold ml-1">₹{country.value.toFixed(2)} Cr ({country.percent})</span>
+                    <span className="text-slate-500 font-bold ml-1"> ₹{(country.tradeValue / 10000000).toFixed(2)} Cr ({((country.tradeValue / countries.reduce((sum, item) => sum + item.tradeValue, 0)) * 100).toFixed(1)}%)</span>
                   </div>
                 ))}
               </div>
@@ -540,14 +684,14 @@ export default function HSCodeIntelligence() {
                   filteredTableData.map((row, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/60 transition">
                       <td className="py-3 text-slate-800 font-bold">{row.hsCode}</td>
-                      <td className="py-3 font-bold text-slate-700 max-w-[200px] truncate">{row.desc}</td>
-                      <td className="py-3 text-slate-400 font-semibold">{row.heading}</td>
+                      <td className="py-3 font-bold text-slate-700 max-w-[200px] truncate">{row.description}</td>
+                      <td className="py-3 text-slate-400 font-semibold">Chapter {row.chapter} / {row.heading}</td>
                       <td className="py-3 text-slate-500">{row.flow}</td>
-                      <td className="py-3 font-bold text-slate-800">{row.value}</td>
+                      <td className="py-3 font-bold text-slate-800">₹ {(row.tradeValue / 10000000).toFixed(2)} Cr</td>
                       <td className="py-3 text-slate-500">{row.shipments}</td>
-                      <td className="py-3 text-slate-500">{row.avgValue}</td>
-                      <td className="py-3 text-slate-700 font-semibold">{row.country}</td>
-                      <td className="py-3 text-green-500 font-bold">{row.growth}</td>
+                      <td className="py-3 text-slate-500">₹ {(row.avgShipmentValue / 100000).toFixed(2)} L</td>
+                      <td className="py-3 text-slate-700 font-semibold">{row.topCountry}</td>
+                      <td className="py-3 text-green-500 font-bold">-</td>
                       <td className="py-3 text-center text-slate-400 cursor-pointer hover:text-slate-600"><MoreVertical size={14} className="mx-auto" /></td>
                     </tr>
                   ))

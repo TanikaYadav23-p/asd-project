@@ -233,17 +233,41 @@ export default function ExportIntelligenceDashboard() {
   // ==========================================
   // 3. MEMOIZED FILTERING LOGIC
   // ==========================================
-  const filteredShipments = useMemo(() => {
-    return INITIAL_SHIPMENTS.filter(ship => {
-      const matchSearch = ship.desc.toLowerCase().includes(appliedFilters.search.toLowerCase()) || ship.hsCode.includes(appliedFilters.search);
-      const matchPort = appliedFilters.port === "All Ports" || ship.port.includes(appliedFilters.port);
-      const matchCountry = appliedFilters.country === "All Countries" || ship.country === appliedFilters.country;
-      const matchExporter = appliedFilters.exporter === "All Exporters" || ship.exporter.includes(appliedFilters.exporter.split(" ")[0]);
-      const matchBuyer = appliedFilters.buyer === "All Buyers" || ship.buyer.includes(appliedFilters.buyer.split(" ")[0]);
-      
-      return matchSearch && matchPort && matchCountry && matchExporter && matchBuyer;
-    });
-  }, [appliedFilters]);
+ const filteredShipments = useMemo(() => {
+  return recentShipments.filter((ship) => {
+    const matchSearch =
+      ship.cargo?.productName
+        ?.toLowerCase()
+        .includes(appliedFilters.search.toLowerCase()) ||
+      ship.cargo?.hsCode?.hsCode
+        ?.toString()
+        .includes(appliedFilters.search);
+
+    const matchPort =
+      appliedFilters.port === "All Ports" ||
+      ship.route?.warehouse === appliedFilters.port;
+
+    const matchCountry =
+      appliedFilters.country === "All Countries" ||
+      ship.route?.destinationCountry === appliedFilters.country;
+
+    const matchExporter =
+      appliedFilters.exporter === "All Exporters" ||
+      ship.exporter?.companyName === appliedFilters.exporter;
+
+    const matchBuyer =
+      appliedFilters.buyer === "All Buyers" ||
+      ship.buyer?.companyName === appliedFilters.buyer;
+
+    return (
+      matchSearch &&
+      matchPort &&
+      matchCountry &&
+      matchExporter &&
+      matchBuyer
+    );
+  });
+}, [recentShipments, appliedFilters]);
 
   const dynamicPieData = useMemo(() => {
     const colors=["#2563EB","#10B981","#8B5CF6","#F59E0B","#6366F1","#94A3B8","#EC4899"];
@@ -629,21 +653,21 @@ export default function ExportIntelligenceDashboard() {
                 <tbody className="divide-y divide-slate-50 text-slate-600 font-medium">
                   {filteredShipments.length > 0 ? (
                     filteredShipments.map((ship, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/80 transition">
-                        <td className="py-3.5 text-blue-600 font-semibold">{ship.id}</td>
-                        <td className="py-3.5 text-slate-400 font-bold">{ship.hsCode}</td>
-                        <td className="py-3.5 max-w-[180px] truncate font-semibold text-slate-700">{ship.desc}</td>
-                        <td className="py-3.5 truncate text-slate-500">{ship.exporter}</td>
-                        <td className="py-3.5 truncate text-slate-500">{ship.buyer}</td>
-                        <td className="py-3.5 text-slate-700">{ship.country}</td>
-                        <td className="py-3.5 text-slate-500">{ship.port}</td>
-                        <td className="py-3.5 text-slate-400 whitespace-nowrap">{ship.date}</td>
-                        <td className="py-3.5 font-bold text-slate-800">{ship.value}</td>
+                      <tr key={ship._id} className="hover:bg-slate-50/80 transition">
+                        <td className="py-3.5 text-blue-600 font-semibold">{ship.sbNumber}</td>
+                        <td className="py-3.5 text-slate-400 font-bold">{ship.cargo?.hsCode?.hsCode || "-"}</td>
+                        <td className="py-3.5 max-w-[180px] truncate font-semibold text-slate-700"> {ship.cargo?.productName}</td>
+                        <td className="py-3.5 truncate text-slate-500">{ship.exporter?.companyName}</td>
+                        <td className="py-3.5 truncate text-slate-500">{ship.buyer?.companyName}</td>
+                        <td className="py-3.5 text-slate-700">{ship.route?.destinationCountry}</td>
+                        <td className="py-3.5 text-slate-500">{ship.route?.warehouse || "-"}</td>
+                        <td className="py-3.5 text-slate-400 whitespace-nowrap">{new Date(ship.shipmentDate).toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric",})}</td>
+                        <td className="py-3.5 font-bold text-slate-800">₹ {ship.cargo?.value?.toFixed(2)}</td>
                         <td className="py-3.5 text-center">
                           <span className={`inline-block px-2.5 py-0.5 rounded-full text-[9px] font-bold ${
-                            ship.status === "DELIVERED" ? "bg-green-100 text-green-700" :
-                            ship.status === "IN TRANSIT" ? "bg-blue-100 text-blue-700" : "bg-orange-100 text-orange-700"
-                          }`}>{ship.status}</span>
+                            ship.status === "Delivered" ? "bg-green-100 text-green-700" :
+                            ship.status === "In Transit" ? "bg-blue-100 text-blue-700" : "bg-orange-100 text-orange-700"
+                          }`}>{ship.shipmentStatus}</span>
                         </td>
                       </tr>
                     ))

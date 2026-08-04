@@ -20,7 +20,7 @@ exports.getDashboard = async (req, res) => {
         }
 
         if (country) {
-            filter["route.destination"] = country;
+            filter["route.destinationCountry"] = country;
         }
 
         if (flow === "Import") {
@@ -45,7 +45,7 @@ exports.getDashboard = async (req, res) => {
 
         const exporters = await Shipment.distinct("exporter.companyName", filter);
         const suppliers = await Shipment.distinct("supplier.companyName", filter);
-        const countries = await Shipment.distinct("route.origin", filter);
+        const countries = await Shipment.distinct("route.originCountry", filter);
 
         const avgShipmentValue = await Shipment.aggregate([
             { $match: filter },
@@ -300,7 +300,7 @@ exports.getCountries = async (req, res) => {
         const countries = await Shipment.aggregate([
             {
                 $group: {
-                    _id: "$route.destination",
+                    _id: "$route.destinationCountry",
                     tradeValue: { $sum: "$cargo.value" },
                     shipments: { $sum: 1 }
                 }
@@ -468,7 +468,7 @@ exports.getHSCodeDetails = async (req, res) => {
                     tradeValue: { $sum: "$cargo.value" },
                     shipments: { $sum: 1 },
                     avgShipmentValue: { $avg: "$cargo.value" },
-                    topCountry: { $first: "$route.destination" }
+                    topCountry: { $first: "$route.destinationCountry" }
                 }
             },
             {
@@ -505,7 +505,7 @@ exports.getFilterOptions = async (req, res) => {
 
         const subHeadings = await HSCode.distinct("subHeading");
 
-        const countries = await Shipment.distinct("route.destination");
+        const countries = await Shipment.distinct("route.destinationCountry");
 
         const flows = ["Import", "Export", "Both"];
 
