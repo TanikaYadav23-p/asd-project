@@ -14,8 +14,8 @@ exports.getDashboard = async (req, res) => {
             };
         }
 
-        if (origin) filter["route.origin"] = origin;
-        if (destination) filter["route.destination"] = destination;
+        if (origin) filter["route.originCountry"] = origin;
+        if (destination) filter["route.destinationCountry"] = destination;
         if (exporter) filter["exporter.companyName"] = exporter;
         if (importer) filter["importer.companyName"] = importer;
         if (status) filter.status = status;
@@ -35,7 +35,7 @@ exports.getDashboard = async (req, res) => {
 
         const exporters = await Shipment.distinct("exporter.companyName", filter);
         const suppliers = await Shipment.distinct("supplier.companyName", filter);
-        const countries = await Shipment.distinct("route.origin", filter);
+        const countries = await Shipment.distinct("route.originCountry", filter);
 
         const avgShipmentValue = await Shipment.aggregate([
             { $match: filter },
@@ -91,10 +91,10 @@ exports.getShipments = async (req, res) => {
         const filter = {};
 
         if (req.query.origin)
-            filter["route.origin"] = req.query.origin;
+            filter["route.originCountry"] = req.query.origin;
 
         if (req.query.destination)
-            filter["route.destination"] = req.query.destination;
+            filter["route.destinationCountry"] = req.query.destination;
 
         if (req.query.exporter)
             filter["exporter.companyName"] = req.query.exporter;
@@ -139,9 +139,9 @@ exports.getFilterOptions = async (req, res) => {
 
         const hsCodes = await Shipment.distinct("cargo.hsCode");
 
-        const originCountries = await Shipment.distinct("route.origin");
+        const originCountries = await Shipment.distinct("route.originCountry");
 
-        const destinationCountries = await Shipment.distinct("route.destination");
+        const destinationCountries = await Shipment.distinct("route.destinationCountry");
 
         const importers = await Shipment.distinct("importer.companyName");
 
@@ -185,8 +185,8 @@ exports.exportReport = async (req, res) => {
             };
         }
 
-        if (origin) filter["route.origin"] = origin;
-        if (destination) filter["route.destination"] = destination;
+        if (origin) filter["route.originCountry"] = origin;
+        if (destination) filter["route.destinationCountry"] = destination;
         if (exporter) filter["exporter.companyName"] = exporter;
         if (importer) filter["importer.companyName"] = importer;
         if (hsCode) filter["cargo.hsCode"] = hsCode;

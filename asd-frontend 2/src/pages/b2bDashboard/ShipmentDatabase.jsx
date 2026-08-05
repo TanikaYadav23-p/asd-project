@@ -1,4 +1,10 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  getDashboard,
+  getFilterOptions,
+  getShipments,
+  exportReport
+} from '../../api/ShipmentDatabaseApi';
 import {
   Calendar,
   ChevronDown,
@@ -194,6 +200,12 @@ export default function ShipmentDatabase() {
     },
   ];
 
+  const [dashboard, setDashboard] = useState({});
+  const [shipments, setShipments] = useState([]);
+  const [filterOptions, setFilterOptions] = useState({});
+  const [report, setReport] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   // --- STATES FOR FILTERING ---
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedOrigin, setSelectedOrigin] = useState("All Countries");
@@ -201,6 +213,46 @@ export default function ShipmentDatabase() {
   const [selectedImporter, setSelectedImporter] = useState("All Importers");
   const [selectedExporter, setSelectedExporter] = useState("All Exporters");
   const [selectedPort, setSelectedPort] = useState("All Ports");
+
+  const fetchDashboard = async () => {
+    try {
+      const res = await getDashboard();
+      setDashboard(res.data.data || {});
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const fetchShipments = async () => {
+    try {
+      const res = await getShipments();
+      setShipments(res.data.data || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const fetchFilterOptions = async () => {
+    try {
+      const res = await getFilterOptions();
+      setFilterOptions(res.data.data || {});
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const fetchReport = async () => {
+    try {
+      const res = await exportReport();
+      setReport(res.data.data || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  useEffect (() => {
+    fetchDashboard();
+    fetchShipments();
+    fetchFilterOptions();
+    fetchReport();
+  }, []);
+
 
   // --- DYNAMIC DROPDOWN OPTIONS GENERATION ---
   const uniqueOrigins = useMemo(
