@@ -147,7 +147,7 @@ exports.getFilterOptions = async (req, res) => {
 
         const exporters = await Shipment.distinct("exporter.companyName");
 
-        const ports = await Shipment.distinct("route.portOfLoading");
+        const ports = await Shipment.distinct("route.originCity");
 
         return res.status(200).json({
             status: 1,

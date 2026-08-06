@@ -1,4 +1,14 @@
-import React, { useState } from "react";
+import React, { useState,useEffect,useMemo } from "react";
+import {
+  getDashboard,
+  getCountryOverview,
+  getFilterOptions,
+  getRegionAnalysis,
+  getSummary,
+  getTopCountries,
+  getTopRoutes,
+  getTradeFlow,
+} from '../../api/TradeMapApi';
 import {
   CalendarDays,
   Download,
@@ -32,19 +42,23 @@ import {
   Line,
 } from "recharts";
 
-const KPI_STATS = [
-  { title: "Global Trade Value (INR)", value: "₹1,245.80 Cr", change: "▲ 16.6% vs last month", icon: IndianRupee },
-  { title: "Total Shipments", value: "8,742", change: "▲ 16.8% vs last month", icon: Package },
-  { title: "Countries Traded", value: "168", change: "▲ 6 vs last month", icon: Globe2 },
-  { title: "Export Value (INR)", value: "₹620.45 Cr", change: "▲ 17.3% vs last month", icon: ArrowUpRight },
-  { title: "Import Value (INR)", value: "₹625.35 Cr", change: "▲ 19.8% vs last month", icon: ArrowDownLeft },
-  { title: "Top Product Category", value: "Electronics", change: "₹185.45 Cr", icon: Tag, plain: true },
-  { title: "Top Trading Country", value: "USA", change: "₹185.45 Cr", icon: Flag, plain: true },
-];
 
 const TABS = ["Trade Flow", "Country Analysis", "Product Analysis"];
+const countryCodes = {
+  India: "IN",
+  China: "CN",
+  USA: "US",
+  Germany: "DE",
+  Japan: "JP",
+  Australia: "AU",
+  Brazil: "BR",
+  Canada: "CA",
+  France: "FR",
+  Singapore: "SG",
+  UAE: "AE",
+};
 
-const TRADE_ROUTES = [
+/*const TRADE_ROUTES = [
   { from: "China", to: "USA", fFlag: "CN", tFlag: "US", value: "₹185.45 Cr", share: "14.9%", width: "70%" },
   { from: "India", to: "UAE", fFlag: "IN", tFlag: "AE", value: "₹96.30 Cr", share: "7.7%", width: "38%" },
   { from: "Germany", to: "USA", fFlag: "DE", tFlag: "US", value: "₹74.20 Cr", share: "6.0%", width: "30%" },
@@ -97,7 +111,7 @@ const MAP_LINES = [
   { top: "30%", left: "39%", w: 17, angle: 4 },
   { top: "35%", left: "55%", w: 16, angle: -18 },
   { top: "55%", left: "40%", w: 15, angle: 24 },
-];
+]; */
 
 function SectionCard({ children, className = "" }) {
   return (
@@ -111,7 +125,223 @@ export default function TradeMapDashboard() {
   const [activeTab, setActiveTab] = useState("Trade Flow");
   const [flowType, setFlowType] = useState("Total Trade");
 
-  const totalRegionValue = REGION_DATA.reduce((a, b) => a + b.value, 0).toFixed(2);
+  const [dashboard, setDashboard] = useState({});
+  const [tradeFlow, setTradeFlow] = useState([]);
+  const [topRoutes, setTopRoutes] = useState([]);
+  const [countryOverview, setCountryOverview] = useState([]);
+  const [topCountries, setTopCountries] = useState([]);
+  const [regionAnalysis, setRegionAnalysis] = useState([]);
+  const [summary, setSummary] = useState({});
+  const [filterOptions, setFilterOptions] = useState({});
+
+  const [filters, setFilters] = useState({
+  tradeType: "All",
+  fromCountry: "All",
+  toCountry: "All",
+  product: "All",
+  hsCode: "All",
+  timePeriod: "This Month",
+});
+
+const [appliedFilters, setAppliedFilters] = useState({
+  tradeType: "All",
+  fromCountry: "All",
+  toCountry: "All",
+  product: "All",
+  hsCode: "All",
+  timePeriod: "This Month",
+});
+  
+
+  const fetchDashboard = async () => {
+  try {
+    const res = await getDashboard();
+    setDashboard(res.data.data || {});
+  } catch (err) {
+    console.log(err);
+  }
+};
+const fetchTradeFlow = async () => {
+  try {
+    const res = await getTradeFlow();
+    setTradeFlow(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+const fetchTopRoutes = async () => {
+  try {
+    const res = await getTopRoutes();
+    setTopRoutes(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+const fetchCountryOverview = async () => {
+  try {
+    const res = await getCountryOverview();
+    setCountryOverview(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+const fetchTopCountries = async () => {
+  try {
+    const res = await getTopCountries();
+    setTopCountries(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+const fetchRegionAnalysis = async () => {
+  try {
+    const res = await getRegionAnalysis();
+    setRegionAnalysis(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+const fetchSummary = async () => {
+  try {
+    const res = await getSummary();
+    setSummary(res.data.data || {});
+  } catch (err) {
+    console.log(err);
+  }
+};
+const fetchFilterOptions = async () => {
+  try {
+    const res = await getFilterOptions();
+    setFilterOptions(res.data.data || {});
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+useEffect(() => {
+  fetchDashboard();
+  fetchTradeFlow();
+  fetchTopRoutes();
+  fetchCountryOverview();
+  fetchTopCountries();
+  fetchRegionAnalysis();
+  fetchSummary();
+  fetchFilterOptions();
+}, []);
+
+const handleApplyFilters = () => {
+  setAppliedFilters(filters);
+};
+const handleResetFilters = () => {
+  const reset = {
+    tradeType: "All",
+    fromCountry: "All",
+    toCountry: "All",
+    product: "All",
+    hsCode: "All",
+    timePeriod: "This Month",
+  };
+
+  setFilters(reset);
+  setAppliedFilters(reset);
+};
+
+const filteredCountryOverview = useMemo(() => {
+  return countryOverview.filter((row) => {
+    const matchesTradeType =
+      appliedFilters.tradeType === "All" ||
+      row.tradeType === appliedFilters.tradeType;
+
+    const matchesFromCountry =
+      appliedFilters.fromCountry === "All" ||
+      row.fromCountry === appliedFilters.fromCountry;
+
+    const matchesToCountry =
+      appliedFilters.toCountry === "All" ||
+      row.toCountry === appliedFilters.toCountry;
+
+    const matchesProduct =
+      appliedFilters.product === "All" ||
+      row.topProduct === appliedFilters.product;
+
+    const matchesHsCode =
+      appliedFilters.hsCode === "All" ||
+      row.hsCode?._id === appliedFilters.hsCode;
+
+    return (
+      matchesTradeType &&
+      matchesFromCountry &&
+      matchesToCountry &&
+      matchesProduct &&
+      matchesHsCode
+    );
+  });
+}, [countryOverview, appliedFilters]);
+
+  const KPI_STATS = [
+  { title: "Global Trade Value (INR)", value: `₹${((dashboard.globalTradeValue || 0) / 10000000).toFixed(2)} Cr`, change: "Total Trade Value", icon: IndianRupee },
+  { title: "Total Shipments", value: dashboard.totalShipments || 0, change: "Across All Routes", icon: Package },
+  { title: "Countries Traded", value:  dashboard.countriesTraded || 0, change: "Trading Countries", icon: Globe2 },
+  { title: "Export Value (INR)", value: `₹${((dashboard.exportValue || 0) / 10000000).toFixed(2)} Cr`, change: "Export Trade", icon: ArrowUpRight },
+  { title: "Import Value (INR)", value: `₹${((dashboard.importValue || 0) / 10000000).toFixed(2)} Cr`, change: "Import Trade", icon: ArrowDownLeft },
+  { title: "Top Product Category", value: dashboard.topProduct?._id || "-", change: `₹${((dashboard.topProduct?.value || 0) / 10000000).toFixed(2)} Cr`, icon: Tag, plain: true },
+  { title: "Top Trading Country", value: dashboard.topTradingCountry?._id || "-", change: `₹${((dashboard.topTradingCountry?.value || 0) / 10000000).toFixed(2)} Cr`, icon: Flag, plain: true },
+];
+
+  const COUNTRY_COORDINATES = {
+  India: { top: "55%", left: "67%" },
+  USA: { top: "38%", left: "18%" },
+  China: { top: "42%", left: "75%" },
+  Germany: { top: "30%", left: "50%" },
+  UAE: { top: "50%", left: "58%" },
+  Japan: { top: "40%", left: "84%" },
+  Australia: { top: "75%", left: "82%" },
+};
+const MAP_DOTS = tradeFlow.flatMap((item) => {
+  const from = COUNTRY_COORDINATES[item.fromCountry];
+  const to = COUNTRY_COORDINATES[item.toCountry];
+
+  return [
+    from && {
+      top: from.top,
+      left: from.left,
+      color: "#2563EB",
+    },
+    to && {
+      top: to.top,
+      left: to.left,
+      color: "#10B981",
+      big: true,
+    },
+  ].filter(Boolean);
+});
+const MAP_LINES = tradeFlow
+  .map((item) => {
+    const from = COUNTRY_COORDINATES[item.fromCountry];
+
+    if (!from) return null;
+
+    return {
+      top: from.top,
+      left: from.left,
+      w:
+        item.tradeValue >= 10000000000
+          ? 25
+          : item.tradeValue >= 5000000000
+          ? 18
+          : item.tradeValue >= 1000000000
+          ? 12
+          : 8,
+      angle: 10,
+    };
+  })
+  .filter(Boolean);
+  const totalTradeValue = topRoutes.reduce(
+  (sum, item) => sum + item.tradeValue,
+  0
+);
+
+ const totalRegionValue = (regionAnalysis.reduce((sum, item) => sum + item.tradeValue, 0) / 10000000).toFixed(2);
 
   return (
     <div className="h-screen w-full bg-[#F8FAFC] text-slate-600 font-sans antialiased overflow-y-auto py-5">
@@ -192,21 +422,23 @@ export default function TradeMapDashboard() {
             <div>
               <label className="text-[10px] text-[#07156B] font-bold block mb-1.5 uppercase">Trade Type</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>All (Import/Export)</option>
-                  <option>Import</option>
-                  <option>Export</option>
+                <select  value={filters.tradeType} onChange={(e) => setFilters({ ...filters, tradeType: e.target.value })} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="All">All (Import/Export)</option>
+                  {filterOptions.tradeTypes?.map((type, idx) => (
+                    <option key={idx} value={type}>{type}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
             </div>
             <div>
-              <label className="text-[10px] text-[#07156B] font-bold block mb-1.5 uppercase">Time Period</label>
+              <label className="text-[10px] text-[#07156B] font-bold block mb-1.5 uppercase">Product</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>This Month</option>
-                  <option>Last Month</option>
-                  <option>This Year</option>
+                <select value={filters.product} onChange={(e) => setFilters({ ...filters, product: e.target.value })} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="All">All Products</option>
+                  {filterOptions.products?.map((product, idx) => (
+                    <option key={idx} value={product}>{product}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -214,8 +446,11 @@ export default function TradeMapDashboard() {
             <div>
               <label className="text-[10px] text-[#07156B] font-bold block mb-1.5 uppercase">From Country</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>All Countries</option>
+                <select  value={filters.fromCountry} onChange={(e) =>setFilters({ ...filters, fromCountry: e.target.value }) }className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="All">All Countries</option>
+                  {filterOptions.fromCountries?.map((country, idx) => (
+                    <option key={idx} value={country}>{country}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -223,17 +458,23 @@ export default function TradeMapDashboard() {
             <div>
               <label className="text-[10px] text-[#07156B] font-bold block mb-1.5 uppercase">To Country</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>All Countries</option>
+                <select  value={filters.toCountry} onChange={(e) => setFilters({ ...filters, toCountry: e.target.value })} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="All">All Countries</option>
+                  {filterOptions.toCountries?.map((country, idx) => (
+                    <option key={idx} value={country}>{country}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
             </div>
             <div>
-              <label className="text-[10px] text-[#07156B] font-bold block mb-1.5 uppercase">Product / HS Code</label>
+              <label className="text-[10px] text-[#07156B] font-bold block mb-1.5 uppercase">HS Code</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>All Products</option>
+                <select value={filters.hsCode} onChange={(e) => setFilters({ ...filters, hsCode: e.target.value })} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option>All HS Codes</option>
+                  {filterOptions.hsCodes?.map((item, idx) => (
+                    <option key={idx} value={item.hsCode?.hsCode}>{item.hsCode?.hsCode} - {item.hsCode?.description}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -250,10 +491,10 @@ export default function TradeMapDashboard() {
              </button> */}
              
             <div className="flex gap-5 items-center justify-between ">
-              <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl py-2 px-3 transition shadow-xs whitespace-nowrap">
+              <button onClick={handleApplyFilters} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl py-2 px-3 transition shadow-xs whitespace-nowrap">
                 Apply Filters
               </button>
-              <button className="text-slate-400 hover:text-slate-600 text-xs font-medium px-3 whitespace-nowrap">
+              <button onClick={handleResetFilters} className="text-slate-400 hover:text-slate-600 text-xs font-medium px-3 whitespace-nowrap">
                 Reset
               </button>
             </div>
@@ -354,29 +595,31 @@ export default function TradeMapDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {TRADE_ROUTES.map((r, i) => (
-                    <tr key={i}>
+                  {topRoutes.map((route, i) =>  {
+                     const share = totalTradeValue > 0 ? ((route.tradeValue / totalTradeValue) * 100).toFixed(1) : 0;
+                     return (
+                    <tr key={route._id}>
                       <td className="py-2 font-semibold text-slate-700 whitespace-nowrap flex items-center gap-1">
-                          <ReactCountryFlag countryCode={r.fFlag} svg style={{ width: "14px", height: "14px" }} />
-                        {r.from}</td>
+                          <ReactCountryFlag countryCode={countryCodes[route.fromCountry] || ""} svg style={{ width: "14px", height: "14px" }} />
+                        {route.fromCountry}</td>
                       <td className="py-2 font-semibold text-slate-700 whitespace-nowrap ">
-                          <ReactCountryFlag countryCode={r.tFlag} svg style={{ width: "14px", height: "14px" }} />
-                       {r.to}</td>
-                      <td className="py-2 text-right font-bold text-slate-800 whitespace-nowrap">{r.value}</td>
+                          <ReactCountryFlag countryCode={countryCodes[route.toCountry] || ""} svg style={{ width: "14px", height: "14px" }} />
+                       {route.toCountry}</td>
+                      <td className="py-2 text-right font-bold text-slate-800 whitespace-nowrap">₹{(route.tradeValue / 10000000).toFixed(2)} Cr</td>
                       <td className="py-2 text-right w-20">
                         <div className="flex items-center justify-end gap-1.5">
                           <div className="w-10 h-1 bg-slate-100 rounded-full overflow-hidden hidden sm:block">
-                            <div className="h-full bg-emerald-500" style={{ width: r.width }} />
+                            <div className="h-full bg-emerald-500" style={{ width: `${share}%` }} />
                           </div>
-                          <span className="font-bold text-slate-500">{r.share}</span>
+                          <span className="font-bold text-slate-500">{route.share}%</span>
                         </div>
                       </td>
-                    </tr>
-                  ))}
+                    </tr>);
+                  })}
                   <tr className="border-t border-slate-100">
                     <td className="py-2 font-bold text-slate-800" colSpan={2}>Total</td>
-                    <td className="py-2 text-right font-bold text-slate-800">₹620.45 Cr</td>
-                    <td className="py-2 text-right font-bold text-slate-500">49.2%</td>
+                    <td className="py-2 text-right font-bold text-slate-800">₹{(totalTradeValue / 10000000).toFixed(2)} Cr</td>
+                    <td className="py-2 text-right font-bold text-slate-500">100%</td>
                   </tr>
                 </tbody>
               </table>
@@ -391,21 +634,21 @@ export default function TradeMapDashboard() {
               <button className="text-blue-600 text-[10px] font-bold">View All</button>
             </div>
             <div className="space-y-2.5">
-              {TOP_COUNTRIES.map((c, i) => (
+              {topCountries.map((c, i) => (
                 <div key={i} className="text-[11px]">
                   <div className="flex justify-between mb-1">
                     <span className="font-semibold text-slate-700 flex items-center gap-1">
                          <ReactCountryFlag
-                           countryCode={c.flag}
+                           countryCode={countryCodes[c._id] || ""}
                             svg
                             style={{ width: "12px", height: "12px" }}
                          />
-                         {c.name}
+                         {c._id}
                          </span>
-                    <span className="font-bold text-slate-700">{c.value} <span className="text-slate-400 font-semibold">{c.share}</span></span>
+                    <span className="font-bold text-slate-700">₹{(c.tradeValue / 10000000).toFixed(2)} Cr<span className="text-slate-400 font-semibold">({((c.tradeValue / topCountries.reduce((sum, item) => sum + item.tradeValue,0)) * 100).toFixed(1)}%)</span></span>
                   </div>
                   <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-emerald-500 h-full rounded-full" style={{ width: c.width }} />
+                    <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${((c.tradeValue / topCountries.reduce((sum, item) => sum + item.tradeValue, 0)) * 100 ).toFixed(1)}%`, }} />
                   </div>
                 </div>
               ))}
@@ -424,9 +667,9 @@ export default function TradeMapDashboard() {
               <div className="relative w-[110px] h-[110px] shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={REGION_DATA} innerRadius={32} outerRadius={50}    dataKey="value" stroke="none">
-                      {REGION_DATA.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
+                    <Pie data={regionAnalysis} innerRadius={32} outerRadius={50} dataKey="tradeValue" stroke="none">
+                      {regionAnalysis.map((entry, index) => (
+                        <Cell key={index} fill={["#10B981","#3B82F6","#F59E0B","#8B5CF6","#EF4444","#06B6D4","#84CC16",][index % 7]} />
                       ))}
                     </Pie>
                   </PieChart>
@@ -437,14 +680,14 @@ export default function TradeMapDashboard() {
                 </div>
               </div>
               <div className="space-y-8 flex-1 text-[10px] ">
-                {REGION_DATA.map((r, i) => (
+                {regionAnalysis.map((r, i) => (
                   <div key={i} className="flex items-center justify-between  ">
                     <div className="flex items-center gap-1.5 ">
-                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: r.color }} />
-                      <span className="text-slate-600 font-semibold">{r.name}</span>
+                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: ["#10B981","#3B82F6","#F59E0B","#8B5CF6","#EF4444","#06B6D4","#84CC16",][i % 7], }} />
+                      <span className="text-slate-600 font-semibold">{r._id}</span>
                     </div>
                     <span className="text-slate-500 font-semibold text-right whitespace-nowrap">
-                      ₹{r.value.toFixed(2)} Cr ({r.percent})
+                       ₹{(r.tradeValue / 10000000).toFixed(2)} Cr ({((r.tradeValue / regionAnalysis.reduce((sum, item) => sum + item.tradeValue, 0)) * 100).toFixed(1)}%)
                     </span>
                   </div>
                 ))}
@@ -459,39 +702,39 @@ export default function TradeMapDashboard() {
                 <div className="flex items-center gap-1 text-[9px] text-[#07156B] font-bold uppercase mb-1">
                   <Link2 size={10} /> Inter-Regional Trade
                 </div>
-                <div className="text-base font-black text-[#07156B]">₹845.60 Cr</div>
-                <div className="text-[10px] text-[#07156B] font-semibold">67.9%</div>
+                <div className="text-base font-black text-[#07156B]">₹{((summary.interRegionalTrade || 0) / 10000000).toFixed(2)} Cr</div>
+                <div className="text-[10px] text-[#07156B] font-semibold"> {(((summary.interRegionalTrade || 0) / ((summary.interRegionalTrade || 0) + (summary.intraRegionalTrade || 0))) * 100 || 0).toFixed(1)}%</div>
               </div>
               <div className="bg-slate-50/60 flex flex-col space-y-3 border border-slate-100 rounded-xl p-2.5">
                 <div className="flex items-center gap-1 text-[9px] text-[#07156B] font-bold uppercase mb-1">
                   <Building2 size={10} /> Intra-Regional Trade
                 </div>
-                <div className="text-base font-black text-[#07156B]">₹400.20 Cr</div>
-                <div className="text-[10px] text-[#07156B] font-semibold">32.1%</div>
+                <div className="text-base font-black text-[#07156B]">₹{((summary.intraRegionalTrade || 0) / 10000000).toFixed(2)} Cr</div>
+                <div className="text-[10px] text-[#07156B] font-semibold">{(((summary.intraRegionalTrade || 0) / ((summary.interRegionalTrade || 0) + (summary.intraRegionalTrade || 0))) * 100 || 0).toFixed(1)}%</div>
               </div>
               <div className="bg-slate-50/60 flex flex-col space-y-3 border border-slate-100 rounded-xl p-2.5">
                 <div className="flex items-center gap-1 text-[9px] text-[#07156B] font-bold uppercase mb-1">
                   <TrendingUp size={10} /> Top Growing Route
                 </div>
-                <div className="text-[11px] flex items-center justify-between font-bold text-slate-800">India →  <ReactCountryFlag
-                            countryCode={"US"}
+                <div className="text-[11px] flex items-center justify-between font-bold text-slate-800">{summary.topGrowingRoute?.fromCountry} → <ReactCountryFlag
+                            countryCode={countryCodes[summary.topGrowingRoute?.toCountry] || ""}
                             svg
                             style={{ width: "12px", height: "12px" }}
-                            /> USA <span className="text-emerald-500">▲ 32.6%</span></div>
-                <div className="text-[10px] text-[#07156B] font-semibold">Trade Value: ₹28.60 Cr</div>
+                            /> {summary.topGrowingRoute?.toCountry} <span className="text-emerald-500">▲ {summary.topGrowingRoute?.growth || 0}%</span></div>
+                <div className="text-[10px] text-[#07156B] font-semibold">Trade Value: ₹{((summary.topGrowingRoute?.tradeValue || 0) / 10000000).toFixed(2)}Cr</div>
               </div>
               <div className="bg-slate-50/60 flex flex-col space-y-3 border border-slate-100 rounded-xl p-2.5">
                 <div className="flex items-center gap-1 text-[9px] text-[#07156B] font-bold uppercase mb-1">
                   <PlusCircle size={10} /> New Trade Route Added
                 </div>
-                <div className="text-[11px]  flex  items-center justify-between font-bold text-slate-800">Brazil →
+                <div className="text-[11px]  flex  items-center justify-between font-bold text-slate-800">{summary.newestRoute?.fromCountry} →
                          <ReactCountryFlag
-                            countryCode={"IN"}
+                            countryCode={countryCodes[summary.newestRoute?.toCountry] || ""}
                             svg
                             style={{ width: "12px", height: "12px" }}
                             />
-                             India</div>
-                <div className="text-[10px] text-[#07156B] font-semibold">Trade Value: ₹2.35 Cr</div>
+                             {summary.newestRoute?.toCountry}</div>
+                <div className="text-[10px] text-[#07156B] font-semibold">Trade Value: ₹{((summary.newestRoute?.tradeValue || 0) / 10000000).toFixed(2)} Cr</div>
               </div>
             </div>
           </SectionCard>
@@ -517,36 +760,36 @@ export default function TradeMapDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50  ">
-                {TRADE_OVERVIEW.map((r, i) => (
+                {filteredCountryOverview.map((r, i) => (
                   <tr key={i}>
                     <td className="py-2.5 font-semibold text-[#07156B] whitespace-nowrap flex items-center gap-1">
                           <div className="flex items-center gap-1">
                             <ReactCountryFlag
-                            countryCode={r.fFlag}
+                            countryCode={countryCodes[r.fromCountry]}
                             svg
                             style={{ width: "12px", height: "12px" }}
                             />
-                            <span>{r.from}</span>
+                            <span>{r.fromCountry}</span>
                     </div> </td>
                     <td className="py-2.5 font-semibold text-[#07156B] whitespace-nowrap  ">
                           <div className="flex items-center gap-1">
                             <ReactCountryFlag
-                            countryCode={r.tFlag}
+                            countryCode={countryCodes[r.toCountry]}
                             svg
                             style={{ width: "12px", height: "12px" }}
                             />
-                            <span>{r.to}</span>
+                            <span>{r.toCountry}</span>
                         </div>
                     </td>
-                    <td className="py-2.5 text-[#07156B] whitespace-nowrap">{r.type}</td>
-                    <td className="py-2.5 text-center font-bold text-[#07156B] whitespace-nowrap">{r.value}</td>
+                    <td className="py-2.5 text-[#07156B] whitespace-nowrap">{r.tradeType}</td>
+                    <td className="py-2.5 text-center font-bold text-[#07156B] whitespace-nowrap">₹{(r.tradeValue / 10000000).toFixed(2)} Cr</td>
                     <td className="py-2.5 text-center text-[#07156B] whitespace-nowrap">{r.shipments}</td>
-                    <td className="py-2.5  text-center text-[#07156B] whitespace-nowrap">{r.product}</td>
+                    <td className="py-2.5  text-center text-[#07156B] whitespace-nowrap">{r.topProduct}</td>
                     <td className="py-2.5 text-left font-bold text-emerald-500 whitespace-nowrap">▲ {r.growth}</td>
-                    <td className="py-2.5 text-left font-semibold text-[#07156B] whitespace-nowrap">{r.share}</td>
+                    <td className="py-2.5 text-left font-semibold text-[#07156B] whitespace-nowrap">{((r.tradeValue / filteredCountryOverview.reduce((sum, item) => sum + item.tradeValue, 0)) * 100).toFixed(1)}%</td>
                     <td className="py-2.5 w-20 h-8">
                       <ResponsiveContainer width="100%" height={24}>
-                        <LineChart data={r.trend.map((v) => ({ v }))}>
+                        <LineChart data={[{ v: r.tradeValue * 0.6 },{ v: r.tradeValue * 0.8 },{ v: r.tradeValue },]}>
                           <Line type="monotone" dataKey="v" stroke="#10B981" strokeWidth={1.5} dot={false} />
                         </LineChart>
                       </ResponsiveContainer>

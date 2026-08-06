@@ -1,4 +1,15 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  getDashboard,
+  getTopCountries,
+  getTopSuppliers,
+  getSupplierTypes,
+  getQualityDistribution,
+  getSupplierSpotlight,
+  getRecentShipments,
+  getFilterOptions,
+  getTopCertifications
+} from '../../api/SupplierDiscoveryApi';
 import {
   Calendar,
   LayoutDashboard,
@@ -34,16 +45,7 @@ import {
 // 1. EXACT MAPPED DATA FROM {65F36CC2-3D40-4FBC-88F1-0061C6F7D952}.png
 // ==========================================
 
-const KPI_DATA = [
-  { title: "Total Suppliers", value: "8,742", change: "▲ 16.8% vs last month", isUp: true, color: "text-blue-600", bg: "bg-blue-50", icon: Building2 },
-  { title: "Active Suppliers", value: "18,742", change: "▲ 18.8% vs last month", isUp: true, color: "text-emerald-600", bg: "bg-emerald-50", icon: UserCheck },
-  { title: "Countries Covered", value: "65", change: "▲ 12.3% vs last month", isUp: true, color: "text-cyan-600", bg: "bg-cyan-50", icon: Globe },
-  { title: "Products Covered", value: "12,856", change: "▲ 14.7% vs last month", isUp: true, color: "text-amber-600", bg: "bg-amber-50", icon: Cpu },
-  { title: "Total Shipments", value: "14.26 L", change: "▲ 9.4% vs last month", isUp: true, color: "text-orange-600", bg: "bg-orange-50", icon: Package },
-  { title: "Total Trade Value (INR)", value: "₹8,452.65 Cr", change: "▼ 2.3% vs last month", isUp: false, color: "text-emerald-700", bg: "bg-emerald-50", icon: TrendingUp },
-];
-
-const COUNTRY_DATA = [
+/*const COUNTRY_DATA = [
   { name: "USA", value: 512.35, percent: "27.3%", color: "#3B82F6" },
   { name: "UAE", value: 302.80, percent: "16.1%", color: "#10B981" },
   { name: "China", value: 268.40, percent: "14.3%", color: "#8B5CF6" },
@@ -135,41 +137,175 @@ const SUPPLIERS_MASTER_LIST = [
     certifications: ["ISO 9001"],
     recentShipments: [{ code: "82032000", date: "05 Apr 2025", val: "₹ 9.80 Cr" }]
   }
-];
+];*/
 
 export default function SupplierDiscovery() {
+
+  const [dashboard, setDashboard] = useState({});
+  const [topCountries, setTopCountries] = useState([]);
+  const [supplierTypes, setSupplierTypes] = useState([]);
+  const [qualityDistribution, setQualityDistribution] = useState({});
+  const [topCertifications, setTopCertifications] = useState([]);
+  const [topSuppliers, setTopSuppliers] = useState([]);
+  const [supplierSpotlight, setSupplierSpotlight] = useState({});
+  const [recentShipments, setRecentShipments] = useState([]);
+  const [filterOptions, setFilterOptions] = useState({});
   // States for Live Filtering
   const [searchQuery, setSearchQuery] = useState("");
   const [countryFilter, setCountryFilter] = useState("All Countries");
   const [typeFilter, setTypeFilter] = useState("All Type");
+  const [shipmentFilter, setShipmentFilter] = useState("All");
+  const [tradeValueFilter, setTradeValueFilter] = useState("All");
+  const [certificationFilter, setCertificationFilter] = useState("All Certifications");
   
   // Applied filter state triggered on "Apply Filters" button click
-  const [appliedFilters, setAppliedFilters] = useState({ search: "", country: "All Countries", type: "All Type" });
+  const [appliedFilters, setAppliedFilters] = useState({ search: "", country: "All Countries", type: "All Type", shipment: "All", tradeValue: "All", certification: "All Certifications", });
 
   // Selected Supplier for Spotlight Section (Defaults to first item)
-  const [selectedSupplier, setSelectedSupplier] = useState(SUPPLIERS_MASTER_LIST[0]);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+
+  const fetchDashboard = async () => {
+  try {
+    const res = await getDashboard();
+    setDashboard(res.data.data || {});
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchTopCountries = async () => {
+  try {
+    const res = await getTopCountries();
+    setTopCountries(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchSupplierTypes = async () => {
+  try {
+    const res = await getSupplierTypes();
+    setSupplierTypes(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchQualityDistribution = async () => {
+  try {
+    const res = await getQualityDistribution();
+    setQualityDistribution(res.data.data || {});
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchTopCertifications = async () => {
+  try {
+    const res = await getTopCertifications();
+    setTopCertifications(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const fetchTopSuppliers = async () => {
+  try {
+    const res = await getTopSuppliers();
+    setTopSuppliers(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchSupplierSpotlight = async (supplierId) => {
+  try {
+    const res = await getSupplierSpotlight(supplierId);
+    setSelectedSupplier({...res.data.data.supplier,
+      recentShipments: res.data.data.recentShipments,});
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchRecentShipments = async () => {
+  try {
+    const res = await getRecentShipments();
+    setRecentShipments(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchFilterOptions = async () => {
+  try {
+    const res = await getFilterOptions();
+    setFilterOptions(res.data.data || {});
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+useEffect(() => {
+  fetchDashboard();
+  fetchTopCountries();
+  fetchSupplierTypes();
+  fetchQualityDistribution();
+  fetchTopSuppliers();
+  fetchTopCertifications();
+  fetchRecentShipments();
+  fetchFilterOptions();
+}, []);
+useEffect(() => {
+  if (topSuppliers.length > 0) {
+    fetchSupplierSpotlight(topSuppliers[0]._id);
+  }
+}, [topSuppliers]);
+
+  const KPI_DATA = [
+  { title: "Total Suppliers", value: dashboard.totalSuppliers || 0, change: "", isUp: true, color: "text-blue-600", bg: "bg-blue-50", icon: Building2 },
+  { title: "Active Suppliers", value: dashboard.activeSuppliers || 0, change: "", isUp: true, color: "text-emerald-600", bg: "bg-emerald-50", icon: UserCheck },
+  { title: "Countries Covered", value: dashboard.countriesCovered || 0, change: "", isUp: true, color: "text-cyan-600", bg: "bg-cyan-50", icon: Globe },
+  { title: "Products Covered", value: dashboard.productsCovered || 0, change: "", isUp: true, color: "text-amber-600", bg: "bg-amber-50", icon: Cpu },
+  { title: "Total Shipments", value: dashboard.totalShipments || 0, change: "", isUp: true, color: "text-orange-600", bg: "bg-orange-50", icon: Package },
+  { title: "Total Trade Value (INR)", value: `₹ ${((dashboard.totalTradeValue || 0) / 10000000).toFixed(2)} Cr`, change: "", isUp: false, color: "text-emerald-700", bg: "bg-emerald-50", icon: TrendingUp },
+];
 
   const handleApplyFilters = () => {
-    setAppliedFilters({ search: searchQuery, country: countryFilter, type: typeFilter });
+    setAppliedFilters({ search: searchQuery, country: countryFilter, type: typeFilter, shipment: shipmentFilter, tradeValue: tradeValueFilter, certification: certificationFilter, });
   };
 
   const handleReset = () => {
     setSearchQuery("");
     setCountryFilter("All Countries");
     setTypeFilter("All Type");
-    setAppliedFilters({ search: "", country: "All Countries", type: "All Type" });
+    setShipmentFilter("All");
+    setTradeValueFilter("All");
+    setCertificationFilter("All Certifications");
+
+    setAppliedFilters({ search: "", country: "All Countries", type: "All Type",  shipment: "All", tradeValue: "All", certification: "All Certifications", });
   };
 
   // Filtered List Logic
-  const filteredSuppliers = useMemo(() => {
-    return SUPPLIERS_MASTER_LIST.filter(sup => {
-      const matchesSearch = sup.name.toLowerCase().includes(appliedFilters.search.toLowerCase()) ||
-                            sup.topProducts.some(p => p.toLowerCase().includes(appliedFilters.search.toLowerCase()));
-      const matchesCountry = appliedFilters.country === "All Countries" || sup.country === appliedFilters.country;
-      const matchesType = appliedFilters.type === "All Type" || sup.type === appliedFilters.type;
-      return matchesSearch && matchesCountry && matchesType;
-    });
-  }, [appliedFilters]);
+ const filteredSuppliers = useMemo(() => {
+  return topSuppliers.filter((sup) => {
+    const matchesSearch =
+      sup.companyName?.toLowerCase().includes(appliedFilters.search.toLowerCase());
+
+    const matchesCountry =
+      appliedFilters.country === "All Countries" ||
+      sup.country === appliedFilters.country;
+
+    const matchesType =
+      appliedFilters.type === "All Type" ||
+      sup.supplierType === appliedFilters.type;
+
+    return matchesSearch && matchesCountry && matchesType;
+  });
+}, [topSuppliers, appliedFilters]);
+
+  const qualityData = Object.entries(qualityDistribution).map(([range, percentage]) => ({range,percentage,}));
+  const totalSuppliers = supplierTypes.reduce((sum, item) => sum + item.suppliers, 0);
 
   return (
     <div className="overflow-y-auto bg-[#F8FAFC] p-5 text-slate-600 font-sans antialiased selection:bg-blue-500 selection:text-white pt-14">
@@ -220,12 +356,14 @@ export default function SupplierDiscovery() {
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase tracking-wider">HS Code / Product</label>
             <div className="relative">
               <input 
+                list="hsCodes"
                 type="text" 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search HS Code or Product" 
                 className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-1.5 pl-7 pr-3 text-xs focus:outline-none focus:border-blue-500 transition placeholder:text-slate-300"
               />
+              <datalist id="hsCodes">{filterOptions.hsCodes?.map((item, index) => (<option key={index} value={item} />))}</datalist>
               <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
             </div>
           </div>
@@ -234,12 +372,10 @@ export default function SupplierDiscovery() {
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase tracking-wider">Country</label>
             <div className="relative">
               <select value={countryFilter} onChange={(e) => setCountryFilter(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-1.5 pl-2.5 pr-8 text-xs appearance-none focus:outline-none">
-                <option>All Countries</option>
-                <option>China</option>
-                <option>India</option>
-                <option>Germany</option>
-                <option>USA</option>
-                <option>UAE</option>
+                <option value="All Countries">All Countries</option>
+                {filterOptions.countries?.map((country, index) => (
+                  <option key={index} value={country}>{country}</option>
+                ))}
               </select>
               <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -248,7 +384,12 @@ export default function SupplierDiscovery() {
           <div>
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase tracking-wider">Minimum Shipment</label>
             <div className="relative">
-              <select className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-1.5 pl-2.5 pr-8 text-xs appearance-none focus:outline-none"><option>All</option></select>
+              <select value={shipmentFilter} onChange={(e) => setShipmentFilter(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-1.5 pl-2.5 pr-8 text-xs appearance-none focus:outline-none">
+                <option value="All">All</option>
+                {filterOptions.shipmentRanges?.map((range, index) => (
+                  <option key={index} value={range}>{range}+</option>
+                ))}
+                </select>
               <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
           </div>
@@ -256,7 +397,12 @@ export default function SupplierDiscovery() {
           <div>
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase tracking-wider">Minimum Trade Value(INR)</label>
             <div className="relative">
-              <select className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-1.5 pl-2.5 pr-8 text-xs appearance-none focus:outline-none"><option>All</option></select>
+             <select value={tradeValueFilter} onChange={(e) => setTradeValueFilter(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-1.5 pl-2.5 pr-8 text-xs appearance-none focus:outline-none">
+              <option value="All">All</option>
+              {filterOptions.tradeValueRanges?.map((range, index) => (
+                <option key={index} value={range}>₹ {Number(range).toLocaleString()}+</option>
+              ))}
+              </select> 
               <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
           </div>
@@ -265,10 +411,10 @@ export default function SupplierDiscovery() {
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase tracking-wider">Supplier Type</label>
             <div className="relative">
               <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-1.5 pl-2.5 pr-8 text-xs appearance-none focus:outline-none">
-                <option>All Type</option>
-                <option>Manufacturer</option>
-                <option>Exporter</option>
-                <option>Trader</option>
+                <option value="All Type">All Type</option>
+                 {filterOptions.supplierTypes?.map((type, index) => (
+                  <option key={index} value={type}>{type}</option>
+                ))}
               </select>
               <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -277,7 +423,12 @@ export default function SupplierDiscovery() {
           <div>
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase tracking-wider">Certification</label>
             <div className="relative">
-              <select className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-1.5 pl-2.5 pr-8 text-xs appearance-none focus:outline-none"><option>All Certifications</option></select>
+              <select value={certificationFilter} onChange={(e) => setCertificationFilter(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-1.5 pl-2.5 pr-8 text-xs appearance-none focus:outline-none">
+                <option value="All Certifications">All Certifications</option>
+                {filterOptions.certifications?.map((cert, index) => (
+                  <option key={index} value={cert}>{cert}</option>
+                ))}
+              </select>
               <ChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
           </div>
@@ -316,24 +467,24 @@ export default function SupplierDiscovery() {
             <div className="relative w-[150px] h-[100px] shrink-0">
               <ResponsiveContainer width="100%" height="110%">
                 <PieChart>
-                  <Pie data={COUNTRY_DATA} innerRadius={40} outerRadius={54} dataKey="value" stroke="none">
-                    {COUNTRY_DATA.map((entry, index) => <Cell key={index} fill={entry.color} />)}
+                  <Pie data={topCountries} innerRadius={40} outerRadius={54} dataKey="tradeValue" stroke="none">
+                    {topCountries.map((entry, index) => <Cell key={index} fill={["#2563EB","#0EA5E9","#10B981","#F59E0B","#8B5CF6","#EF4444"][index % 6]} />)}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                 <span className="text-[8px] text-slate-400 font-bold uppercase leading-none">Total Suppliers</span>
-                <span className="font-bold text-[10px] text-slate-800 mt-0.5">25,689</span>
+                <span className="font-bold text-[10px] text-slate-800 mt-0.5">{topCountries.reduce((sum, item) => sum + item.suppliers, 0)}</span>
               </div>
             </div>
             <div className="space-y-0.5 flex-1 pl-2 max-h-[125px] overflow-y-auto scrollbar-none text-[10px]">
-              {COUNTRY_DATA.map((c, i) => (
+              {topCountries.map((c, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: c.color }} />
-                    <span className="text-slate-600 font-semibold">{c.name}</span>
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: ["#2563EB","#0EA5E9","#10B981","#F59E0B","#8B5CF6","#EF4444"][i % 6] }} />
+                    <span className="text-slate-600 font-semibold">{c._id}</span>
                   </div>
-                  <span className="text-slate-400 font-medium">₹{c.value.toFixed(2)} Cr ({c.percent})</span>
+                  <span className="text-slate-400 font-medium">₹{(c.tradeValue / 10000000).toFixed(2)} Cr ({((c.suppliers / topCountries.reduce((sum,item)=>sum+item.suppliers,0))*100).toFixed(1)}%)</span>
                 </div>
               ))}
             </div>
@@ -350,24 +501,24 @@ export default function SupplierDiscovery() {
             <div className="relative w-[100px] h-[100px] shrink-0">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={TYPE_DATA} innerRadius={32} outerRadius={44} dataKey="value" stroke="none">
-                    {TYPE_DATA.map((entry, index) => <Cell key={index} fill={entry.color} />)}
+                  <Pie data={supplierTypes} innerRadius={32} outerRadius={44} dataKey="suppliers" stroke="none">
+                    {supplierTypes.map((entry, index) => <Cell key={index} fill={["#3B82F6", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444", "#06B6D4",][index % 6]} />)}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                 <span className="text-[7px] text-slate-400 font-bold uppercase leading-none">Total Suppliers</span>
-                <span className="font-bold text-[10px] text-slate-800 mt-0.5">25,689</span>
+                <span className="font-bold text-[10px] text-slate-800 mt-0.5">{totalSuppliers}</span>
               </div>
             </div>
             <div className="space-y-1 flex-1 pl-2 text-[9px]">
-              {TYPE_DATA.map((t, i) => (
+              {supplierTypes.map((t, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-1">
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: t.color }} />
-                    <span className="text-slate-600 font-semibold">{t.name}</span>
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor:["#3B82F6", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444", "#06B6D4", ][i % 6], }} />
+                    <span className="text-slate-600 font-semibold">{t._id}</span>
                   </div>
-                  <span className="text-slate-500 font-medium">{t.value.toLocaleString()} ({t.percent})</span>
+                  <span className="text-slate-500 font-medium">{t.suppliers} ({totalSuppliers ? ((t.suppliers / totalSuppliers) * 100).toFixed(1) : 0}%)</span>
                 </div>
               ))}
             </div>
@@ -381,8 +532,9 @@ export default function SupplierDiscovery() {
             <h3 className="font-bold text-xs text-slate-800">Supplier Quality Score Distribution</h3>
           </div>
           <div className="h-[120px] w-full mt-1">
+            
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={QUALITY_SCORE_DATA} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
+              <BarChart data={qualityData} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
                 <XAxis dataKey="range" tick={{ fill: '#94a3b8', fontSize: 9 }} tickLine={false} axisLine={false} />
                 <YAxis tick={{ fill: '#94a3b8', fontSize: 9 }} unit="%" axisLine={false} tickLine={false} />
                 <Tooltip cursor={{ fill: 'transparent' }} />
@@ -399,7 +551,7 @@ export default function SupplierDiscovery() {
             <h3 className="font-bold text-xs text-slate-800">Top Certifications</h3>
           </div>
           <div className="space-y-1.5 max-h-[130px] overflow-y-auto scrollbar-none">
-            {TOP_CERTIFICATIONS.map((cert, i) => (
+            {topCertifications.map((cert, i) => (
               <div key={i} className="flex justify-between items-center text-[10px] bg-slate-50/60 px-2 py-1 rounded-lg border border-slate-100">
                 <span className="text-slate-700 font-semibold">{cert.name}</span>
                 <span className="font-bold text-slate-500">{cert.count}</span>
@@ -440,23 +592,23 @@ export default function SupplierDiscovery() {
                   {filteredSuppliers.map((sup, idx) => (
                     <tr 
                       key={idx} 
-                      onClick={() => setSelectedSupplier(sup)}
-                      className={`cursor-pointer transition group ${selectedSupplier.name === sup.name ? "bg-blue-50/60" : "hover:bg-slate-50/50"}`}
+                      onClick={() => fetchSupplierSpotlight(sup._id)}
+                      className={`cursor-pointer transition group ${selectedSupplier?.companyName === sup.companyName ? "bg-blue-50/60" : "hover:bg-slate-50/50"}`}
                     >
                       <td className="py-2.5 font-bold text-slate-800 flex items-center gap-1">
-                        {sup.name}
-                        {sup.verified && <BadgeCheck size={13} className="text-emerald-500 shrink-0" />}
+                        {sup.companyName}
+                        {sup.isVerified && <BadgeCheck size={13} className="text-emerald-500 shrink-0" />}
                       </td>
                       <td className="py-2.5 font-semibold text-slate-500">{sup.country}</td>
-                      <td className="py-2.5 text-slate-500">{sup.type}</td>
-                      <td className="py-2.5 text-center font-bold text-slate-700">{sup.products}</td>
-                      <td className="py-2.5 text-center font-semibold text-slate-600">{sup.shipments}</td>
-                      <td className="py-2.5 font-bold text-slate-800">{sup.value}</td>
+                      <td className="py-2.5 text-slate-500">{sup.supplierType}</td>
+                      <td className="py-2.5 text-center font-bold text-slate-700">{sup.products?.length || 0}</td>
+                      <td className="py-2.5 text-center font-semibold text-slate-600">{sup.totalShipments}</td>
+                      <td className="py-2.5 font-bold text-slate-800">₹{sup.totalTradeValue?.toLocaleString()}</td>
                       <td className="py-2.5 text-center">
                         <span className={`px-1.5 py-0.5 rounded font-bold text-[10px] ${
-                          sup.score >= 85 ? "bg-green-50 text-green-600 border border-green-100" : "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                          sup.qualityScore >= 85 ? "bg-green-50 text-green-600 border border-green-100" : "bg-emerald-50 text-emerald-600 border border-emerald-100"
                         }`}>
-                          {sup.score}
+                          {sup.qualityScore}
                         </span>
                       </td>
                       <td className="py-2.5 text-center">
@@ -491,10 +643,10 @@ export default function SupplierDiscovery() {
                 </div>
                 <div>
                   <h4 className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
-                    {selectedSupplier.name}
-                    {selectedSupplier.verified && <span className="text-[9px] bg-green-100 text-green-600 font-black px-1 py-0.2 rounded uppercase">Verified</span>}
+                    {selectedSupplier?.companyName}
+                    {selectedSupplier?.isVerified && <span className="text-[9px] bg-green-100 text-green-600 font-black px-1 py-0.2 rounded uppercase">Verified</span>}
                   </h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5 font-medium">📍 {selectedSupplier.country} • 🏢 {selectedSupplier.type}</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5 font-medium">📍 {selectedSupplier?.country} • 🏢 {selectedSupplier?.supplierType}</p>
                 </div>
               </div>
               <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-[11px] px-3 py-1.5 rounded-xl transition shadow-xs flex items-center gap-1 whitespace-nowrap">
@@ -506,19 +658,19 @@ export default function SupplierDiscovery() {
             <div className="grid grid-cols-4 gap-2 text-center mb-4">
               <div className="bg-slate-50 border border-slate-150 rounded-xl p-2">
                 <span className="text-[8px] font-bold text-slate-400 block uppercase">Quality Score</span>
-                <span className="text-xs font-black text-slate-800 mt-1 block">{selectedSupplier.score} / 100</span>
+                <span className="text-xs font-black text-slate-800 mt-1 block">{selectedSupplier?.qualityScore} / 100</span>
               </div>
               <div className="bg-slate-50 border border-slate-150 rounded-xl p-2">
                 <span className="text-[8px] font-bold text-slate-400 block uppercase">Total Shipments</span>
-                <span className="text-xs font-black text-slate-800 mt-1 block">{selectedSupplier.shipments}</span>
+                <span className="text-xs font-black text-slate-800 mt-1 block">{selectedSupplier?.totalShipments}</span>
               </div>
               <div className="bg-slate-50 border border-slate-150 rounded-xl p-2">
                 <span className="text-[8px] font-bold text-slate-400 block uppercase">Trade Value (INR)</span>
-                <span className="text-xs font-black text-slate-800 mt-1 block">{selectedSupplier.value}</span>
+                <span className="text-xs font-black text-slate-800 mt-1 block">{selectedSupplier?.totalTradeValue}</span>
               </div>
               <div className="bg-slate-50 border border-slate-150 rounded-xl p-2">
                 <span className="text-[8px] font-bold text-slate-400 block uppercase">Products</span>
-                <span className="text-xs font-black text-slate-800 mt-1 block">{selectedSupplier.products}</span>
+                <span className="text-xs font-black text-slate-800 mt-1 block">{selectedSupplier?.products?.length}</span>
               </div>
             </div>
 
@@ -526,7 +678,7 @@ export default function SupplierDiscovery() {
             <div className="mb-4">
               <span className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Top Products</span>
               <div className="flex flex-wrap gap-1.5">
-                {selectedSupplier.topProducts.map((p, idx) => (
+                {selectedSupplier?.products?.map((p, idx) => (
                   <span key={idx} className="bg-blue-50 text-blue-600 border border-blue-100/50 rounded-lg px-2 py-0.5 text-[10px] font-bold">
                     {p}
                   </span>
@@ -541,7 +693,7 @@ export default function SupplierDiscovery() {
               <div className="sm:col-span-4">
                 <span className="text-[10px] text-slate-400 font-bold block mb-2 uppercase">Certifications</span>
                 <div className="space-y-1.5">
-                  {selectedSupplier.certifications.map((c, i) => (
+                  {selectedSupplier?.certifications?.map((c, i) => (
                     <div key={i} className="flex items-center gap-1.5 text-[10px] text-slate-600 font-bold">
                       <Award size={12} className="text-emerald-500 shrink-0" />
                       <span>{c}</span>
@@ -557,11 +709,11 @@ export default function SupplierDiscovery() {
                   <button className="text-blue-500 text-[9px] font-bold hover:underline">View All</button>
                 </div>
                 <div className="space-y-1.5">
-                  {selectedSupplier.recentShipments?.map((s, idx) => (
+                  {selectedSupplier?.recentShipments?.map((s, idx) => (
                     <div key={idx} className="flex justify-between items-center text-[10px] font-medium text-slate-500">
-                      <span className="font-bold text-slate-700">HS Code: {s.code}</span>
-                      <span>{s.date}</span>
-                      <span className="font-bold text-slate-800">{s.val}</span>
+                      <span className="font-bold text-slate-700">HS Code: {s.cargo?.hsCode}</span>
+                      <span>{new Date(s.shipmentDate).toLocaleDateString()}</span>
+                      <span className="font-bold text-slate-800">₹{s.cargo?.value}</span>
                     </div>
                   ))}
                 </div>

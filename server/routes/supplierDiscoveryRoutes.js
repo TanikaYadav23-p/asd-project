@@ -9,14 +9,16 @@ const {
     getTopSuppliers,
     getSupplierSpotlight,
     getRecentShipments,
-    getFilterOptions
+    getFilterOptions,
+    getTopCertifications
 } = require("../controllers/supplierDiscoveryController");
 router.get("/dashboard", getDashboard);
 router.get("/top-countries", getTopCountries);
 router.get("/supplier-types", getSupplierTypes);
 router.get("/quality-distribution", getQualityDistribution);
+router.get("/top-certifications",getTopCertifications);
 router.get("/top-suppliers", getTopSuppliers);
-router.get("/supplier-spotlight", getSupplierSpotlight);
+router.get("/supplier-spotlight/:supplierId", getSupplierSpotlight);
 router.get("/recent-shipments", getRecentShipments);
 router.get("/filters", getFilterOptions);
 

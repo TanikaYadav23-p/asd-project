@@ -24,7 +24,10 @@ exports.getDashboard = async (req, res) => {
             }
         ]);
 
-        const countries = await TradeRoute.distinct("fromCountry");
+        const fromCountries = await TradeRoute.distinct("fromCountry");
+        const toCountries = await TradeRoute.distinct("toCountry");
+
+        const countries = [...new Set([...fromCountries, ...toCountries])];
 
         const topProduct = await TradeRoute.aggregate([
             {
@@ -199,9 +202,11 @@ exports.getSummary = async (req, res) => {
 
         const interRegional = await TradeRoute.aggregate([
             {
-                $match: {
-                    fromCountry: { $ne: "$toCountry" }
+               $match: {
+                $expr: {
+                    $ne: ["$fromCountry", "$toCountry"]
                 }
+            }
             },
             {
                 $group: {
@@ -294,8 +299,8 @@ exports.getFilterOptions = async (req, res) => {
 
         const products = await TradeRoute.distinct("topProduct");
 
-        const hsCodes = await TradeRoute.distinct("hsCode");
-
+        const hsCodes = await TradeRoute.find({}, "hsCode").populate("hsCode","hsCode description").select("hsCode");
+        
         return res.status(200).json({
             status: 1,
             message: "Filter options fetched successfully",

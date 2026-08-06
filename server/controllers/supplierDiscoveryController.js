@@ -76,6 +76,9 @@ exports.getTopCountries = async (req, res) => {
                     _id: "$country",
                     suppliers: {
                         $sum: 1
+                    },
+                    tradeValue: {
+                        $sum: "$totalTradeValue"
                     }
                 }
             },
@@ -179,6 +182,52 @@ exports.getQualityDistribution = async (req, res) => {
     }
 };
 
+exports.getTopCertifications = async (req, res) => {
+  try {
+
+    const certifications = await Supplier.aggregate([
+      {
+        $unwind: "$certifications"
+      },
+      {
+        $group: {
+          _id: "$certifications",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: {
+          count: -1
+        }
+      },
+      {
+        $limit: 10
+      },
+      {
+        $project: {
+          _id: 0,
+          name: "$_id",
+          count: 1
+        }
+      }
+    ]);
+
+    return res.status(200).json({
+      status: 1,
+      message: "Top certifications fetched successfully",
+      data: certifications
+    });
+
+  } catch (error) {
+
+    return res.status(500).json({
+      status: 0,
+      message: error.message
+    });
+
+  }
+};
+
 exports.getTopSuppliers = async (req, res) => {
     try {
 
@@ -208,11 +257,7 @@ exports.getTopSuppliers = async (req, res) => {
 exports.getSupplierSpotlight = async (req, res) => {
     try {
 
-        const supplier = await Supplier.findOne()
-            .sort({
-                qualityScore: -1,
-                totalTradeValue: -1
-            });
+        const supplier = await Supplier.findById(req.params.supplierId);
 
         if (!supplier) {
             return res.status(404).json({

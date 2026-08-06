@@ -7,10 +7,10 @@ exports.getDashboard = async (req, res) => {
         const totalBuyers = await Buyer.countDocuments();
 
         const activeBuyers = await Buyer.countDocuments({
-            active: true
+            status: "Active"
         });
 
-        const countries = await Buyer.distinct("country");
+        const countries = await Buyer.distinct("location.country");
 
         const shipmentStats = await Shipment.aggregate([
             {
@@ -49,48 +49,53 @@ exports.getDashboard = async (req, res) => {
 };
 
 exports.getTopBuyers = async (req, res) => {
-    try {
+  try {
+    const buyers = await Shipment.aggregate([
+      {
+        $group: {
+          _id: "$buyer.companyName",
+          country: { $first: "$buyer.country" },
+          tradeValue: { $sum: "$cargo.value" }
+        }
+      },
+      {
+        $sort: {
+          tradeValue: -1
+        }
+      },
+      {
+        $limit: 10
+      }
+    ]);
 
-        const totalTrade = await Buyer.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    total: { $sum: "$totalTradeValue" }
-                }
-            }
-        ]);
+    const totalTradeValue = buyers.reduce(
+      (sum, item) => sum + item.tradeValue,
+      0
+    );
 
-        const totalValue = totalTrade[0]?.total || 0;
+    const data = buyers.map(item => ({
+      buyer: item._id,
+      country: item.country,
+      tradeValue: item.tradeValue,
+      share:
+        totalTradeValue > 0
+          ? ((item.tradeValue / totalTradeValue) * 100).toFixed(2)
+          : "0.00"
+    }));
 
-        const buyers = await Buyer.find()
-            .sort({ totalTradeValue: -1 })
-            .limit(10);
+    return res.status(200).json({
+      status: 1,
+      message: "Top buyers fetched successfully",
+      data
+    });
 
-        const data = buyers.map(item => ({
-            buyer: item.companyName,
-            country: item.country,
-            tradeValue: item.totalTradeValue,
-            share: totalValue
-                ? ((item.totalTradeValue / totalValue) * 100).toFixed(2)
-                : 0
-        }));
-
-        return res.status(200).json({
-            status: 1,
-            message: "Top buyers fetched successfully",
-            data
-        });
-
-    } catch (error) {
-
-        return res.status(500).json({
-            status: 0,
-            message: error.message
-        });
-
-    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.message
+    });
+  }
 };
-
 exports.getTradeTrend = async (req, res) => {
     try {
 
@@ -135,53 +140,63 @@ exports.getTradeTrend = async (req, res) => {
 };
 
 exports.getCountries = async (req, res) => {
-    try {
+  try {
 
-        const countries = await Buyer.aggregate([
-            {
-                $group: {
-                    _id: "$country",
-                    buyers: { $sum: 1 },
-                    tradeValue: { $sum: "$totalTradeValue" }
-                }
-            },
-            {
-                $sort: {
-                    tradeValue: -1
-                }
-            }
-        ]);
+    const countries = await Shipment.aggregate([
+      {
+        $group: {
+          _id: "$buyer.country",
+          buyers: {
+            $addToSet: "$buyer.companyName"
+          },
+          tradeValue: {
+            $sum: "$cargo.value"
+          }
+        }
+      },
+      {
+        $project: {
+          country: "$_id",
+          buyers: {
+            $size: "$buyers"
+          },
+          tradeValue: 1
+        }
+      },
+      {
+        $sort: {
+          tradeValue: -1
+        }
+      }
+    ]);
 
-        return res.status(200).json({
-            status: 1,
-            message: "Buyer countries fetched successfully",
-            data: countries
-        });
+    return res.status(200).json({
+      status: 1,
+      message: "Buyer countries fetched successfully",
+      data: countries
+    });
 
-    } catch (error) {
-
-        return res.status(500).json({
-            status: 0,
-            message: error.message
-        });
-
-    }
+  } catch (error) {
+    return res.status(500).json({
+      status: 0,
+      message: error.message
+    });
+  }
 };
-
 
 exports.getGrowthBuyers = async (req, res) => {
     try {
 
         const buyers = await Buyer.find()
             .sort({
-                totalTradeValue: -1
+                tradeVolume: -1
             })
             .limit(10);
 
         const data = buyers.map(item => ({
             buyer: item.companyName,
-            tradeValue: item.totalTradeValue,
-            growth: item.qualityScore || 0
+            tradeValue: item.tradeVolume,
+            growth: item.avgGrowth || 0
         }));
 
         return res.status(200).json({
@@ -204,25 +219,27 @@ exports.getBuyerConcentration = async (req, res) => {
     try {
 
         const buyers = await Buyer.find().sort({
-            totalTradeValue: -1
+            tradeVolume: -1
         });
 
         const totalTrade = buyers.reduce(
-            (sum, item) => sum + (item.totalTradeValue || 0),
+            (sum, item) => sum + (item.tradeVolume || 0),
             0
         );
 
         const top10 = buyers
             .slice(0, 10)
-            .reduce((sum, item) => sum + item.totalTradeValue, 0);
+            .reduce((sum, item) => sum + item.tradeVolume, 0);
 
         const top50 = buyers
             .slice(0, 50)
-            .reduce((sum, item) => sum + item.totalTradeValue, 0);
+            .reduce((sum, item) => sum + item.tradeVolume, 0);
 
         const top100 = buyers
             .slice(0, 100)
-            .reduce((sum, item) => sum + item.totalTradeValue, 0);
+            .reduce((sum, item) => sum + item.tradeVolume, 0);
+        
+        const totalBuyers = await Buyer.countDocuments();
 
         const buyerTypes = await Buyer.aggregate([
             {
@@ -232,6 +249,13 @@ exports.getBuyerConcentration = async (req, res) => {
                 }
             }
         ]);
+
+        const buyerTypeData = buyerTypes.map(item => ({
+            buyerType: item._id,
+            count: item.count,
+            percentage: totalBuyers
+            ? ((item.count / totalBuyers) * 100).toFixed(1) : 0
+        }));
 
         return res.status(200).json({
             status: 1,
@@ -246,7 +270,7 @@ exports.getBuyerConcentration = async (req, res) => {
                 top100Share: totalTrade
                     ? ((top100 / totalTrade) * 100).toFixed(2)
                     : 0,
-                buyerTypes
+                buyerTypes: buyerTypeData
             }
         });
 
@@ -297,13 +321,13 @@ exports.getFilterOptions = async (req, res) => {
 
         const buyers = await Buyer.find({}, "_id companyName");
 
-        const countries = await Buyer.distinct("country");
+        const countries = await Buyer.distinct("location.country");
 
         const buyerTypes = await Buyer.distinct("buyerType");
 
         const products = await Shipment.distinct("cargo.productName");
 
-        const hsCodes = await Shipment.distinct("cargo.hsCode");
+        const hsCodes = await Shipment.find({}, "cargo.hsCode").populate("cargo.hsCode", "hsCode").select("cargo.hsCode");
 
         const shipmentRanges = [
             100,

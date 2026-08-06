@@ -24,10 +24,26 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
-
+const countryCodes = {
+  India: "IN",
+  China: "CN",
+  Germany: "DE",
+  USA: "US",
+  "United States": "US",
+  UAE: "AE",
+  "Saudi Arabia": "SA",
+  Switzerland: "CH",
+  Bangladesh: "BD",
+  Brazil: "BR",
+  Russia: "RU",
+  Japan: "JP",
+  France: "FR",
+  Singapore: "SG",
+  Australia: "AU",
+};
 export default function ShipmentDatabase() {
   // Static Raw Data
-  const rawShipmentsData = [
+  /*const rawShipmentsData = [
     {
       id: "SHP-2025-1045",
       hs: "85",
@@ -198,7 +214,7 @@ export default function ShipmentDatabase() {
       value: 7.6,
       status: "Pending",
     },
-  ];
+  ];*/
 
   const [dashboard, setDashboard] = useState({});
   const [shipments, setShipments] = useState([]);
@@ -256,29 +272,29 @@ export default function ShipmentDatabase() {
 
   // --- DYNAMIC DROPDOWN OPTIONS GENERATION ---
   const uniqueOrigins = useMemo(
-    () => ["All Countries", ...new Set(rawShipmentsData.map((s) => s.origin))],
-    [],
+    () => ["All Countries", ...new Set(shipments.map((s) => s.route?.originCountry).filter(Boolean))],
+    [shipments],
   );
   const uniqueDests = useMemo(
-    () => ["All Countries", ...new Set(rawShipmentsData.map((s) => s.dest))],
-    [],
+    () => ["All Countries", ...new Set(shipments.map((s) => s.route?.destinationCountry).filter(Boolean))],
+    [shipments],
   );
   const uniqueImporters = useMemo(
     () => [
       "All Importers",
-      ...new Set(rawShipmentsData.map((s) => s.importer)),
+      ...new Set(shipments.map((s) => s.importer?.companyName).filter(Boolean)),
     ],
-    [],
+    [shipments],
   );
   const uniqueExporters = useMemo(
     () => [
       "All Exporters",
-      ...new Set(rawShipmentsData.map((s) => s.exporter)),
+      ...new Set(shipments.map((s) => s.exporter?.companyName).filter(Boolean)),
     ],
-    [],
+    [shipments],
   );
   const uniquePorts = useMemo(
-    () => ["All Ports", ...new Set(rawShipmentsData.map((s) => s.loading))],
+    () => ["All Ports", ...new Set(shipments.map((s) => s.route?.originCity).filter(Boolean))],
     [],
   );
 
@@ -294,62 +310,76 @@ export default function ShipmentDatabase() {
 
   // --- DYNAMIC SEARCH & FILTER LOGIC ---
   const filteredShipments = useMemo(() => {
-    return rawShipmentsData.filter((shipment) => {
-      const matchesSearch =
-        shipment.desc.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        shipment.hs.includes(searchTerm) ||
-        shipment.id.toLowerCase().includes(searchTerm.toLowerCase());
+  return shipments.filter((shipment) => {
+    const matchesSearch =
+      (shipment.cargo?.hsCode?.description || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      (shipment.cargo?.hsCode?.hsCode || "")
+        .includes(searchTerm) ||
+      (shipment.sbNumber || "")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
 
-      const matchesOrigin =
-        selectedOrigin === "All Countries" ||
-        shipment.origin === selectedOrigin;
-      const matchesDest =
-        selectedDest === "All Countries" || shipment.dest === selectedDest;
-      const matchesImporter =
-        selectedImporter === "All Importers" ||
-        shipment.importer === selectedImporter;
-      const matchesExporter =
-        selectedExporter === "All Exporters" ||
-        shipment.exporter === selectedExporter;
-      const matchesPort =
-        selectedPort === "All Ports" || shipment.loading === selectedPort;
+    const matchesOrigin =
+      selectedOrigin === "All Countries" ||
+      shipment.route?.originCountry === selectedOrigin;
 
-      return (
-        matchesSearch &&
-        matchesOrigin &&
-        matchesDest &&
-        matchesImporter &&
-        matchesExporter &&
-        matchesPort
-      );
-    });
-  }, [
-    searchTerm,
-    selectedOrigin,
-    selectedDest,
-    selectedImporter,
-    selectedExporter,
-    selectedPort,
-  ]);
+    const matchesDest =
+      selectedDest === "All Countries" ||
+      shipment.route?.destinationCountry === selectedDest;
 
+    const matchesImporter =
+      selectedImporter === "All Importers" ||
+      shipment.importer?.companyName === selectedImporter;
+
+    const matchesExporter =
+      selectedExporter === "All Exporters" ||
+      shipment.exporter?.companyName === selectedExporter;
+
+    const matchesPort =
+      selectedPort === "All Ports" ||
+      shipment.route?.originCity === selectedPort;
+
+    return (
+      matchesSearch &&
+      matchesOrigin &&
+      matchesDest &&
+      matchesImporter &&
+      matchesExporter &&
+      matchesPort
+    );
+  });
+}, [
+  shipments,
+  searchTerm,
+  selectedOrigin,
+  selectedDest,
+  selectedImporter,
+  selectedExporter,
+  selectedPort,
+]);
   // --- DYNAMIC COUNTERS & STATS COMPUTATION ---
   const totalValue = useMemo(() => {
-    return filteredShipments
-      .reduce((sum, item) => sum + item.value, 0)
-      .toFixed(2);
+   return (
+     filteredShipments.reduce(
+       (sum, item) => sum + (item.cargo?.value || 0),
+       0
+      ) / 10000000).toFixed(2);
   }, [filteredShipments]);
 
   const uniqueExportersCount = useMemo(() => {
-    return new Set(filteredShipments.map((s) => s.exporter)).size;
-  }, [filteredShipments]);
+   return new Set(
+     filteredShipments.map((s) => s.exporter?.companyName)).size;
+}, [filteredShipments]);
 
   const handleApplyFilters = () => {
     setAppliedFilters({
       search: searchTerm,
       port: selectedPort,
-      country: selectedCountry,
+      origin: selectedOrigin,
       exporter: selectedExporter,
-      buyer: selectedBuyer,
+      importer: selectedImporter,
     });
   };
 
@@ -400,7 +430,7 @@ export default function ShipmentDatabase() {
               {filteredShipments.length}
             </h3>
             <span className="text-[11px] text-green-600 font-semibold flex items-center gap-0.5 mt-0.5">
-                ▲ 16.8% vs last month
+                
             </span>
           </div>
         </div>
@@ -420,7 +450,7 @@ export default function ShipmentDatabase() {
               ₹{totalValue} Cr
             </h3>
             <span className="text-[11px] text-green-600 font-semibold flex items-center gap-0.5 mt-0.5">
-              ▲ 16.8% vs last month
+             
             </span>
           </div>
         </div>
@@ -440,7 +470,7 @@ export default function ShipmentDatabase() {
               {uniqueExportersCount}
             </h3>
             <span className="text-[11px] text-green-600 font-semibold flex items-center gap-0.5 mt-0.5">
-                ▲ 16.8% vs last month
+               
             </span>
           </div>
         </div>
@@ -454,9 +484,9 @@ export default function ShipmentDatabase() {
             <div className="p-1.5 bg-cyan-50 text-cyan-600 rounded-lg">🚚</div>
           </div>
           <div className="mt-2">
-            <h3 className="text-xl font-bold text-slate-800">320</h3>
+            <h3 className="text-xl font-bold text-slate-800">{dashboard.totalSuppliers || 0}</h3>
              <span className="text-[11px] text-green-600 font-semibold flex items-center gap-0.5 mt-0.5">
-               ▲ 16.8% vs last month
+               
             </span>
           </div>
         </div>
@@ -470,9 +500,9 @@ export default function ShipmentDatabase() {
             </div>
           </div>
           <div className="mt-2">
-            <h3 className="text-xl font-bold text-slate-800">68</h3>
+            <h3 className="text-xl font-bold text-slate-800">{dashboard.countries || 0}</h3>
              <span className="text-[11px] text-green-600 font-semibold flex items-center gap-0.5 mt-0.5">
-                ▲ 16.8% vs last month
+                
             </span>
           </div>
         </div>
@@ -486,9 +516,9 @@ export default function ShipmentDatabase() {
             </div>
           </div>
           <div className="mt-2">
-            <h3 className="text-xl font-bold text-slate-800">₹14.26 L</h3>
+            <h3 className="text-xl font-bold text-slate-800">₹{((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L</h3>
              <span className="text-[11px] text-red-600 font-semibold flex items-center gap-0.5 mt-0.5">
-              <TrendingUp className="w-3 h-3" />  ▲ 16.8% vs last month
+              <TrendingUp className="w-3 h-3" />  
             </span>
           </div>
         </div>
@@ -501,9 +531,9 @@ export default function ShipmentDatabase() {
           </div>
           <div className="mt-2">
             <h3 className="text-xl font-bold text-slate-800">
-              18.6 d
+              {dashboard.avgLeadTime || 0} d
                <span className="text-[11px] text-red-600 font-semibold flex items-center gap-0.5 mt-0.5">
-              ▲ 16.8% vs last month
+              
             </span>
               
               </h3>
@@ -714,73 +744,73 @@ export default function ShipmentDatabase() {
                     className="hover:bg-slate-50/80 transition-colors"
                   >
                     <td className="py-3.5 px-4 font-semibold text-blue-600 hover:underline cursor-pointer whitespace-nowrap">
-                      {row.id}
+                      {row.referenceNumber || row.sbNumber}
                     </td>
                     <td className="py-3.5 px-3 text-slate-500 font-medium">
-                      {row.hs}
+                      {row.cargo?.hsCode?.hsCode}
                     </td>
                     <td
                       className="py-3.5 px-4 font-medium text-slate-700 max-w-[180px] truncate"
-                      title={row.desc}
+                      title={row.cargo?.description}
                     >
-                      {row.desc}
+                      {row.cargo?.description}
                     </td>
                     <td className="py-3.5 px-4 font-medium text-slate-600">
-                      {row.importer}
+                      {row.importer?.companyName}
                     </td>
                     <td className="py-3.5 px-4 font-medium text-slate-600">
-                      {row.exporter}
+                      {row.exporter?.companyName}
                     </td>
                     <td className="py-3.5 px-3 whitespace-nowrap">
                       <span className="mr-1.5 inline-flex align-middle shadow-sm rounded-sm ">
                         <ReactCountryFlag
-                          countryCode={row.originCode}
+                          countryCode={countryCodes[row.route?.originCountry] || ""}
                           svg
                           style={{ width: "18px", height: "13px" }}
                         />
                       </span>
                       <span className="text-slate-600 font-medium align-middle">
-                        {row.origin}
+                        {row.route?.originCountry}
                       </span>
                     </td>
                     <td className="py-3.5 px-3 whitespace-nowrap">
                       <span className="mr-1.5 inline-flex align-middle shadow-sm rounded-sm ">
                         <ReactCountryFlag
-                          countryCode={row.destCode}
+                          countryCode={countryCodes[row.route?.destinationCountry] || ""}
                           svg
                           style={{ width: "18px", height: "13px" }}
                         />
                       </span>
                       <span className="text-slate-600 font-medium align-middle">
-                        {row.dest}
+                        {row.route?.destinationCountry}
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-slate-500">
-                      {row.loading}
+                      {row.route?.originCity}
                     </td>
                     <td className="py-3.5 px-4 text-slate-500">
-                      {row.discharge}
+                      {row.route?.destinationCity}
                     </td>
                     <td className="py-3.5 px-3 text-slate-500 whitespace-nowrap">
-                      {row.shipDate}
+                      {row.shipmentDate ? new Date(row.shipmentDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short",year: "numeric",}) : "-"}
                     </td>
                     <td className="py-3.5 px-3 text-slate-500 whitespace-nowrap">
-                      {row.arrDate}
+                      {row.eta ? new Date(row.eta).toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric",}) : "-"}
                     </td>
                     <td className="py-3.5 px-4 text-right font-bold text-slate-800 whitespace-nowrap">
-                      ₹ {row.value.toFixed(2)} Cr
+                      ₹ {(row.cargo?.value / 10000000).toFixed(2)} Cr
                     </td>
                     <td className="py-3.5 px-4 text-center whitespace-nowrap">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide ${
-                          row.status === "Delivered"
+                          row.shipmentStatus === "Delivered"
                             ? "bg-green-50 text-green-600"
-                            : row.status === "In Transit"
+                            : row.shipmentStatus === "In Transit"
                               ? "bg-blue-50 text-blue-600"
                               : "bg-orange-50 text-orange-600"
                         }`}
                       >
-                        {row.status}
+                        {row.shipmentStatus}
                       </span>
                     </td>
                     <td className="py-3.5 px-3 text-center text-slate-400 hover:text-slate-600 cursor-pointer text-lg font-bold">
