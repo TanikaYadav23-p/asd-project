@@ -186,7 +186,7 @@ const [appliedFilters, setAppliedFilters] = useState({
   timePeriod: "This Month",
   compareWith: "Last Month",
 });
-  const totalTypeValue = TYPE_DATA.reduce((a, b) => a + b.value, 0).toFixed(2);
+
 
   const fetchDashboard = async () => {
   try {
