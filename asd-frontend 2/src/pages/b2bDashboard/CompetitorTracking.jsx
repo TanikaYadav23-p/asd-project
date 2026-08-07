@@ -1,4 +1,17 @@
-import React, { useState } from "react";
+import React, { useState,useMemo,useEffect } from "react";
+import {
+   getDashboard,
+   getTradeComparison,
+   getMarketShare,
+   getTradeTrend,
+   getTopCompetitors,
+   getTopProducts,
+   getCountryPresence,
+   getActivitySnapshot,
+   getFilterOptions,
+   getCompetitorDetails,
+   getInsights
+} from "../../api/CompetitorTrackApi";
 import ReactCountryFlag from "react-country-flag";
 import {
   CalendarDays,
@@ -53,19 +66,9 @@ function Flag({ country, size = 14 }) {
   );
 }
 
-const KPI_STATS = [
-  { title: "Total Competitors Tracked", value: "12", change: "▲ 2 vs last month", icon: Users, bg: "bg-slate-100", color: "text-slate-500" },
-  { title: "Total Shipments", value: "8,742", change: "▲ 15.6% vs last month", icon: Package, bg: "bg-blue-50", color: "text-blue-500" },
-  { title: "Total Trade Value (INR)", value: "₹658.74 Cr", change: "▲ 18.7% vs last month", icon: IndianRupee, bg: "bg-teal-50", color: "text-teal-600" },
-  { title: "Markets Covered", value: "68", change: "▲ 6 vs last month", icon: Boxes, bg: "bg-orange-50", color: "text-orange-500" },
-  { title: "Products Handled", value: "1,256", change: "▲ 12.3% vs last month", icon: Sprout, bg: "bg-emerald-50", color: "text-emerald-500" },
-  { title: "New Competitors Added", value: "2", change: "▲ 2 vs last month", icon: Eye, bg: "bg-purple-50", color: "text-purple-500" },
-  { title: "Market Share (Avg.)", value: "24.6%", change: "▲ 3.4% vs last month", icon: Truck, bg: "bg-rose-50", color: "text-rose-500" },
-];
-
 const TABS = ["Overview", "Competitor Performance", "Market Share Analysis", "Product Analysis", "Country Analysis", "Trend Analysis", "Alerts & Insights"];
 
-const TRADE_COMPARISON = [
+/*const TRADE_COMPARISON = [
   { name: "Global Tech Industries", value: 185.45 },
   { name: "Impexon Exports", value: 185.45 },
   { name: "Shree Enterprises", value: 185.45 },
@@ -131,7 +134,7 @@ const ACTIVITY_SNAPSHOT = [
   { name: "Shree Enterprises", country: "Germany", shipments: "1,125", value: "₹98.75 Cr", growth: "9.3%", up: true, product: "Integrated Circuits (8542)", destination: "Germany", share: "13.1%", active: "23 Apr 2025" },
   { name: "Trade India Pvt. Ltd.", country: "USA", shipments: "845", value: "₹76.30 Cr", growth: "-2.6%", up: false, product: "Auto Parts (8708)", destination: "USA", share: "9.8%", active: "23 Apr 2025" },
   { name: "Oceanic Solutions", country: "Netherlands", shipments: "612", value: "₹65.40 Cr", growth: "6.8%", up: true, product: "Industrial Machinery (8471)", destination: "Netherlands", share: "7.6%", active: "22 Apr 2025" },
-];
+];*/
 
 function SectionCard({ children, className = "" }) {
   return (
@@ -151,6 +154,159 @@ function ViewAllLink({ text }) {
 
 export default function CompetitorTrackingDashboard() {
   const [activeTab, setActiveTab] = useState("Overview");
+  const [dashboard, setDashboard] = useState({});
+  const [tradeComparison, setTradeComparison] = useState([]);
+  const [marketShare, setMarketShare] = useState([]);
+  const [tradeTrend, setTradeTrend] = useState([]);
+  const [topCompetitors, setTopCompetitors] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [countryPresence, setCountryPresence] = useState([]);
+  const [activitySnapshot, setActivitySnapshot] = useState([]);
+  const [filterOptions, setFilterOptions] = useState({});
+  const [competitorDetails, setCompetitorDetails] = useState(null);
+  const [insights, setInsights] = useState([]);
+
+  const [filters, setFilters] = useState({
+  competitor: "All",
+  country: "All",
+  product: "All",
+  tradeType: "All",
+  period: "This Month",
+});
+const [appliedFilters, setAppliedFilters] = useState({
+  competitor: "All",
+  country: "All",
+  product: "All",
+  tradeType: "All",
+  period: "This Month",
+});
+  const fetchDashboard = async () => {
+  try {
+    const res = await getDashboard();
+    setDashboard(res.data.data || {});
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchTradeComparison = async () => {
+  try {
+    const res = await getTradeComparison();
+    setTradeComparison(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchMarketShare = async () => {
+  try {
+    const res = await getMarketShare();
+    setMarketShare(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchTradeTrend = async () => {
+  try {
+    const res = await getTradeTrend();
+    setTradeTrend(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchTopCompetitors = async () => {
+  try {
+    const res = await getTopCompetitors();
+    setTopCompetitors(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchTopProducts = async () => {
+  try {
+    const res = await getTopProducts();
+    setTopProducts(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchCountryPresence = async () => {
+  try {
+    const res = await getCountryPresence();
+    setCountryPresence(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchActivitySnapshot = async () => {
+  try {
+    const res = await getActivitySnapshot();
+    setActivitySnapshot(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchFilterOptions = async () => {
+  try {
+    const res = await getFilterOptions();
+    setFilterOptions(res.data.data || {});
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchInsights = async () => {
+  try {
+    const res = await getInsights();
+    setInsights(res.data.data || []);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+useEffect(() => {
+  fetchDashboard();
+  fetchTradeComparison();
+  fetchMarketShare();
+  fetchTradeTrend();
+  fetchTopCompetitors();
+  fetchTopProducts();
+  fetchCountryPresence();
+  fetchActivitySnapshot();
+  fetchFilterOptions();
+  fetchInsights();
+}, []);
+const handleApplyFilters = () => {
+  setAppliedFilters(filters);
+};
+const handleResetFilters = () => {
+  const defaultFilters = {
+    competitor: "All",
+    country: "All",
+    product: "All",
+    tradeType: "All",
+    period: "This Month",
+  };
+
+  setFilters(defaultFilters);
+  setAppliedFilters(defaultFilters);
+};
+  const KPI_STATS = [
+  { title: "Total Competitors Tracked", value: dashboard.totalCompetitors || 0, change: "", icon: Users, bg: "bg-slate-100", color: "text-slate-500" },
+  { title: "Total Shipments", value: dashboard.totalShipments ?? 0, change: "", icon: Package, bg: "bg-blue-50", color: "text-blue-500" },
+  { title: "Total Trade Value (INR)", value: `₹${((dashboard.totalTradeValue ?? 0) / 10000000).toFixed(2)} Cr`, change: "", icon: IndianRupee, bg: "bg-teal-50", color: "text-teal-600" },
+  { title: "Markets Covered", value: dashboard.marketsCovered ?? 0, change: "", icon: Boxes, bg: "bg-orange-50", color: "text-orange-500" },
+  { title: "Products Handled", value: dashboard.productsHandled ?? 0, change: "", icon: Sprout, bg: "bg-emerald-50", color: "text-emerald-500" },
+  { title: "New Competitors Added", value: dashboard.newCompetitors ?? 0, change: "", icon: Eye, bg: "bg-purple-50", color: "text-purple-500" },
+  { title: "Market Share (Avg.)", value: `${(dashboard.marketShare ?? 0).toFixed(1)}%`, change: "", icon: Truck, bg: "bg-rose-50", color: "text-rose-500" },
+];
+
 
   return (
     <div className="overflow-y-auto w-full bg-[#F8FAFC] text-slate-600 font-sans antialiased">
@@ -203,8 +359,11 @@ export default function CompetitorTrackingDashboard() {
             <div>
               <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Competitor</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>All Competitors</option>
+                <select value={filters.competitor} onChange={(e) => setFilters({ ...filters, competitor: e.target.value })} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="All">All Competitors</option>
+                  {filterOptions.competitors?.map((competitor) => (
+                    <option key={competitor.companyName} value={competitor.companyName}>{competitor.companyName}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -212,8 +371,11 @@ export default function CompetitorTrackingDashboard() {
             <div>
               <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Country</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>All Countries</option>
+                <select value={filters.country} onChange={(e) => setFilters({ ...filters, country: e.target.value })}className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="All">All Countries</option>
+                  {filterOptions.countries?.map((country) => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -221,8 +383,11 @@ export default function CompetitorTrackingDashboard() {
             <div>
               <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Product / HS Code</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>All Products</option>
+                <select value={filters.product} onChange={(e) => setFilters({ ...filters, product: e.target.value })} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="All">All Products</option>
+                  {filterOptions.products?.map((product) => (
+                    <option key={product} value={product}>{product}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -230,8 +395,11 @@ export default function CompetitorTrackingDashboard() {
             <div>
               <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Trade Type</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>All (Import/Export)</option>
+                <select value={filters.tradeType} onChange={(e) => setFilters({ ...filters, tradeType: e.target.value })} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="All">All (Import/Export)</option>
+                  {filterOptions.tradeTypes?.map((type) => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -239,8 +407,11 @@ export default function CompetitorTrackingDashboard() {
             <div>
               <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Time Period</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>This Month</option>
+                <select value={filters.period} onChange={(e) => setFilters({ ...filters, period: e.target.value })} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="This Month">This Month</option>
+                  {filterOptions.periods?.map((period) => (
+                    <option key={period} value={period}>{period}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -249,10 +420,10 @@ export default function CompetitorTrackingDashboard() {
               <button className="flex items-center justify-center gap-1.5 bg-slate-50/80 border border-slate-200 text-slate-600 rounded-xl py-2 px-3 text-xs font-semibold hover:bg-slate-100 transition whitespace-nowrap">
                 <Sliders size={13} className="text-slate-400" /> More Filters
               </button>
-              <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl py-2 px-3 transition shadow-xs whitespace-nowrap">
+              <button onClick={handleApplyFilters} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl py-2 px-3 transition shadow-xs whitespace-nowrap">
                 Apply Filters
               </button>
-              <button className="text-slate-400 hover:text-slate-600 text-xs font-medium px-1 whitespace-nowrap">
+              <button onClick={handleResetFilters} className="text-slate-400 hover:text-slate-600 text-xs font-medium px-1 whitespace-nowrap">
                 Reset
               </button>
             </div>
@@ -286,10 +457,10 @@ export default function CompetitorTrackingDashboard() {
             </div>
             <div className="h-[220px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={TRADE_COMPARISON} margin={{ top: 20, right: 5, left: -10, bottom: 0 }}>
+                <BarChart data={tradeComparison} margin={{ top: 20, right: 5, left: -10, bottom: 0 }}>
                   <CartesianGrid stroke="#F1F5F9" vertical={false} />
                   <XAxis
-                    dataKey="name"
+                    dataKey="companyName"
                     tick={{ fill: "#94a3b8", fontSize: 8 }}
                     tickLine={false}
                     axisLine={false}
@@ -303,8 +474,8 @@ export default function CompetitorTrackingDashboard() {
                     tickFormatter={(v) => `${v} Cr`}
                     width={45}
                   />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#2563EB" radius={[4, 4, 0, 0]} maxBarSize={38} />
+                  <Tooltip formatter={(value) => [`₹${Number(value).toFixed(2)} Cr`, "Trade Value"]} labelFormatter={(label) => `Competitor: ${label}`}/>
+                  <Bar dataKey="totalTradeValue" fill="#2563EB" radius={[4, 4, 0, 0]} maxBarSize={38} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -317,26 +488,26 @@ export default function CompetitorTrackingDashboard() {
               <div className="relative w-[130px] h-[130px] shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={MARKET_SHARE} innerRadius={38} outerRadius={58} dataKey="value" stroke="none">
-                      {MARKET_SHARE.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
+                    <Pie data={marketShare} innerRadius={38} outerRadius={58} dataKey="marketShare" stroke="none">
+                      {marketShare.map((entry, index) => (
+                        <Cell key={index} fill={["#2563EB", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444"][index % 5]} />
                       ))}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <span className="text-[7px] text-slate-400 font-bold uppercase leading-none">Total Market Share</span>
-                  <span className={`font-black text-[12px] mt-1 ${HEADING}`}>100%</span>
+                  <span className={`font-black text-[12px] mt-1 ${HEADING}`}>{marketShare.reduce((total, item) => total + (item.marketShare || 0), 0).toFixed(1)}%</span>
                 </div>
               </div>
               <div className="space-y-1.5 flex-1 text-[11px]">
-                {MARKET_SHARE.map((m, i) => (
+                {marketShare.map((m, i) => (
                   <div key={i} className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: m.color }} />
-                      <span className="text-slate-600 font-semibold truncate max-w-[110px]">{m.name}</span>
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: ["#2563EB", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444"][i % 5], }} />
+                      <span className="text-slate-600 font-semibold truncate max-w-[110px]">{m.companyName}</span>
                     </div>
-                    <span className={`font-bold ${HEADING}`}>{m.value}%</span>
+                    <span className={`font-bold ${HEADING}`}>{m.marketShare}%</span>
                   </div>
                 ))}
               </div>
@@ -354,24 +525,35 @@ export default function CompetitorTrackingDashboard() {
             <div className="flex flex-col sm:flex-row gap-2">
               <div className="h-[190px] flex-1">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={TREND_DATA} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
+                  <LineChart data={tradeTrend} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
                     <CartesianGrid stroke="#F1F5F9" vertical={false} />
-                    <XAxis dataKey="date" tick={{ fill: "#94a3b8", fontSize: 8 }} tickLine={false} axisLine={false} />
+                    <XAxis dataKey="_id" tick={{ fill: "#94a3b8", fontSize: 8 }} tickLine={false} axisLine={false} />
                     <YAxis tick={{ fill: "#94a3b8", fontSize: 9 }} tickLine={false} axisLine={false} tickFormatter={(v) => `${v} Cr`} width={40} />
-                    <Tooltip />
-                    {Object.entries(TREND_LINES_COLORS).map(([key, color]) => (
-                      <Line key={key} type="monotone" dataKey={key} stroke={color} strokeWidth={2} dot={false} />
-                    ))}
+                    <Tooltip  contentStyle={{
+    backgroundColor: "#fff",
+    border: "1px solid #E2E8F0",
+    borderRadius: "8px",
+    fontSize: "10px",
+  }}
+  labelStyle={{
+    color: "#07156B",
+    fontWeight: "700",
+    fontSize: "10px",
+  }}
+  formatter={(value, name) => [
+    name === "tradeValue" ? `${value} Cr` : value,
+    name === "tradeValue" ? "Trade Value" : "Shipments",
+  ]}/>
+                    <Line key={key} type="monotone" dataKey="tradeValue" stroke="#2563EB" strokeWidth={2} dot={false} />
+                    <Line key={key} type="monotone" dataKey="shipments" stroke="#2563EB" strokeWidth={2} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
               <div className="space-y-1.5 text-[10px] sm:w-28 shrink-0">
-                {Object.entries(TREND_LINES_COLORS).map(([key, color]) => (
-                  <div key={key} className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: color }} />
-                    <span className="text-slate-600 font-semibold leading-tight">{key}</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: "#2563EB" }} />
+                    <span className="text-slate-600 font-semibold leading-tight">Trade Value</span>
                   </div>
-                ))}
               </div>
             </div>
             <ViewAllLink text="View Trend Analysis" />
@@ -392,14 +574,14 @@ export default function CompetitorTrackingDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {TOP_SHIPMENTS.map((c, i) => (
+                  {topCompetitors.map((c, i) => (
                     <tr key={i}>
-                      <td className={`py-2.5 font-semibold whitespace-nowrap ${HEADING}`}>{c.name}</td>
-                      <td className="py-2.5 text-right font-bold text-slate-700 whitespace-nowrap">{c.shipments}</td>
-                      <td className={`py-2.5 text-right font-bold whitespace-nowrap ${c.up ? "text-emerald-500" : "text-rose-500"}`}>
-                        {c.up ? "▲" : "▼"} {c.change}
+                      <td className={`py-2.5 font-semibold whitespace-nowrap ${HEADING}`}>{c.companyName}</td>
+                      <td className="py-2.5 text-right font-bold text-slate-700 whitespace-nowrap">{c.totalShipments}</td>
+                      <td className={`py-2.5 text-right font-bold whitespace-nowrap ${c.growth >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
+                        {c.growth >= 0 ? "▲" : "▼"} {Math.abs(c.growth)}%
                       </td>
-                      <td className="py-2.5 text-right font-semibold text-slate-500 whitespace-nowrap">{c.share}</td>
+                      <td className="py-2.5 text-right font-semibold text-slate-500 whitespace-nowrap">{c.marketShare}%</td>
                     </tr>
                   ))}
                 </tbody>
@@ -421,12 +603,12 @@ export default function CompetitorTrackingDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {TOP_PRODUCTS.map((p, i) => (
+                  {topProducts.map((p, i) => (
                     <tr key={i}>
-                      <td className={`py-2.5 font-semibold whitespace-nowrap ${HEADING}`}>{p.code}</td>
-                      <td className="py-2.5 text-slate-600">{p.desc}</td>
-                      <td className="py-2.5 text-slate-500">{p.competitor}</td>
-                      <td className="py-2.5 text-right font-bold text-slate-800 whitespace-nowrap">{p.value}</td>
+                      <td className={`py-2.5 font-semibold whitespace-nowrap ${HEADING}`}>{p._id}</td>
+                      <td className="py-2.5 text-slate-600">{p.description || "-"}</td>
+                      <td className="py-2.5 text-slate-500">{p.competitor || "-"}</td>
+                      <td className="py-2.5 text-right font-bold text-slate-800 whitespace-nowrap">₹{(p.tradeValue / 10000000).toFixed(2)} Cr</td>
                     </tr>
                   ))}
                 </tbody>
@@ -447,10 +629,10 @@ export default function CompetitorTrackingDashboard() {
                 />
               </div>
               <div className="space-y-2 text-[11px] shrink-0">
-                {COUNTRY_PRESENCE.map((c, i) => (
+                {countryPresence.map((c, i) => (
                   <div key={i} className="flex items-center gap-1.5 font-bold">
-                    <Flag country={c.country} />
-                    <span className={HEADING}>{c.country} {c.count}</span>
+                    <Flag country={c._id} />
+                    <span className={HEADING}>{c._id} {c.competitors}</span>
                   </div>
                 ))}
               </div>
@@ -477,25 +659,25 @@ export default function CompetitorTrackingDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {ACTIVITY_SNAPSHOT.map((r, i) => (
+                {activitySnapshot.map((r, i) => (
                   <tr key={i}>
-                    <td className={`py-2.5 font-semibold whitespace-nowrap ${HEADING}`}>{r.name}</td>
+                    <td className={`py-2.5 font-semibold whitespace-nowrap ${HEADING}`}>{r.companyName}</td>
                     <td className="py-2.5 whitespace-nowrap">
                       <span className="flex items-center gap-1.5 text-slate-600 font-medium">
                         <Flag country={r.country} /> {r.country}
                       </span>
                     </td>
-                    <td className="py-2.5 text-right text-slate-600 whitespace-nowrap">{r.shipments}</td>
-                    <td className="py-2.5 text-right font-bold text-slate-800 whitespace-nowrap">{r.value}</td>
-                    <td className={`py-2.5 text-right font-bold whitespace-nowrap ${r.up ? "text-emerald-500" : "text-rose-500"}`}>
-                      {r.up ? "▲" : "▼"} {r.growth}
+                    <td className="py-2.5 text-right text-slate-600 whitespace-nowrap">{r.totalShipments}</td>
+                    <td className="py-2.5 text-right font-bold text-slate-800 whitespace-nowrap">₹{(r.totalTradeValue / 10000000).toFixed(2)} Cr</td>
+                    <td className={`py-2.5 text-right font-bold whitespace-nowrap ${r.growth >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
+                       {r.growth >= 0 ? "▲" : "▼"} {Math.abs(r.growth)}%
                     </td>
-                    <td className="py-2.5 text-slate-600 whitespace-nowrap">{r.product}</td>
-                    <td className="py-2.5 text-slate-600 whitespace-nowrap">{r.destination}</td>
-                    <td className="py-2.5 text-right font-semibold text-slate-500 whitespace-nowrap">{r.share}</td>
+                    <td className="py-2.5 text-slate-600 whitespace-nowrap"> {r.topProduct}</td>
+                    <td className="py-2.5 text-slate-600 whitespace-nowrap">{r.topDestination}</td>
+                    <td className="py-2.5 text-right font-semibold text-slate-500 whitespace-nowrap">{r.marketShare}%</td>
                     <td className="py-2.5 text-right whitespace-nowrap">
                       <span className="flex items-center justify-end gap-1 text-slate-500">
-                        <Clock size={11} /> {r.active}
+                        <Clock size={11} /> {r.active ? "Active" : "Inactive"}
                       </span>
                     </td>
                   </tr>

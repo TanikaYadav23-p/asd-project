@@ -428,7 +428,7 @@ const handleResetFilters = () => {
             <div>
               <label className="text-[10px] text-[#07156B] font-bold block mb-1.5 uppercase">Country</label>
               <div className="relative">
-                <select value={filters.country} onChange={(e) =setFilters({...filters,country: e.target.value,})} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <select value={filters.country} onChange={(e) => setFilters({...filters,country: e.target.value,})} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
                   <option value="All">All Countries</option>
                   {filterOptions.countries?.map((country) => (
                     <option key={country} value={country}>{country}</option>

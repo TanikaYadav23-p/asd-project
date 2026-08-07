@@ -193,8 +193,11 @@ exports.getDashboard = async(req,res)=>{
                         {
                         $group:{
                         _id:"$products",
+                        description:{
+                            $first:"$products.description"
+                        },
                         competitors:{
-                        $sum:1
+                         $first:"$companyName"
                         },
                         tradeValue:{
                         $sum:"$totalTradeValue"
