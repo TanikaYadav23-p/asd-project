@@ -103,6 +103,55 @@ exports.getDashboard = async(req,res)=>{
         }
         };
 
+        exports.getTradeValueByType = async (req, res) => {
+        try {
+
+        const data = await TradeRoute.aggregate([
+            {
+                $group: {
+                    _id: "$tradeType",
+                    tradeValue: {
+                        $sum: "$tradeValue"
+                    }
+                }
+            },
+            {
+                $sort: {
+                    tradeValue: -1
+                }
+            }
+        ]);
+
+        const totalTradeValue = data.reduce(
+            (sum, item) => sum + item.tradeValue,
+            0
+        );
+
+        const result = data.map((item) => ({
+            tradeType: item._id,
+            tradeValue: item.tradeValue,
+            percentage: totalTradeValue
+                ? ((item.tradeValue / totalTradeValue) * 100).toFixed(1)
+                : "0"
+        }));
+
+        return res.status(200).json({
+            status: 1,
+            message: "Trade value by type fetched successfully",
+            data: result,
+            totalTradeValue
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+            status: 0,
+            message: error.message
+        });
+
+    }
+};
+
         exports.getMarketSummary=async(req,res)=>{
             try{
             
@@ -414,9 +463,14 @@ exports.getDashboard = async(req,res)=>{
                                         .sort({growth:-1})
                                         .limit(10);
                                         
+                                        const result = opportunities.map((item) => ({
+                                            ...item.toObject(),
+                                            score: Math.min(100, Math.max(0, item.growth || 0))
+                                        }));
+
                                         res.json({
                                         status:1,
-                                        data:opportunities
+                                        data: result
                                         });
                                         
                                         }catch(error){

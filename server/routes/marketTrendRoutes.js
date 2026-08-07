@@ -5,6 +5,7 @@ const{
 
 getDashboard,
 getTradeTrend,
+getTradeValueByType,
 getMarketSummary,
 getTopCategories,
 getGrowingCountries,
@@ -19,6 +20,7 @@ getFilterOptions
 
 router.get("/dashboard",getDashboard);
 router.get("/trade-trend",getTradeTrend);
+router.get("/trade-value-by-type",getTradeValueByType);
 router.get("/market-summary",getMarketSummary);
 router.get("/top-categories",getTopCategories);
 router.get("/growing-countries",getGrowingCountries);
