@@ -1,4 +1,19 @@
-import { useState } from "react";
+import { useState,useMemo,useEffect } from "react";
+import {
+  getDashboard,
+  getCompanyProfile,
+  getTopHSCodes,
+  getTopTradingPartners,
+  getTradeTrend,
+  getImportExportChart,
+  getShipmentTrend,
+  getTopProducts,
+  getRecentShipments,
+  getTopCountries,
+  getFinancialSnapshot,
+  getFilterOptions,
+  getCompanyDetails,
+} from '../../api/CompanyIntelApi';
 import {
   CalendarDays,
   Download,
@@ -34,17 +49,7 @@ import {
   Tooltip,
 } from "recharts";
 
-const KPI_STATS = [
-  { title: "Total Shipment", value: "8,742", change: "▲ 18.6% vs last month", isUp: true, icon: Truck, bg: "bg-blue-50", color: "text-blue-500" },
-  { title: "Total Trade Value (INR)", value: "₹3,203.45 Cr", change: "▲ 18.6% vs last month", isUp: true, icon: IndianRupee, bg: "bg-emerald-50", color: "text-emerald-500" },
-  { title: "Total Shipments", value: "2.45 L", change: "▲ 12.3% vs last month", isUp: true, icon: Users, bg: "bg-purple-50", color: "text-purple-500" },
-  { title: "Total Trade Value (INR)", value: "₹3,203.45 Cr", change: "▲ 14.7% vs last month", isUp: true, icon: Truck, bg: "bg-orange-50", color: "text-orange-500" },
-  { title: "Countries Covered", value: "68", change: "▲ 9.4% vs last month", isUp: true, icon: Globe, bg: "bg-purple-50", color: "text-purple-500" },
-  { title: "Avg. Shipment Value (INR)", value: "₹14.26 L", change: "▼ 3.2% vs last month", isUp: false, icon: IndianRupee, bg: "bg-orange-50", color: "text-orange-500" },
-  { title: "Avg. Lead Time (Days)", value: "18.6", change: "▼ 3.2% vs last month", isUp: false, icon: Clock, bg: "bg-rose-50", color: "text-rose-500" },
-];
-
-const HS_CODES = [
+/*const HS_CODES = [
   { code: "8536", desc: "Electrical apparatus for switching", value: "₹125.45 Cr" },
   { code: "8542", desc: "Integrated circuits & micro assemblies", value: "₹98.76 Cr" },
   { code: "8504", desc: "Electric transformers", value: "₹76.32 Cr" },
@@ -99,15 +104,27 @@ const RECENT_SHIPMENTS = [
   { id: "SHP-2025-1043", date: "22 Apr 2025", hsCode: "8504", desc: "Power Transformers", partner: "Gulf Power FZE", country: "AE", value: "₹28.30 Cr", status: "In Transit" },
   { id: "SHP-2025-1042", date: "21 Apr 2025", hsCode: "8537", desc: "Control Panels", partner: "BJ Components B.V.", country: "NL", value: "₹18.90 Cr", status: "Delivered" },
   { id: "SHP-2025-1041", date: "20 Apr 2025", hsCode: "9031", desc: "Testing Instruments", partner: "Shanghai Tech Co.", country: "CN", value: "₹16.20 Cr", status: "Pending" },
-];
+];*/
 
 const STATUS_STYLES = {
   Delivered: "bg-emerald-50 text-emerald-600",
   "In Transit": "bg-blue-50 text-blue-600",
   Pending: "bg-orange-50 text-orange-600",
 };
+const COUNTRY_CODES = {
+  "United States": "US",
+  "India": "IN",
+  "United Arab Emirates": "AE",
+  "Germany": "DE",
+  "China": "CN",
+  "Netherlands": "NL",
+  "Brazil": "BR",
+  "United Kingdom": "GB",
+  "Singapore": "SG",
+  "Japan": "JP"
+};
 
-const GROWTH_COUNTRIES = [
+/*const GROWTH_COUNTRIES = [
   { country: "USA", flag: "US", value: "₹185.45 Cr", growth: "32.6%" },
   { country: "Germany", flag: "DE", value: "₹74.20 Cr", growth: "28.3%" },
   { country: "UAE", flag: "AE", value: "₹96.30 Cr", growth: "24.7%" },
@@ -120,7 +137,7 @@ const FINANCIALS = {
   exportTurnover: "₹856.30 Cr",
   netProfit: "₹98.45 Cr",
   exportRatio: "68.7%",
-};
+};*/
 
 const TABS = ["Overview", "Shipment Analysis", "Partner Analysis", "Product Analysis", "Country Analysis", "Financials", "News & Insights", "Documents"];
 
@@ -128,6 +145,152 @@ export default function CompanyIntelligence() {
   const [activeTab, setActiveTab] = useState("Overview");
   const [searchCompany, setSearchCompany] = useState("");
 
+  const [dashboard, setDashboard] = useState(null);
+const [companyProfile, setCompanyProfile] = useState(null);
+const [topHSCodes, setTopHSCodes] = useState([]);
+const [topTradingPartners, setTopTradingPartners] = useState([]);
+const [tradeTrend, setTradeTrend] = useState([]);
+const [importExportChart, setImportExportChart] = useState(null);
+const [shipmentTrend, setShipmentTrend] = useState([]);
+const [topProducts, setTopProducts] = useState([]);
+const [recentShipments, setRecentShipments] = useState([]);
+const [topCountries, setTopCountries] = useState([]);
+const [financialSnapshot, setFinancialSnapshot] = useState(null);
+const [filterOptions, setFilterOptions] = useState(null);
+const [companyDetails, setCompanyDetails] = useState(null);
+
+const fetchDashboard = async () => {
+  try {
+    const res = await getDashboard();
+    setDashboard(res.data?.data || null);
+  } catch (error) {
+    console.error("Dashboard fetch error:", error);
+  }
+};
+
+const fetchCompanyProfile = async () => {
+  try {
+    const res = await getCompanyProfile();
+    setCompanyProfile(res.data.data || null);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const fetchTopHSCodes = async () => {
+  try {
+    const res = await getTopHSCodes();
+    setTopHSCodes(res.data?.data || []);
+  } catch (error) {
+    console.error("Top HS Codes fetch error:", error);
+  }
+};
+
+const fetchTopTradingPartners = async () => {
+  try {
+    const res = await getTopTradingPartners();
+    setTopTradingPartners(res.data?.data || []);
+  } catch (error) {
+    console.error("Top Trading Partners fetch error:", error);
+  }
+};
+
+const fetchTradeTrend = async () => {
+  try {
+    const res = await getTradeTrend();
+    setTradeTrend(res.data?.data || []);
+  } catch (error) {
+    console.error("Trade Trend fetch error:", error);
+  }
+};
+
+const fetchImportExportChart = async () => {
+  try {
+    const res = await getImportExportChart();
+    setImportExportChart(res.data?.data || null);
+  } catch (error) {
+    console.error("Import Export Chart fetch error:", error);
+  }
+};
+
+const fetchShipmentTrend = async () => {
+  try {
+    const res = await getShipmentTrend();
+    setShipmentTrend(res.data?.data || []);
+  } catch (error) {
+    console.error("Shipment Trend fetch error:", error);
+  }
+};
+
+const fetchTopProducts = async () => {
+  try {
+    const res = await getTopProducts();
+    setTopProducts(res.data?.data || []);
+  } catch (error) {
+    console.error("Top Products fetch error:", error);
+  }
+};
+
+const fetchRecentShipments = async () => {
+  try {
+    const res = await getRecentShipments();
+    setRecentShipments(res.data?.data || []);
+  } catch (error) {
+    console.error("Recent Shipments fetch error:", error);
+  }
+};
+
+const fetchTopCountries = async () => {
+  try {
+    const res = await getTopCountries();
+    setTopCountries(res.data?.data || []);
+  } catch (error) {
+    console.error("Top Countries fetch error:", error);
+  }
+};
+
+const fetchFinancialSnapshot = async () => {
+  try {
+    const res = await getFinancialSnapshot();
+    setFinancialSnapshot(res.data?.data || null);
+  } catch (error) {
+    console.error("Financial Snapshot fetch error:", error);
+  }
+};
+
+const fetchFilterOptions = async () => {
+  try {
+    const res = await getFilterOptions();
+    setFilterOptions(res.data?.data || null);
+  } catch (error) {
+    console.error("Filter Options fetch error:", error);
+  }
+};
+
+useEffect(() => {
+  fetchDashboard();
+  fetchCompanyProfile();
+  fetchTopHSCodes();
+  fetchTopTradingPartners();
+  fetchTradeTrend();
+  fetchImportExportChart();
+  fetchShipmentTrend();
+  fetchTopProducts();
+  fetchRecentShipments();
+  fetchTopCountries();
+  fetchFinancialSnapshot();
+  fetchFilterOptions();
+}, []);
+
+const KPI_STATS = [
+  { title: "Total Companies", value: dashboard?.totalCompanies || 0, change: "", isUp: true, icon: Truck, bg: "bg-blue-50", color: "text-blue-500" },
+  { title: "Total Trade Value (INR)", value: `₹${((dashboard?.totalTradeValue || 0) / 10000000).toFixed(2)} Cr`, change: "", isUp: true, icon: IndianRupee, bg: "bg-emerald-50", color: "text-emerald-500" },
+  { title: "Total Shipments", value: dashboard?.totalShipments || 0, change: "", isUp: true, icon: Users, bg: "bg-purple-50", color: "text-purple-500" },
+  { title: "Total Trade Value (INR)", value: `₹${((dashboard?.totalTradeValue || 0) / 10000000).toFixed(2)} Cr`, change: "", isUp: true, icon: Truck, bg: "bg-orange-50", color: "text-orange-500" },
+  { title: "Countries Covered", value: dashboard?.countriesCovered || 0, change: "", isUp: true, icon: Globe, bg: "bg-purple-50", color: "text-purple-500" },
+  { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard?.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "", isUp: false, icon: IndianRupee, bg: "bg-orange-50", color: "text-orange-500" },
+  { title: "Avg. Lead Time (Days)", value: (dashboard?.avgLeadTime || 0).toFixed(1), change: "", isUp: false, icon: Clock, bg: "bg-rose-50", color: "text-rose-500" },
+];
   return (
     <div className="min-h-screen overflow-y-auto bg-[#F8FAFC] p-4 sm:p-6 text-slate-600 font-sans antialiased">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -171,37 +334,39 @@ export default function CompanyIntelligence() {
             <div className="w-11 h-11 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shrink-0">GT</div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <p className="font-bold text-xs text-slate-800">Global Tech Industries Pvt. Ltd.</p>
+                <p className="font-bold text-xs text-slate-800">{companyProfile?.company || "-"}</p>
+                {companyProfile?.verified && (
                 <span className="flex items-center gap-1 text-[10px] font-bold text-blue-600">
-                  <CheckCircle2 size={12} /> Verified
+                <CheckCircle2 size={12} /> Verified
                 </span>
+                )}
               </div>
               <div className="flex flex-wrap gap-3 text-[10px] text-slate-400 font-semibold mt-1.5">
-                <span className="flex items-center gap-1"><MapPin size={11} /> New Delhi, India</span>
-                <span className="flex items-center gap-1"><Hash size={11} /> CIN: U74899DL2012PTC225478</span>
-                <span className="flex items-center gap-1"><Briefcase size={11} /> Private Limited</span>
+                <span className="flex items-center gap-1"><MapPin size={11} />{companyProfile?.location?.city || "-"}, {companyProfile?.location?.country || "-"}</span>
+                <span className="flex items-center gap-1"><Hash size={11} />CIN: {companyProfile?.cinNumber || "-"}</span>
+                <span className="flex items-center gap-1"><Briefcase size={11} />{companyProfile?.businessType || "-"}</span>
               </div>
-              <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">Global Tech Industries Pvt. Ltd. is engaged in the manufacturing and export of electronic components and industrial automation products.</p>
+              <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">{companyProfile?.subtitle || "-"}</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-3 pt-3 border-t border-slate-100">
                 <div>
                   <p className="text-[9px] text-slate-400 font-bold uppercase">Established Year</p>
-                  <p className="text-[11px] font-bold text-slate-700 mt-0.5">2012</p>
+                  <p className="text-[11px] font-bold text-slate-700 mt-0.5">{companyProfile?.establishedYear || "-"}</p>
                 </div>
                 <div>
                   <p className="text-[9px] text-slate-400 font-bold uppercase">Employees</p>
-                  <p className="text-[11px] font-bold text-slate-700 mt-0.5">250-500</p>
+                  <p className="text-[11px] font-bold text-slate-700 mt-0.5">{companyProfile?.employees || "-"}</p>
                 </div>
                 <div>
                   <p className="text-[9px] text-slate-400 font-bold uppercase">Website</p>
-                  <p className="text-[11px] font-bold text-blue-600 mt-0.5">www.globaltech.com</p>
+                  <p className="text-[11px] font-bold text-blue-600 mt-0.5">{companyProfile?.website || "-"}</p>
                 </div>
                 <div>
                   <p className="text-[9px] text-slate-400 font-bold uppercase">Industry</p>
-                  <p className="text-[11px] font-bold text-slate-700 mt-0.5">Electronics & Electrical</p>
+                  <p className="text-[11px] font-bold text-slate-700 mt-0.5">{companyProfile?.industry || "-"}</p>
                 </div>
                 <div>
                   <p className="text-[9px] text-slate-400 font-bold uppercase">Business Type</p>
-                  <p className="text-[11px] font-bold text-slate-700 mt-0.5">Manufacturer, Exporter</p>
+                  <p className="text-[11px] font-bold text-slate-700 mt-0.5">{companyProfile?.businessType || "-"}</p>
                 </div>
               </div>
             </div>
@@ -213,13 +378,13 @@ export default function CompanyIntelligence() {
               <button className="text-[10px] font-bold text-blue-600">View All</button>
             </div>
             <div className="space-y-3">
-              {HS_CODES.map((h) => (
-                <div key={h.code} className="flex items-center justify-between gap-3 text-[11px]">
+              {topHSCodes.map((h) => (
+                <div key={h._id} className="flex items-center justify-between gap-3 text-[11px]">
                   <div>
-                    <p className="font-bold text-slate-800">{h.code}</p>
-                    <p className="text-slate-400 font-semibold">{h.desc}</p>
+                    <p className="font-bold text-slate-800">{h._id}</p>
+                    <p className="text-slate-400 font-semibold">{h.description}</p>
                   </div>
-                  <p className="font-bold text-slate-700 whitespace-nowrap">{h.value}</p>
+                  <p className="font-bold text-slate-700 whitespace-nowrap">₹{(h.tradeValue / 10000000).toFixed(2)} Cr</p>
                 </div>
               ))}
             </div>
@@ -240,14 +405,14 @@ export default function CompanyIntelligence() {
                   </tr>
                 </thead>
                 <tbody>
-                  {TRADING_PARTNERS.map((p) => (
-                    <tr key={p.country} className="border-t border-slate-50">
+                  {topTradingPartners.map((p) => (
+                    <tr key={p._id} className="border-t border-slate-50">
                       <td className="py-1.5 flex items-center gap-1.5 font-bold text-slate-700">
-                        <ReactCountryFlag countryCode={p.flag} svg style={{ width: "14px", height: "14px" }} />
-                        {p.country}
+                        <ReactCountryFlag countryCode={COUNTRY_CODES[p._id] || "IN"} svg style={{ width: "14px", height: "14px" }} />
+                        {p._id}
                       </td>
-                      <td className="py-1.5 text-right font-semibold text-slate-600">{p.value}</td>
-                      <td className="py-1.5 text-right font-semibold text-slate-600">{p.shipments}</td>
+                      <td className="py-1.5 text-right font-semibold text-slate-600">₹{((p.tradeValue || 0) / 10000000).toFixed(2)} Cr</td>
+                      <td className="py-1.5 text-right font-semibold text-slate-600">{p.shipments || 0}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -345,22 +510,22 @@ export default function CompanyIntelligence() {
               <span className="text-[9px] text-slate-400 bg-slate-50 border border-slate-150 px-2 py-0.5 rounded font-medium">This Month</span>
             </div>
             <div className="mb-3">
-              <span className="text-lg font-black text-slate-800 tracking-tight">₹1,876.45 Cr</span>
-              <span className="text-[10px] text-emerald-500 font-bold ml-2">▲ 17.6% vs last month</span>
+              <span className="text-lg font-black text-slate-800 tracking-tight">₹{(tradeTrend.filter(item => new Date(item._id).getMonth() === new Date().getMonth()).reduce((total, item) => total + (item.tradeValue || 0), 0) / 10000000).toFixed(2)} Cr</span>
+              <span className="text-[10px] text-emerald-500 font-bold ml-2">Updated</span>
             </div>
             <div className="h-[130px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={TREND_DATA}>
+                <AreaChart data={tradeTrend}>
                   <defs>
                     <linearGradient id="trendFill" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#10B981" stopOpacity={0.25} />
                       <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="date" tick={{ fill: "#94a3b8", fontSize: 9 }} tickLine={false} axisLine={false} />
+                  <XAxis dataKey="_id" tick={{ fill: "#94a3b8", fontSize: 9 }} tickLine={false} axisLine={false} />
                   <YAxis hide />
                   <Tooltip />
-                  <Area type="monotone" dataKey="value" stroke="#10B981" strokeWidth={2} fill="url(#trendFill)" dot={{ fill: "#10B981", r: 2.5 }} />
+                  <Area type="monotone" dataKey="tradeValue" stroke="#10B981" strokeWidth={2} fill="url(#trendFill)" dot={{ fill: "#10B981", r: 2.5 }} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -368,7 +533,7 @@ export default function CompanyIntelligence() {
           <div className="grid grid-cols-1 gap-2 pt-2.5 border-t border-slate-50">
             <div className="bg-slate-50/60 p-1.5 rounded-xl border border-slate-100 flex items-center justify-between px-3">
               <span className="text-[9px] text-slate-400 font-bold uppercase">Export Value (INR)</span>
-              <span className="text-xs font-bold text-slate-700">₹1,876.45 Cr</span>
+              <span className="text-xs font-bold text-slate-700">₹{(tradeTrend.filter(item => new Date(item._id).getMonth() === new Date().getMonth()).reduce((total, item) => total + (item.tradeValue || 0), 0) / 10000000).toFixed(2)} Cr</span>
             </div>
           </div>
         </div>
@@ -379,25 +544,26 @@ export default function CompanyIntelligence() {
             <div className="relative flex items-center justify-center">
               <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
-                  <Pie data={IMPORT_EXPORT_DATA} dataKey="value" innerRadius={50} outerRadius={72} startAngle={90} endAngle={450} stroke="none">
-                    {IMPORT_EXPORT_DATA.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                  <Pie data={[{ name: "Import", value: importExportChart?.importValue || 0 },{ name: "Export", value: importExportChart?.exportValue || 0 }]} 
+                  dataKey="value" innerRadius={50} outerRadius={72} startAngle={90} endAngle={450} stroke="none">
+                    <Cell fill="#3B82F6" /><Cell fill="#10B981" />
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute text-center">
                 <span className="text-[8px] text-slate-400 font-bold uppercase block">Total Value</span>
-                <span className="font-black text-xs text-slate-800">₹658.74 Cr</span>
+                <span className="font-black text-xs text-slate-800"> ₹{(((importExportChart?.importValue || 0) + (importExportChart?.exportValue || 0)) / 10000000).toFixed(2)} Cr</span>
               </div>
             </div>
           </div>
           <div className="space-y-2 pt-2.5 border-t border-slate-50 text-[11px]">
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 font-bold text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-blue-500" />Import</span>
-              <span className="font-semibold text-slate-500">₹ 312.45 Cr (47.4%)</span>
+              <span className="font-semibold text-slate-500"> ₹{((importExportChart?.importValue || 0) / 10000000).toFixed(2)} Cr{" "}({(((importExportChart?.importValue || 0) / ((importExportChart?.importValue || 0) + (importExportChart?.exportValue || 0))) * 100).toFixed(1)}%)</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 font-bold text-slate-600"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />Export</span>
-              <span className="font-semibold text-slate-500">₹ 346.29 Cr (52.6%)</span>
+              <span className="font-semibold text-slate-500"> ₹{((importExportChart?.exportValue || 0) / 10000000).toFixed(2)} Cr{" "}({(((importExportChart?.exportValue || 0) / ((importExportChart?.importValue || 0) + (importExportChart?.exportValue || 0))) * 100).toFixed(1)}%)</span>
             </div>
           </div>
         </div>
@@ -412,11 +578,11 @@ export default function CompanyIntelligence() {
             </div>
             <div className="h-[150px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={SHIPMENTS_TREND_DATA}>
-                  <XAxis dataKey="date" tick={{ fill: "#94a3b8", fontSize: 9 }} tickLine={false} axisLine={false} />
+                <BarChart data={shipmentTrend}>
+                  <XAxis dataKey="_id" tick={{ fill: "#94a3b8", fontSize: 9 }} tickLine={false} axisLine={false} />
                   <YAxis hide />
                   <Tooltip />
-                  <Bar dataKey="value" fill="#3B82F6" radius={[6, 6, 0, 0]} barSize={22} />
+                  <Bar dataKey="shipments" fill="#3B82F6" radius={[6, 6, 0, 0]} barSize={22} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -424,9 +590,9 @@ export default function CompanyIntelligence() {
           <div className="bg-slate-50/60 p-1.5 rounded-xl border border-slate-100 flex items-center justify-between px-3 mt-2.5">
             <div>
               <span className="text-[9px] text-slate-400 font-bold uppercase block">Total Shipments</span>
-              <span className="text-xs font-bold text-slate-700">12,458</span>
+              <span className="text-xs font-bold text-slate-700"> {shipmentTrend.reduce((total, item) => total + (item.shipments || 0),0).toLocaleString("en-IN")}</span>
             </div>
-            <span className="text-[9px] text-emerald-500 font-bold">▲ 14.6%</span>
+            <span className="text-[9px] text-emerald-500 font-bold">▲ Updated</span>
           </div>
         </div>
 
@@ -437,14 +603,14 @@ export default function CompanyIntelligence() {
               <button className="text-[10px] font-bold text-blue-600">View All</button>
             </div>
             <div className="space-y-3">
-              {TOP_PRODUCTS.map((p) => (
-                <div key={p.name}>
+              {topProducts.map((p) => (
+                <div key={p._id}>
                   <div className="flex items-center justify-between text-[11px] mb-1">
-                    <span className="font-bold text-slate-700">{p.name}</span>
-                    <span className="font-semibold text-slate-500">{p.value} ({p.pct}%)</span>
+                    <span className="font-bold text-slate-700">{p._id}</span>
+                    <span className="font-semibold text-slate-500"> ₹{(p.tradeValue / 10000000).toFixed(2)} Cr ({((p.tradeValue / topProducts.reduce((total, item) => total + (item.tradeValue || 0), 0)) * 100).toFixed(1)} %)</span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full ${p.color}`} style={{ width: `${p.pct}%` }} />
+                    <div className="h-full rounded-full bg-green-500" style={{ width: `${((p.tradeValue /topProducts.reduce((total, item) => total + (item.tradeValue || 0),0)) * 100).toFixed(1)}%` }} />
                   </div>
                 </div>
               ))}
@@ -474,20 +640,19 @@ export default function CompanyIntelligence() {
                   </tr>
                 </thead>
                 <tbody>
-                  {RECENT_SHIPMENTS.map((s) => (
-                    <tr key={s.id} className="border-t border-slate-50">
-                      <td className="py-2 font-bold text-blue-600">{s.id}</td>
-                      <td className="py-2 font-semibold text-slate-500">{s.date}</td>
-                      <td className="py-2 font-semibold text-slate-500">{s.hsCode}</td>
-                      <td className="py-2 font-semibold text-slate-600">{s.desc}</td>
-                      <td className="py-2 font-semibold text-slate-600">{s.partner}</td>
+                  {recentShipments.map((s) => (
+                    <tr key={s._id} className="border-t border-slate-50">
+                      <td className="py-2 font-bold text-blue-600">{s.sbNumber || s.referenceNumber || s._id}</td>
+                      <td className="py-2 font-semibold text-slate-500"> {s.shipmentDate ? new Date(s.shipmentDate).toLocaleDateString("en-IN") : "-"}</td>
+                      <td className="py-2 font-semibold text-slate-500">{s.cargo?.hsCode?.hsCode || "-"}</td>
+                      <td className="py-2 font-semibold text-slate-600">{s.cargo?.productName || "-"}</td>
+                      <td className="py-2 font-semibold text-slate-600"> {s.buyer?.companyName || s.importer?.companyName || s.exporter?.companyName || "-"}</td>
                       <td className="py-2 flex items-center gap-1.5 font-semibold text-slate-600">
-                        <ReactCountryFlag countryCode={s.country} svg style={{ width: "13px", height: "13px" }} />
-                        {s.country}
+                         {s.route?.destinationCountry ? (<><ReactCountryFlag countryCode={s.route.destinationCountry} svg style={{ width: "13px", height: "13px" }}/>{s.route.destinationCountry}</>) : ( "-")}
                       </td>
-                      <td className="py-2 text-right font-bold text-slate-700">{s.value}</td>
+                      <td className="py-2 text-right font-bold text-slate-700">{s.cargo?.value != null ? `₹${(Number(s.cargo.value) / 10000000).toFixed(2)} Cr` : "-"}</td>
                       <td className="py-2 text-right">
-                        <span className={`text-[9px] font-bold px-2 py-1 rounded-full ${STATUS_STYLES[s.status]}`}>{s.status}</span>
+                        <span className={`text-[9px] font-bold px-2 py-1 rounded-full ${STATUS_STYLES[s.shipmentStatus] || "bg-slate-100 text-slate-500"}`}>{s.shipmentStatus || "-"}</span>
                       </td>
                     </tr>
                   ))}
@@ -509,14 +674,14 @@ export default function CompanyIntelligence() {
               <button className="text-[10px] font-bold text-blue-600">View All</button>
             </div>
             <div className="divide-y divide-slate-100">
-              {GROWTH_COUNTRIES.map((g) => (
-                <div key={g.country} className="flex items-center justify-between py-2.5 text-[11px]">
+              {topCountries.map((g) => (
+                <div key={g._id} className="flex items-center justify-between py-2.5 text-[11px]">
                   <span className="flex items-center gap-1.5 font-bold text-slate-800">
-                    <ReactCountryFlag countryCode={g.flag} svg style={{ width: "13px", height: "13px" }} />
-                    {g.country}
+                    <ReactCountryFlag countryCode={g._id} svg style={{ width: "13px", height: "13px" }} />
+                    {g._id}
                   </span>
-                  <span className="font-semibold text-slate-500">{g.value}</span>
-                  <span className="text-emerald-500 font-black">▲ {g.growth}</span>
+                  <span className="font-semibold text-slate-500">₹{(Number(g.tradeValue || 0) / 10000000).toFixed(2)} Cr</span>
+                  <span className="text-emerald-500 font-black">▲ {g.shipments}</span>
                 </div>
               ))}
             </div>
@@ -531,24 +696,24 @@ export default function CompanyIntelligence() {
               <div className="space-y-2.5 text-[11px]">
                 <div>
                   <p className="text-[9px] text-slate-400 font-bold uppercase">Annual Turnover</p>
-                  <p className="font-extrabold text-slate-800">{FINANCIALS.turnover}</p>
+                  <p className="font-extrabold text-slate-800">₹{(Number(financialSnapshot?.annualTurnover || 0) / 10000000).toFixed(2)} Cr</p>
                 </div>
                 <div>
                   <p className="text-[9px] text-slate-400 font-bold uppercase">Export Turnover</p>
-                  <p className="font-extrabold text-slate-800">{FINANCIALS.exportTurnover}</p>
+                  <p className="font-extrabold text-slate-800">₹{(Number(financialSnapshot?.exportTurnover || 0) / 10000000).toFixed(2)} Cr</p>
                 </div>
                 <div>
                   <p className="text-[9px] text-slate-400 font-bold uppercase">Net Profit</p>
-                  <p className="font-extrabold text-slate-800">{FINANCIALS.netProfit}</p>
+                  <p className="font-extrabold text-slate-800">₹{(Number(financialSnapshot?.netProfit || 0) / 10000000).toFixed(2)} Cr</p>
                 </div>
                 <div>
                   <p className="text-[9px] text-slate-400 font-bold uppercase">Export Ratio</p>
-                  <p className="font-extrabold text-slate-800">{FINANCIALS.exportRatio}</p>
+                  <p className="font-extrabold text-slate-800">{Number(financialSnapshot?.avgExportRatio || 0).toFixed(1)}%</p>
                 </div>
               </div>
               <ResponsiveContainer width={100} height={100}>
                 <PieChart>
-                  <Pie data={[{ value: 68.7 }, { value: 31.3 }]} dataKey="value" innerRadius={32} outerRadius={46} stroke="none">
+                  <Pie data={[{ value: Number(financialSnapshot?.avgExportRatio || 0) },{ value: 100 - Number(financialSnapshot?.avgExportRatio || 0) }]} dataKey="value" innerRadius={32} outerRadius={46} stroke="none">
                     <Cell fill="#2563EB" />
                     <Cell fill="#E2E8F0" />
                   </Pie>

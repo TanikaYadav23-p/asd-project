@@ -236,7 +236,10 @@ exports.getTopTradingPartners = async (req, res) => {
                 const imports=await Shipment.aggregate([
                 {
                 $match:{
-                "route.mode":"Import"
+                 "importer.companyName": {
+            $exists: true,
+            $ne: ""
+          }
                 }
                 },
                 {
@@ -252,7 +255,10 @@ exports.getTopTradingPartners = async (req, res) => {
                 const exportsData=await Shipment.aggregate([
                 {
                 $match:{
-                "route.mode":"Export"
+               "exporter.companyName": {
+            $exists: true,
+            $ne: ""
+          }
                 }
                 },
                 {
@@ -406,7 +412,7 @@ exports.getTopTradingPartners = async (req, res) => {
                                 const countries=await Shipment.aggregate([
                                 {
                                 $group:{
-                                _id:"$route.destination",
+                                _id:"$route.destinationCountry",
                                 tradeValue:{
                                 $sum:"$cargo.value"
                                 },
