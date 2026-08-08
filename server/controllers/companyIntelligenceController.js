@@ -57,7 +57,7 @@ exports.getDashboard=async(req,res)=>{
         
         const{id}=req.params;
         
-        const company=await Company.findById(id);
+        const company=await Company.findOne().sort({ createdAt: -1 });
         
         if(!company){
         
@@ -82,6 +82,110 @@ exports.getDashboard=async(req,res)=>{
         
         }
         };
+
+        exports.getTopHSCodes = async (req, res) => {
+  try {
+    const topHSCodes = await Shipment.aggregate([
+      {
+        $match: {
+          "cargo.hsCode": { $ne: null }
+        }
+      },
+      {
+        $lookup: {
+          from: "hscodes",
+          localField: "cargo.hsCode",
+          foreignField: "_id",
+          as: "hsCode"
+        }
+      },
+      {
+        $unwind: "$hsCode"
+      },
+      {
+        $group: {
+          _id: "$hsCode.hsCode",
+          productName: { $first: "$hsCode.productName" },
+          description: { $first: "$hsCode.description" },
+          tradeValue: {
+            $sum: { $ifNull: ["$cargo.value", 0] }
+          },
+          shipments: {
+            $sum: 1
+          }
+        }
+      },
+      {
+        $sort: {
+          tradeValue: -1
+        }
+      },
+      {
+        $limit: 5
+      }
+    ]);
+
+    res.json({
+      status: 1,
+      data: topHSCodes
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 0,
+      message: error.message
+    });
+  }
+};
+
+
+// TOP TRADING PARTNERS
+exports.getTopTradingPartners = async (req, res) => {
+  try {
+    const topTradingPartners = await Shipment.aggregate([
+      {
+        $match: {
+          "route.destinationCountry": {
+            $exists: true,
+            $ne: ""
+          }
+        }
+      },
+      {
+        $group: {
+          _id: "$route.destinationCountry",
+
+          tradeValue: {
+            $sum: { $ifNull: ["$cargo.value", 0] }
+          },
+
+          shipments: {
+            $sum: 1
+          }
+        }
+      },
+      {
+        $sort: {
+          tradeValue: -1
+        }
+      },
+      {
+        $limit: 5
+      }
+    ]);
+
+    res.json({
+      status: 1,
+      data: topTradingPartners
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      status: 0,
+      message: error.message
+    });
+  }
+};
 
         exports.getTradeTrend=async(req,res)=>{
             try{

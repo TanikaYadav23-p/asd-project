@@ -544,8 +544,8 @@ const handleResetFilters = () => {
     name === "tradeValue" ? `${value} Cr` : value,
     name === "tradeValue" ? "Trade Value" : "Shipments",
   ]}/>
-                    <Line key={key} type="monotone" dataKey="tradeValue" stroke="#2563EB" strokeWidth={2} dot={false} />
-                    <Line key={key} type="monotone" dataKey="shipments" stroke="#2563EB" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="tradeValue" stroke="#2563EB" strokeWidth={2} dot={false} />
+                    <Line type="monotone" dataKey="shipments" stroke="#10B981" strokeWidth={2} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -553,6 +553,8 @@ const handleResetFilters = () => {
                   <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: "#2563EB" }} />
                     <span className="text-slate-600 font-semibold leading-tight">Trade Value</span>
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: "#10B981" }} />
+                    <span className="text-slate-600 font-semibold leading-tight">Shipments</span>
                   </div>
               </div>
             </div>

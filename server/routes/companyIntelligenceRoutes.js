@@ -4,6 +4,8 @@ const router = express.Router();
 const {
     getDashboard,
     getCompanyProfile,
+    getTopHSCodes,
+    getTopTradingPartners,
     getTradeTrend,
     getImportExportChart,
     getShipmentTrend,
@@ -16,7 +18,9 @@ const {
 } = require("../controllers/companyIntelligenceController");
 
 router.get("/dashboard", getDashboard);
-router.get("/company-profile/:id", getCompanyProfile);
+router.get("/company-profile", getCompanyProfile);
+router.get("/top-hs-codes", getTopHSCodes);
+router.get("/top-trading-partners", getTopTradingPartners);
 router.get("/trade-trend", getTradeTrend);
 router.get("/import-export-chart", getImportExportChart);
 router.get("/shipment-trend", getShipmentTrend);
