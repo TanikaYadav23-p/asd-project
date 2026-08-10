@@ -1,4 +1,16 @@
-import React, { useState } from "react";
+import React, { useState,useMemo,useEffect } from "react";
+import {
+  getRiskDashboard,
+  getRiskMap,
+  getRiskDistribution,
+  getRiskTopCountries,
+  getRiskCategories,
+  getRecentRiskAlerts,
+  getRiskTrend,
+  getTopRiskHSCodes,
+  getShipmentsAtRisk,
+  getRiskFilterOptions
+} from '../../api/RiskAnalysisApi';
 import ReactCountryFlag from "react-country-flag";
 import {
   CalendarDays,
@@ -82,18 +94,58 @@ function StatusBadge({ status }) {
     </span>
   );
 }
+const COUNTRY_POSITIONS = {
+  "United Arab Emirates": {
+    top: "39%",
+    left: "63%",
+  },
 
-const KPI_STATS = [
-  { title: "Overall Risk Score", value: "56 / 100", change: "Moderate Risk", icon: Gauge, bg: "bg-amber-50", color: "text-amber-500", tag: true },
-  { title: "High Risk Alerts", value: "18", change: "▲ 12 vs last month", icon: AlertTriangle, bg: "bg-rose-50", color: "text-rose-500" },
-  { title: "Medium Risk Alerts", value: "32", change: "▲ 6 vs last month", icon: AlertTriangle, bg: "bg-amber-50", color: "text-amber-500" },
-  { title: "Low Risk Alerts", value: "54", change: "▲ 8 vs last month", icon: ShieldCheck, bg: "bg-emerald-50", color: "text-emerald-500" },
-  { title: "Countries at High Risk", value: "7", change: "▲ 2 vs last month", icon: Target, bg: "bg-blue-50", color: "text-blue-500" },
-  { title: "Shipments Affected", value: "124", change: "₹98.75 Cr", icon: PackageSearch, bg: "bg-orange-50", color: "text-orange-500", plain: true },
-  { title: "Watchlist Entities", value: "26", change: "▲ 5 vs last month", icon: ListChecks, bg: "bg-blue-50", color: "text-blue-500" },
-];
+  India: {
+    top: "42%",
+    left: "67%",
+  },
 
-const MAP_LEGEND = [
+  China: {
+    top: "34%",
+    left: "72%",
+  },
+
+  Germany: {
+    top: "27%",
+    left: "51%",
+  },
+
+  Netherlands: {
+    top: "25%",
+    left: "49%",
+  },
+
+  Brazil: {
+    top: "55%",
+    left: "31%",
+  },
+
+  "United States": {
+    top: "34%",
+    left: "22%",
+  },
+
+  Canada: {
+    top: "25%",
+    left: "22%",
+  },
+
+  Australia: {
+    top: "65%",
+    left: "78%",
+  },
+
+  Japan: {
+    top: "38%",
+    left: "79%",
+  },
+};
+/*const MAP_LEGEND = [
   { label: "Very High", color: "#EF4444" },
   { label: "High", color: "#F87171" },
   { label: "Medium", color: "#F59E0B" },
@@ -171,7 +223,7 @@ const SHIPMENTS_AT_RISK = [
   { id: "SHP-2025-1038", date: "23 Apr 2025", from: "Russia", to: "India", hs: "8703", desc: "Motor Cars", level: "Very High", score: 72, factors: "Political, Compliance", impact: "₹8.75 Cr", status: "Delayed" },
   { id: "SHP-2025-1027", date: "22 Apr 2025", from: "UAE", to: "Germany", hs: "7208", desc: "Flat Rolled Products", level: "High", score: 60, factors: "Economic, Supply Chain", impact: "₹5.32 Cr", status: "At Risk" },
   { id: "SHP-2025-1019", date: "21 Apr 2025", from: "Iran", to: "Turkey", hs: "3917", desc: "Plastic Tubes & Pipes", level: "High", score: 58, factors: "Regulatory, Compliance", impact: "₹3.15 Cr", status: "Pending" },
-];
+];*/
 
 function SectionCard({ children, className = "" }) {
   return (
@@ -191,7 +243,173 @@ function ViewAllHeader({ title }) {
 }
 
 export default function RiskAnalysis() {
-  const totalCountries = RISK_DISTRIBUTION.reduce((a, b) => a + b.value, 0);
+
+  const [riskDashboard, setRiskDashboard] = useState(null);
+  const [riskMap, setRiskMap] = useState([]);
+  const [riskDistribution, setRiskDistribution] = useState([]);
+  const [riskTopCountries, setRiskTopCountries] = useState([]);
+  const [riskCategories, setRiskCategories] = useState([]);
+  const [recentRiskAlerts, setRecentRiskAlerts] = useState([]);
+  const [riskTrend, setRiskTrend] = useState([]);
+  const [topRiskHSCodes, setTopRiskHSCodes] = useState([]);
+  const [shipmentsAtRisk, setShipmentsAtRisk] = useState([]);
+  const [riskFilters, setRiskFilters] = useState({countries: [], riskLevels: [], riskCategories: [], hsCodes: []});
+  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedRiskLevel, setSelectedRiskLevel] = useState("");
+  const [selectedRiskCategory, setSelectedRiskCategory] = useState("");
+  const [selectedHSCode, setSelectedHSCode] = useState("");
+
+  const fetchRiskDashboard = async () => {
+    try {
+      const res = await getRiskDashboard();
+      setRiskDashboard(res.data?.data || null);
+    } catch (error) {
+      console.error("Risk Dashboard fetch error:", error);
+    }
+  };
+
+  const fetchRiskMap = async () => {
+    try {
+      const res = await getRiskMap();
+      setRiskMap(res.data?.data || []);
+    } catch (error) {
+      console.error("Risk Map fetch error:", error);
+    }
+  };
+
+  const fetchRiskDistribution = async () => {
+    try {
+      const res = await getRiskDistribution();
+      setRiskDistribution(res.data?.data || []);
+    } catch (error) {
+      console.error("Risk Distribution fetch error:", error);
+    }
+  };
+
+  const fetchRiskTopCountries = async () => {
+    try {
+      const res = await getRiskTopCountries();
+      setRiskTopCountries(res.data?.data || []);
+    } catch (error) {
+      console.error("Risk Top Countries fetch error:", error);
+    }
+  };
+
+  const fetchRiskCategories = async () => {
+    try {
+      const res = await getRiskCategories();
+      setRiskCategories(res.data?.data || []);
+    } catch (error) {
+      console.error("Risk Categories fetch error:", error);
+    }
+  };
+
+  const fetchRecentRiskAlerts = async () => {
+    try {
+      const res = await getRecentRiskAlerts();
+      setRecentRiskAlerts(res.data?.data || []);
+    } catch (error) {
+      console.error("Recent Risk Alerts fetch error:", error);
+    }
+  };
+
+  const fetchRiskTrend = async () => {
+    try {
+      const res = await getRiskTrend();
+      setRiskTrend(res.data?.data || []);
+    } catch (error) {
+      console.error("Risk Trend fetch error:", error);
+    }
+  };
+
+  const fetchTopRiskHSCodes = async () => {
+    try {
+      const res = await getTopRiskHSCodes();
+      setTopRiskHSCodes(res.data?.data || []);
+    } catch (error) {
+      console.error("Top Risk HS Codes fetch error:", error);
+    }
+  };
+
+  const fetchShipmentsAtRisk = async () => {
+    try {
+      const res = await getShipmentsAtRisk();
+      setShipmentsAtRisk(res.data?.data || []);
+    } catch (error) {
+      console.error("Shipments At Risk fetch error:", error);
+    }
+  };
+
+  const fetchRiskFilterOptions = async () => {
+    try {
+      const res = await getRiskFilterOptions();
+
+      setRiskFilters(
+        res.data?.data || {
+          countries: [],
+          riskLevels: [],
+          riskCategories: [],
+          hsCodes: []
+        }
+      );
+    } catch (error) {
+      console.error("Risk Filter Options fetch error:", error);
+    }
+  };
+  const handleApplyFilters = () => {
+    console.log("Selected Filters:", {
+     country: selectedCountry,
+     riskLevel: selectedRiskLevel,
+     riskCategory: selectedRiskCategory,
+     hsCode: selectedHSCode
+    });
+  };
+  const handleResetFilters = () => {
+    setSelectedCountry("");
+    setSelectedRiskLevel("");
+    setSelectedRiskCategory("");
+    setSelectedHSCode("");
+  };
+
+  useEffect(() => {
+    fetchRiskDashboard();
+    fetchRiskMap();
+    fetchRiskDistribution();
+    fetchRiskTopCountries();
+    fetchRiskCategories();
+    fetchRecentRiskAlerts();
+    fetchRiskTrend();
+    fetchTopRiskHSCodes();
+    fetchShipmentsAtRisk();
+    fetchRiskFilterOptions();
+  }, []);
+  const getRiskColor = (riskLevel) => {
+    switch (riskLevel) {
+      case "Very High":
+        return "#EF4444";
+      case "High":
+        return "#F87171";
+      case "Medium":
+        return "#F59E0B";
+      case "Low":
+        return "#10B981";
+      case "Very Low":
+        return "#3B82F6";
+      default:
+        return "#CBD5E1";
+    }
+  };
+  const riskLegend = [...new Set(riskMap.map((item) => item.riskLevel).filter(Boolean)),].map((level) => ({ label: level, color: getRiskColor(level),}));
+  //const totalCountries = RISK_DISTRIBUTION.reduce((a, b) => a + b.value, 0);
+
+  const KPI_STATS = [
+  { title: "Overall Risk Score", value: `${Number(riskDashboard?.overallRisk || 0).toFixed(0)} / 100`, change: Number(riskDashboard?.overallRisk || 0) >= 70 ? "High Risk" : Number(riskDashboard?.overallRisk || 0) >= 40 ? "Moderate Risk" : "Low Risk", icon: Gauge, bg: "bg-amber-50", color: "text-amber-500", tag: true },
+  { title: "High Risk Alerts", value: riskDashboard?.highRisk || 0, change: "", icon: AlertTriangle, bg: "bg-rose-50", color: "text-rose-500" },
+  { title: "Medium Risk Alerts", value: riskDashboard?.mediumRisk || 0, change: "", icon: AlertTriangle, bg: "bg-amber-50", color: "text-amber-500" },
+  { title: "Low Risk Alerts", value: riskDashboard?.lowRisk || 0, change: "", icon: ShieldCheck, bg: "bg-emerald-50", color: "text-emerald-500" },
+  { title: "Countries at High Risk", value: riskDashboard?.countriesAtRisk || 0, change: "", icon: Target, bg: "bg-blue-50", color: "text-blue-500" },
+  { title: "Shipments Affected", value: riskDashboard?.shipmentsAffected || 0, change: "", icon: PackageSearch, bg: "bg-orange-50", color: "text-orange-500", plain: true },
+];
 
   return (
     <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600 font-sans antialiased">
@@ -248,18 +466,23 @@ export default function RiskAnalysis() {
             <div>
               <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Risk Type</label>
               <div className="relative">
-                <input
-                  defaultValue="All Risk Types"
-                  className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs focus:outline-none"
-                />
-                <Search size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <select value={selectedRiskCategory} onChange={(e) => setSelectedRiskCategory(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="">All Risk Types</option>
+                  {riskFilters.riskCategories.map((item) => (
+                    <option key={item} value={item}>{item}</option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"/>
               </div>
             </div>
             <div>
               <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Country / Region</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>All Countries</option>
+                <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)}className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option value="">All Countries</option>
+                  {riskFilters.countries.map((item) => (
+                    <option key={item} value={item}>{item}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -267,26 +490,23 @@ export default function RiskAnalysis() {
             <div>
               <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Product / HS Code</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <select value={selectedHSCode} onChange={(e) => setSelectedHSCode(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
                   <option>All Products</option>
+                  {riskFilters.hsCodes.map((item) => (
+                    <option key={item._id} value={item._id}>{item.hsCode} - {item.productName}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
             </div>
             <div>
-              <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Trade Type</label>
+              <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Risk Level</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>All (Import/Export)</option>
-                </select>
-                <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-              </div>
-            </div>
-            <div>
-              <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Time Period</label>
-              <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                  <option>This Month</option>
+                <select value={selectedRiskLevel} onChange={(e) => setSelectedRiskLevel(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                  <option>All Risk Levels</option>
+                  {riskFilters.riskLevels.map((item) => (
+                    <option key={item} value={item}>{item}</option>
+                  ))}
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
@@ -295,10 +515,10 @@ export default function RiskAnalysis() {
               <button className="flex items-center justify-center gap-1.5 bg-slate-50/80 border border-slate-200 text-slate-600 rounded-xl py-2 px-3 text-xs font-semibold hover:bg-slate-100 transition whitespace-nowrap">
                 <Sliders size={13} className="text-slate-400" /> More Filters
               </button>
-              <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl py-2 px-3 transition shadow-xs whitespace-nowrap">
+              <button onClick={handleApplyFilters} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl py-2 px-3 transition shadow-xs whitespace-nowrap">
                 Apply Filters
               </button>
-              <button className="text-slate-400 hover:text-slate-600 text-xs font-medium px-1 whitespace-nowrap">
+              <button onClick={handleResetFilters} className="text-slate-400 hover:text-slate-600 text-xs font-medium px-1 whitespace-nowrap">
                 Reset
               </button>
             </div>
@@ -315,29 +535,36 @@ export default function RiskAnalysis() {
                 className="absolute inset-0 w-full h-full object-cover"
                 style={{ filter: "grayscale(1) brightness(0) invert(0.85)" }}
               />
-              {MAP_BLOBS.map((b, i) => (
+              {riskMap.map((country, i) => {
+                const position = COUNTRY_POSITIONS[country._id];
+                 if (!position) return null;
+                const riskColor = getRiskColor(country.riskLevel);
+                return (
                 <div
                   key={i}
                   className="absolute rounded-[40%] opacity-90"
                   style={{
-                    top: b.top,
-                    left: b.left,
-                    width: b.w,
-                    height: b.h,
-                    backgroundColor: b.color,
-                    transform: `rotate(${b.rotate})`,
+                    top: position.top,
+                    left: position.left,
+                    width: "35px",
+                    height: "35px",
+                    backgroundColor:  riskColor,
+                    boxShadow: `0 0 18px ${riskColor}`,
                   }}
-                />
-              ))}
+                  title={`${country._id} | ${country.riskLevel} | Risk Score: ${Number(country.riskScore || 0).toFixed(1)} | Alerts: ${country.alerts || 0}`}
+                />);
+              })}
               <div className="absolute bottom-2 left-2 bg-white/95 rounded-lg p-2 shadow border border-slate-100">
                 <span className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Risk Level</span>
                 <div className="space-y-0.5">
-                  {MAP_LEGEND.map((l, i) => (
+                  {riskLegend.length > 0 ? (
+                    riskLegend.map((item, i) => (
                     <div key={i} className="flex items-center gap-1.5 text-[9px] text-slate-500 font-medium">
-                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: l.color }} />
-                      {l.label}
+                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                      {item.label}
                     </div>
-                  ))}
+                    ))) : (<div className="text-[9px] text-slate-400">  No risk data</div>
+                  )}
                 </div>
               </div>
               <div className="absolute bottom-2 right-2 flex flex-col gap-1">
@@ -360,27 +587,27 @@ export default function RiskAnalysis() {
               <div className="relative w-[130px] h-[130px] shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={RISK_DISTRIBUTION} innerRadius={38} outerRadius={58} dataKey="value" stroke="none">
-                      {RISK_DISTRIBUTION.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
+                    <Pie data={riskDistribution} innerRadius={38} outerRadius={58} dataKey="count" stroke="none">
+                      {riskDistribution.map((entry, index) => (
+                        <Cell key={index} fill={getRiskColor(entry._id)} />
                       ))}
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <span className="text-[8px] text-slate-400 font-bold uppercase leading-none">Total</span>
-                  <span className={`font-black text-lg ${HEADING}`}>{totalCountries}</span>
-                  <span className="text-[8px] text-slate-400 font-bold uppercase leading-none">Countries</span>
+                  <span className={`font-black text-lg ${HEADING}`}>{riskDistribution.reduce((total, item) => total + Number(item.count || 0),0)}</span>
+                  <span className="text-[8px] text-slate-400 font-bold uppercase leading-none">Risks</span>
                 </div>
               </div>
               <div className="space-y-2 flex-1 text-[10px]">
-                {RISK_DISTRIBUTION.map((r, i) => (
+                {riskDistribution.map((r, i) => (
                   <div key={i} className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: r.color }} />
-                      <span className="text-slate-600 font-semibold">{r.name}</span>
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getRiskColor(r._id) }} />
+                      <span className="text-slate-600 font-semibold">{r._id}</span>
                     </div>
-                    <span className={`font-bold ${HEADING}`}>{r.value} ({r.percent})</span>
+                    <span className={`font-bold ${HEADING}`}>{r.count} ({riskDistribution.reduce((total, item) => total + Number(item.count || 0), 0) > 0 ? ((Number(r.count) / riskDistribution.reduce((total, item) => total + Number(item.count || 0), 0)) * 100).toFixed(1) : 0}%)</span>
                   </div>
                 ))}
               </div>
@@ -395,19 +622,29 @@ export default function RiskAnalysis() {
                   <tr className="text-[9px] text-slate-400 uppercase font-bold">
                     <th className="text-left pb-2 font-bold">Country</th>
                     <th className="text-right pb-2 font-bold">Score</th>
-                    <th className="text-left pb-2 pl-3 font-bold">Level</th>
-                    <th className="text-right pb-2 font-bold">Trend</th>
+                    <th className="text-right pb-2 font-bold">Level</th>
+                    <th className="text-left pb-2 pl-3 font-bold">Alerts</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {TOP_RISKY_COUNTRIES.map((c, i) => (
+                  {riskTopCountries.map((country, i) => (
                     <tr key={i}>
-                      <td className={`py-2 font-semibold whitespace-nowrap ${HEADING}`}>{c.country}</td>
-                      <td className="py-2 text-right font-bold text-slate-700">{c.score}</td>
-                      <td className="py-2 pl-3"><RiskBadge level={c.level} /></td>
-                      <td className="py-2 text-right font-bold text-rose-500 whitespace-nowrap">{c.trend}</td>
+                      <td className={`py-2 font-semibold whitespace-nowrap ${HEADING}`}>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-slate-400">{COUNTRY_CODES[country._id] || "--"}</span>
+                          <span>{country._id || "-"}</span>
+                        </div>
+                      </td>
+                      <td className="py-2 text-right font-bold text-slate-700">{Number(country.riskScore || 0).toFixed(1)}</td>
+                      <td className="py-2 pl-3"><RiskBadge level={country.riskScore >= 80? "Very High": country.riskScore >= 60? "High" : country.riskScore >= 40? "Medium": country.riskScore >= 20? "Low": "Very Low"}/></td>
+                      <td className="py-2 text-right font-bold text-rose-500 whitespace-nowrap"> {country.alerts || 0}</td>
                     </tr>
                   ))}
+                  {riskTopCountries.length === 0 && (
+                    <tr>
+                      <td colSpan="3" className="py-6 text-center text-slate-400 text-xs">No risk data available</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -418,12 +655,12 @@ export default function RiskAnalysis() {
           <SectionCard>
             <h3 className={`font-bold text-sm mb-3 ${HEADING}`}>Risk by Category</h3>
             <div className="space-y-3">
-              {RISK_BY_CATEGORY.map((c, i) => (
+              {riskCategories.map((c, i) => (
                 <div key={i} className="flex items-center justify-between text-[11px]">
-                  <span className="font-semibold text-slate-700">{c.name}</span>
+                  <span className="font-semibold text-slate-700">{c._id}</span>
                   <div className="flex items-center gap-2">
-                    <span className={`font-bold ${HEADING}`}>{c.value}</span>
-                    <RiskBadge level={c.level} />
+                    <span className={`font-bold ${HEADING}`}>{c.Count}</span>
+                    <RiskBadge level={c.avgRisk >= 80 ? "Very High" : c.avgRisk >= 60 ? "High" : c.avgRisk >= 40 ? "Medium" : c.avgRisk >= 20 ? "Low" : "Very Low"}/>
                   </div>
                 </div>
               ))}
@@ -433,16 +670,16 @@ export default function RiskAnalysis() {
           <SectionCard>
             <ViewAllHeader title="Recent High Risk Alerts" />
             <div className="space-y-2.5">
-              {RECENT_ALERTS.map((a, i) => (
-                <div key={i} className="flex items-start justify-between gap-2 border border-slate-100 rounded-xl p-2.5">
+              {recentRiskAlerts.map((a, i) => (
+                <div key={a._id || i} className="flex items-start justify-between gap-2 border border-slate-100 rounded-xl p-2.5">
                   <div className="flex items-start gap-2">
                     <AlertTriangle size={13} className="text-rose-500 shrink-0 mt-0.5" />
                     <div>
-                      <p className="text-[11px] text-slate-700 font-semibold leading-snug">{a.text}</p>
-                      <p className="text-[10px] text-slate-400 font-medium mt-0.5">{a.tag} • {a.date}</p>
+                      <p className="text-[11px] text-slate-700 font-semibold leading-snug">{a.riskCategory || "Risk"} risk detected for{" "}{a.country || "Unknown Country"}</p>
+                      <p className="text-[10px] text-slate-400 font-medium mt-0.5">{a.hsCode?.productName || a.hsCode?.hsCode || "Risk Alert"}{" "} • {" "}{a.createdAt ? new Date(a.createdAt).toLocaleDateString() : "-"}</p>
                     </div>
                   </div>
-                  <RiskBadge level={a.level} />
+                  <RiskBadge level={a.riskLevel} />
                 </div>
               ))}
             </div>
@@ -457,20 +694,20 @@ export default function RiskAnalysis() {
             </div>
             <div className="h-[150px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={RISK_TREND} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <LineChart data={riskTrend} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
                   <CartesianGrid stroke="#F1F5F9" vertical={false} />
-                  <XAxis dataKey="date" tick={{ fill: "#94a3b8", fontSize: 8 }} tickLine={false} axisLine={false} />
+                  <XAxis dataKey="_id" tick={{ fill: "#94a3b8", fontSize: 8 }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fill: "#94a3b8", fontSize: 9 }} tickLine={false} axisLine={false} width={30} domain={[0, 100]} />
                   <Tooltip />
-                  <Line type="monotone" dataKey="score" stroke="#EF4444" strokeWidth={2} dot={{ fill: "#EF4444", r: 3 }} />
+                  <Line type="monotone" dataKey="avgRisk" stroke="#EF4444" strokeWidth={2} dot={{ fill: "#EF4444", r: 3 }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
             <div className="bg-rose-50 border border-rose-100 rounded-xl p-2.5 mt-2">
               <span className="text-[10px] text-slate-500 font-semibold block">Average Risk Score</span>
               <div className="flex items-center gap-2">
-                <span className={`text-base font-black ${HEADING}`}>78.6 / 100</span>
-                <span className="text-[10px] text-rose-500 font-bold">▲ 6.8 pts vs last month</span>
+                <span className={`text-base font-black ${HEADING}`}>{riskTrend.length > 0 ? (riskTrend.reduce((total, item) => total + Number(item.avgRisk || 0), 0) / riskTrend.length).toFixed(1) : "0.0"}{" "}/ 100</span>
+                <span className="text-[10px] text-rose-500 font-bold">Updated</span>
               </div>
             </div>
           </SectionCard>
@@ -488,12 +725,12 @@ export default function RiskAnalysis() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {TOP_RISKY_HS.map((h, i) => (
+                  {topRiskHSCodes.map((h, i) => (
                     <tr key={i}>
-                      <td className={`py-2 font-semibold whitespace-nowrap ${HEADING}`}>{h.code}</td>
-                      <td className="py-2 text-slate-600">{h.desc}</td>
-                      <td className="py-2 text-right font-bold text-slate-700">{h.score}</td>
-                      <td className="py-2 pl-2"><RiskBadge level={h.level} /></td>
+                      <td className={`py-2 font-semibold whitespace-nowrap ${HEADING}`}>{h._id}</td>
+                      <td className="py-2 text-slate-600">{h.product}</td>
+                      <td className="py-2 text-right font-bold text-slate-700">{Number(h.avgRisk || 0).toFixed(1)}</td>
+                      <td className="py-2 pl-2"><RiskBadge level={h.avgRisk >= 80 ? "Very High" : h.avgRisk >= 60 ? "High" : h.avgRisk >= 40 ? "Medium" : h.avgRisk >= 20 ? "Low" : "Very Low"} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -523,26 +760,26 @@ export default function RiskAnalysis() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {SHIPMENTS_AT_RISK.map((s, i) => (
-                  <tr key={i}>
-                    <td className={`py-2.5 font-semibold whitespace-nowrap ${HEADING}`}>{s.id}</td>
-                    <td className="py-2.5 text-slate-500 whitespace-nowrap">{s.date}</td>
+                {shipmentsAtRisk.map((s, i) => (
+                  <tr key={s._id || i}>
+                    <td className={`py-2.5 font-semibold whitespace-nowrap ${HEADING}`}>{s.shipment?.sbNumber || "-"}</td>
+                    <td className="py-2.5 text-slate-500 whitespace-nowrap"> {s.shipment?.shipmentDate ? new Date(s.shipment.shipmentDate).toLocaleDateString(): "-"}</td>
                     <td className="py-2.5 whitespace-nowrap">
                       <span className="flex items-center gap-1.5 text-slate-600 font-medium">
-                        <Flag country={s.from} /> {s.from}
+                        <Flag country={s.shipment?.route?.originCountry} /> {s.shipment?.route?.originCountry || "-"}
                       </span>
                     </td>
                     <td className="py-2.5 whitespace-nowrap">
                       <span className="flex items-center gap-1.5 text-slate-600 font-medium">
-                        <Flag country={s.to} /> {s.to}
+                        <Flag country={s.shipment?.route?.destinationCountry} /> {s.shipment?.route?.destinationCountry || "-"}
                       </span>
                     </td>
-                    <td className="py-2.5 text-slate-600 whitespace-nowrap">{s.hs}</td>
-                    <td className="py-2.5 text-slate-600 whitespace-nowrap">{s.desc}</td>
-                    <td className="py-2.5"><RiskBadge level={s.level} /></td>
-                    <td className="py-2.5 text-right font-bold text-slate-700">{s.score}</td>
-                    <td className="py-2.5 text-slate-500 whitespace-nowrap">{s.factors}</td>
-                    <td className="py-2.5 text-right font-bold text-slate-800 whitespace-nowrap">{s.impact}</td>
+                    <td className="py-2.5 text-slate-600 whitespace-nowrap">{s.hsCode?.hsCode || "-"}</td>
+                    <td className="py-2.5 text-slate-600 whitespace-nowrap">{s.hsCode?.productName || s.shipment?.cargo?.productName || "-"}</td>
+                    <td className="py-2.5"><RiskBadge level={s.riskLevel} /></td>
+                    <td className="py-2.5 text-right font-bold text-slate-700">{s.riskScore ?? 0}</td>
+                    <td className="py-2.5 text-slate-500 whitespace-nowrap"> {s.riskFactors?.length ? s.riskFactors.join(", ") : "-"}</td>
+                    <td className="py-2.5 text-right font-bold text-slate-800 whitespace-nowrap">{s.estimatedImpact ?? 0}</td>
                     <td className="py-2.5"><StatusBadge status={s.status} /></td>
                     <td className="py-2.5 text-right">
                       <button className={`flex items-center gap-1 border border-slate-200 rounded-lg px-2.5 py-1 text-[10px] font-bold ml-auto ${HEADING}`}>

@@ -145,6 +145,13 @@ export default function CompanyIntelligence() {
   const [activeTab, setActiveTab] = useState("Overview");
   const [searchCompany, setSearchCompany] = useState("");
 
+  const [selectedCountry, setSelectedCountry] = useState("");
+const [selectedCompanyType, setSelectedCompanyType] = useState("");
+const [selectedBusinessType, setSelectedBusinessType] = useState("");
+const [selectedProduct, setSelectedProduct] = useState("");
+
+const [filteredCompanies, setFilteredCompanies] = useState([]);
+
   const [dashboard, setDashboard] = useState(null);
 const [companyProfile, setCompanyProfile] = useState(null);
 const [topHSCodes, setTopHSCodes] = useState([]);
@@ -267,6 +274,35 @@ const fetchFilterOptions = async () => {
   }
 };
 
+const handleApplyFilters = () => {
+  const filtered = companies.filter((company) => {
+    return (
+      (!searchCompany ||
+        company.company?.toLowerCase().includes(searchCompany.toLowerCase())) &&
+      (!selectedCountry ||
+        company.location?.country === selectedCountry) &&
+      (!selectedCompanyType ||
+        company.industry === selectedCompanyType) &&
+      (!selectedBusinessType ||
+        company.businessType === selectedBusinessType) &&
+      (!selectedProduct ||
+        company.product === selectedProduct ||
+        company.products?.includes(selectedProduct))
+    );
+  });
+
+  setFilteredCompanies(filtered);
+};
+const handleResetFilters = () => {
+  setSearchCompany("");
+  setSelectedCountry("");
+  setSelectedCompanyType("");
+  setSelectedBusinessType("");
+  setSelectedProduct("");
+
+  setFilteredCompanies(companies);
+};
+
 useEffect(() => {
   fetchDashboard();
   fetchCompanyProfile();
@@ -331,7 +367,7 @@ const KPI_STATS = [
       <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-xs mb-6">
         <div className="flex flex-col lg:flex-row gap-5">
           <div className="lg:w-2/5 flex items-start gap-3">
-            <div className="w-11 h-11 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shrink-0">GT</div>
+            <div className="w-11 h-11 rounded-full bg-slate-800 text-white flex items-center justify-center font-bold text-sm shrink-0"> {companyProfile?.company?.split(" ").map((word) => word[0]).join("").slice(0, 2).toUpperCase()}</div>
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="font-bold text-xs text-slate-800">{companyProfile?.company || "-"}</p>
@@ -440,8 +476,11 @@ const KPI_STATS = [
           <div>
             <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Country</label>
             <div className="relative">
-              <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                <option>All Countries</option>
+              <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)}className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <option value="">All Countries</option>
+                {filterOptions?.countries?.map((country) => (
+                  <option key={country} value={country}>{country}</option>
+                ))}
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -449,8 +488,11 @@ const KPI_STATS = [
           <div>
             <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Company Type</label>
             <div className="relative">
-              <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                <option>All Types</option>
+              <select value={selectedCompanyType} onChange={(e) => setSelectedCompanyType(e.target.value)}className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <option value="">All Types</option>
+                {filterOptions?.industries?.map((industry) => (
+                  <option key={industry} value={industry}>{industry}</option>
+                ))}
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -458,17 +500,23 @@ const KPI_STATS = [
           <div>
             <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Business Type</label>
             <div className="relative">
-              <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                <option>All</option>
+              <select value={selectedBusinessType} onChange={(e) => setSelectedBusinessType(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <option value="">All</option>
+                {filterOptions?.businessTypes?.map((businessType) => (
+                  <option key={businessType} value={businessType}>{businessType}</option>
+                ))}
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
           </div>
           <div>
-            <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Turnover (INR)</label>
+            <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Product</label>
             <div className="relative">
-              <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
-                <option>All</option>
+              <select value={selectedProduct} onChange={(e) => setSelectedProduct(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <option value="">All</option>
+                {filterOptions?.products?.map((product) => (
+                  <option key={product} value={product}>{product}</option>
+                  ))}
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
@@ -479,8 +527,8 @@ const KPI_STATS = [
             </button>
           </div>
           <div className="flex gap-2 w-full xl:col-span-2">
-            <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl py-2 transition shadow-xs">Apply Filters</button>
-            <button className="text-slate-400 hover:text-slate-600 text-xs font-medium px-2">Reset</button>
+            <button onClick={handleApplyFilters} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl py-2 transition shadow-xs">Apply Filters</button>
+            <button onClick={handleResetFilters} className="text-slate-400 hover:text-slate-600 text-xs font-medium px-2">Reset</button>
           </div>
         </div>
       </div>
@@ -510,7 +558,7 @@ const KPI_STATS = [
               <span className="text-[9px] text-slate-400 bg-slate-50 border border-slate-150 px-2 py-0.5 rounded font-medium">This Month</span>
             </div>
             <div className="mb-3">
-              <span className="text-lg font-black text-slate-800 tracking-tight">₹{(tradeTrend.filter(item => new Date(item._id).getMonth() === new Date().getMonth()).reduce((total, item) => total + (item.tradeValue || 0), 0) / 10000000).toFixed(2)} Cr</span>
+              <span className="text-lg font-black text-slate-800 tracking-tight"> ₹{(tradeTrend.reduce((total, item) => total + Number(item.tradeValue || 0),0) / 10000000).toFixed(2)} Cr</span>
               <span className="text-[10px] text-emerald-500 font-bold ml-2">Updated</span>
             </div>
             <div className="h-[130px] w-full">
@@ -533,7 +581,7 @@ const KPI_STATS = [
           <div className="grid grid-cols-1 gap-2 pt-2.5 border-t border-slate-50">
             <div className="bg-slate-50/60 p-1.5 rounded-xl border border-slate-100 flex items-center justify-between px-3">
               <span className="text-[9px] text-slate-400 font-bold uppercase">Export Value (INR)</span>
-              <span className="text-xs font-bold text-slate-700">₹{(tradeTrend.filter(item => new Date(item._id).getMonth() === new Date().getMonth()).reduce((total, item) => total + (item.tradeValue || 0), 0) / 10000000).toFixed(2)} Cr</span>
+              <span className="text-xs font-bold text-slate-700">₹{(tradeTrend.reduce((total, item) => total + Number(item.tradeValue || 0),0) / 10000000).toFixed(2)} Cr</span>
             </div>
           </div>
         </div>
@@ -607,10 +655,10 @@ const KPI_STATS = [
                 <div key={p._id}>
                   <div className="flex items-center justify-between text-[11px] mb-1">
                     <span className="font-bold text-slate-700">{p._id}</span>
-                    <span className="font-semibold text-slate-500"> ₹{(p.tradeValue / 10000000).toFixed(2)} Cr ({((p.tradeValue / topProducts.reduce((total, item) => total + (item.tradeValue || 0), 0)) * 100).toFixed(1)} %)</span>
+                    <span className="font-semibold text-slate-500">₹{(Number(p.tradeValue || 0) / 10000000).toFixed(2)} Cr ({topProducts.reduce((total, item) => total + Number(item.tradeValue || 0), 0) > 0 ? ((Number(p.tradeValue || 0) / topProducts.reduce((total, item) => total + Number(item.tradeValue || 0), 0)) * 100).toFixed(1) : "0.0"}%)</span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                    <div className="h-full rounded-full bg-green-500" style={{ width: `${((p.tradeValue /topProducts.reduce((total, item) => total + (item.tradeValue || 0),0)) * 100).toFixed(1)}%` }} />
+                    <div className="h-full rounded-full bg-green-500" style={{ width: `${topProducts.reduce((total, item) => total + Number(item.tradeValue || 0), 0) > 0 ? ((Number(p.tradeValue || 0) / topProducts.reduce((total, item) => total + Number(item.tradeValue || 0), 0)) * 100).toFixed(1) : 0}%` }} />
                   </div>
                 </div>
               ))}
@@ -677,7 +725,7 @@ const KPI_STATS = [
               {topCountries.map((g) => (
                 <div key={g._id} className="flex items-center justify-between py-2.5 text-[11px]">
                   <span className="flex items-center gap-1.5 font-bold text-slate-800">
-                    <ReactCountryFlag countryCode={g._id} svg style={{ width: "13px", height: "13px" }} />
+                    <ReactCountryFlag countryCode={COUNTRY_CODES[g._id]} svg style={{ width: "13px", height: "13px" }} />
                     {g._id}
                   </span>
                   <span className="font-semibold text-slate-500">₹{(Number(g.tradeValue || 0) / 10000000).toFixed(2)} Cr</span>

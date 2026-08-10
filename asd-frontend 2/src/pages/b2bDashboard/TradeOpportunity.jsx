@@ -1,22 +1,32 @@
-import React, { useState } from "react";
+import React, { useState,useEffect,useMemo } from "react";
+import {
+  getTradeOpportunityDashboard,
+  getTopCountries,
+  getDistribution,
+  getScoreTrend,
+  getOpportunityTypes,
+  getTopOpportunities,
+  getTopHSCodes,
+  getDemandSupplyInsights,
+  getRecommendedActions,
+  getSavedOpportunities,
+  getTradeOpportunityFilters,
+} from "../../api/TradeOpportunityApi";
 import { 
   TrendingUp, Anchor, ShieldAlert, Percent, Award, Globe, 
   BarChart3, Layers, Download, Calendar, Filter, ChevronDown, 
   Star, ArrowUpRight, HelpCircle, CheckCircle, Flame 
 } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
+import { PieChart, Pie, Cell, Tooltip, AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  ResponsiveContainer, CartesianGrid} from "recharts";
 
 // --- MOCK DATA FOR DYNAMIC RENDERING ---
-const kpiData = [
-  { id: 1, title: "Total Opportunities", value: "1,248", change: "18.7%", up: true, icon: Globe, color: "text-emerald-500", bg: "bg-emerald-50" },
-  { id: 2, title: "High Potential", value: "356", change: "22.4%", up: true, icon: Flame, color: "text-orange-500", bg: "bg-orange-50" },
-  { id: 3, title: "Est. Trade Value (INR)", value: "₹1,245.80 Cr", change: "16.5%", up: true, icon: Layers, color: "text-amber-500", bg: "bg-amber-50" },
-  { id: 4, title: "Avg. Opportunity Score", value: "78.6 / 100", change: "6.8 pts", up: true, icon: Star, color: "text-blue-500", bg: "bg-blue-50" },
-  { id: 5, title: "New Opportunities", value: "152", change: "14.2%", up: true, icon: Award, color: "text-cyan-500", bg: "bg-cyan-50" },
-  { id: 6, title: "Converted Opportunities", value: "68", change: "9.6%", up: true, icon: CheckCircle, color: "text-slate-500", bg: "bg-slate-50" },
-];
 
-const countriesData = [
+/*const countriesData = [
   { code: "US", name: "USA", count: 184, value: "185.45 Cr", score: 82.6 },
   { code: "AE", name: "UAE", count: 142, value: "142.36 Cr", score: 80.3 },
   { code: "DE", name: "Germany", count: 118, value: "125.80 Cr", score: 79.4 },
@@ -38,11 +48,177 @@ const hsCodesData = [
   { code: "8421", desc: "Centrifuges, including dryers", value: "98.25 Cr" },
   { code: "3926", desc: "Plastic articles and fittings", value: "76.40 Cr" },
   { code: "7208", desc: "Flat rolled products of iron", value: "68.75 Cr" },
-];
+];*/
+const COUNTRY_CODES = {
+  "United States": "US",
+  "India": "IN",
+  "United Arab Emirates": "AE",
+  "Germany": "DE",
+  "China": "CN",
+  "Netherlands": "NL",
+  "Brazil": "BR",
+  "United Kingdom": "GB",
+  "Singapore": "SG",
+  "Japan": "JP"
+};
 
 export default function TradeOpportunity() {
   const [activeTab, setActiveTab] = useState("Overview");
 
+  const [dashboard, setDashboard] = useState(null);
+const [topCountries, setTopCountries] = useState([]);
+const [distribution, setDistribution] = useState([]);
+const [scoreTrend, setScoreTrend] = useState([]);
+const [opportunityTypes, setOpportunityTypes] = useState([]);
+const [topOpportunities, setTopOpportunities] = useState([]);
+const [topHSCodes, setTopHSCodes] = useState([]);
+const [demandSupply, setDemandSupply] = useState(null);
+const [recommendedActions, setRecommendedActions] = useState([]);
+const [savedOpportunities, setSavedOpportunities] = useState([]);
+const [filterOptions, setFilterOptions] = useState(null);
+
+const [selectedOpportunityType, setSelectedOpportunityType] = useState("");
+const [selectedTradeType, setSelectedTradeType] = useState("");
+const [selectedHSCode, setSelectedHSCode] = useState("");
+const [selectedCountry, setSelectedCountry] = useState("");
+
+const fetchDashboard = async () => {
+  try {
+    const res = await getTradeOpportunityDashboard();
+    setDashboard(res.data?.data || null);
+  } catch (error) {
+    console.error("Trade Opportunity Dashboard fetch error:", error);
+  }
+};
+
+const fetchTopCountries = async () => {
+  try {
+    const res = await getTopCountries();
+    setTopCountries(res.data?.data || []);
+  } catch (error) {
+    console.error("Top Countries fetch error:", error);
+  }
+};
+
+const fetchDistribution = async () => {
+  try {
+    const res = await getDistribution();
+    setDistribution(res.data?.data || []);
+  } catch (error) {
+    console.error("Distribution fetch error:", error);
+  }
+};
+
+const fetchScoreTrend = async () => {
+  try {
+    const res = await getScoreTrend();
+    setScoreTrend(res.data?.data || []);
+  } catch (error) {
+    console.error("Score Trend fetch error:", error);
+  }
+};
+
+const fetchOpportunityTypes = async () => {
+  try {
+    const res = await getOpportunityTypes();
+    setOpportunityTypes(res.data?.data || []);
+  } catch (error) {
+    console.error("Opportunity Types fetch error:", error);
+  }
+};
+
+const fetchTopOpportunities = async () => {
+  try {
+    const res = await getTopOpportunities();
+    setTopOpportunities(res.data?.data || []);
+  } catch (error) {
+    console.error("Top Opportunities fetch error:", error);
+  }
+};
+
+const fetchTopHSCodes = async () => {
+  try {
+    const res = await getTopHSCodes();
+    setTopHSCodes(res.data?.data || []);
+  } catch (error) {
+    console.error("Top HS Codes fetch error:", error);
+  }
+};
+
+const fetchDemandSupply = async () => {
+  try {
+    const res = await getDemandSupplyInsights();
+    setDemandSupply(res.data?.data || null);
+  } catch (error) {
+    console.error("Demand Supply fetch error:", error);
+  }
+};
+
+const fetchRecommendedActions = async () => {
+  try {
+    const res = await getRecommendedActions();
+    setRecommendedActions(res.data?.data || []);
+  } catch (error) {
+    console.error("Recommended Actions fetch error:", error);
+  }
+};
+
+const fetchSavedOpportunities = async () => {
+  try {
+    const res = await getSavedOpportunities();
+    setSavedOpportunities(res.data?.data || []);
+  } catch (error) {
+    console.error("Saved Opportunities fetch error:", error);
+  }
+};
+
+const fetchTradeOpportunityFilters = async () => {
+  try {
+    const res = await getTradeOpportunityFilters();
+    setFilterOptions(res.data?.data || null);
+  } catch (error) {
+    console.error("Trade Opportunity Filters fetch error:", error);
+  }
+};
+
+const handleApplyFilters = () => {
+  console.log("Applied Filters:", {
+    opportunityType: selectedOpportunityType,
+    tradeType: selectedTradeType,
+    hsCode: selectedHSCode,
+    country: selectedCountry,
+  });
+};
+
+const handleResetFilters = () => {
+  setSelectedOpportunityType("");
+  setSelectedTradeType("");
+  setSelectedHSCode("");
+  setSelectedCountry("");
+};
+
+useEffect(() => {
+  fetchDashboard();
+  fetchTopCountries();
+  fetchDistribution();
+  fetchScoreTrend();
+  fetchOpportunityTypes();
+  fetchTopOpportunities();
+  fetchTopHSCodes();
+  fetchDemandSupply();
+  fetchRecommendedActions();
+  fetchSavedOpportunities();
+  fetchTradeOpportunityFilters();
+}, []);
+
+const kpiData = [
+  { id: 1, title: "Total Opportunities", value: dashboard?.totalOpportunities?.toLocaleString("en-IN") || "0", change: "", up: true, icon: Globe, color: "text-emerald-500", bg: "bg-emerald-50" },
+  { id: 2, title: "High Potential", value: dashboard?.highPotential?.toLocaleString("en-IN") || "0", change: "", up: true, icon: Flame, color: "text-orange-500", bg: "bg-orange-50" },
+  { id: 3, title: "Est. Trade Value (INR)", value: `₹${((dashboard?.tradeValue || 0) / 10000000).toFixed(2)} Cr`, change: "", up: true, icon: Layers, color: "text-amber-500", bg: "bg-amber-50" },
+  { id: 4, title: "Avg. Opportunity Score", value: `${(dashboard?.avgScore || 0).toFixed(1)} / 100`, change: "", up: true, icon: Star, color: "text-blue-500", bg: "bg-blue-50" },
+  { id: 5, title: "New Opportunities", value: dashboard?.newOpportunities?.toLocaleString("en-IN") || "0", change: "", up: true, icon: Award, color: "text-cyan-500", bg: "bg-cyan-50" },
+  { id: 6, title: "Converted Opportunities", value: dashboard?.converted?.toLocaleString("en-IN") || "0", change: "", up: true, icon: CheckCircle, color: "text-slate-500", bg: "bg-slate-50" },
+];
   return (
     <div className="overflow-y-auto bg-slate-50/50 p-3 md:p-6 font-sans text-slate-700 antialiased">
       
@@ -70,30 +246,50 @@ export default function TradeOpportunity() {
 
       {/* FILTER BAR BAR */}
       <div className="bg-white border border-slate-100 rounded-2xl p-3 shadow-xs mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:flex lg:flex-wrap items-center gap-2">
-        {[
-          { label: "Opportunity", val: "All Types" },
-          { label: "Trade Type", val: "All (Import/Export)" },
-          { label: "Product / HS Code", val: "All Products" },
-          { label: "Country", val: "All Countries" },
-          { label: "Min. Opportunity Score", val: "All Scores" },
-          { label: "Est. Trade Value (INR)", val: "All Values" }
-        ].map((f, i) => (
-          <div key={i} className="flex flex-col flex-1 min-w-[140px]">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">{f.label}</span>
-            <div className="flex items-center justify-between border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-xs font-semibold text-slate-700 cursor-pointer">
-              <span className="truncate">{f.val}</span>
-              <ChevronDown size={14} className="text-slate-400 ml-1 shrink-0" />
-            </div>
-          </div>
-        ))}
+        <div className="flex flex-col flex-1 min-w-[140px]">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Opportunity</span>
+          <select value={selectedOpportunityType} onChange={(e) => setSelectedOpportunityType(e.target.value)} className="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-xs font-semibold text-slate-700">
+            <option value="">All Types</option>
+            {filterOptions?.opportunityTypes?.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col flex-1 min-w-[140px]">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Trade Type</span>
+          <select value={selectedTradeType} onChange={(e) => setSelectedTradeType(e.target.value)} className="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-xs font-semibold text-slate-700">
+            <option value="">All (Import/Export)</option>
+            {filterOptions?.tradeTypes?.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col flex-1 min-w-[140px]">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Product / HS Code</span>
+          <select value={selectedHSCode} onChange={(e) => setSelectedHSCode(e.target.value)} className="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-xs font-semibold text-slate-700">
+            <option value="">All Products</option>
+            {filterOptions?.hsCodes?.map((item) => (
+              <option key={item._id} value={item._id}>{item.productName} ({item.hsCode})</option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col flex-1 min-w-[140px]">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Country</span>
+          <select value={selectedCountry} onChange={(e) => setSelectedCountry(e.target.value)} className="border border-slate-200 rounded-lg px-2.5 py-1.5 bg-white text-xs font-semibold text-slate-700">
+            <option value="">All Countries</option>
+            {filterOptions?.countries?.map((country) => (
+              <option key={country} value={country}>{country}</option>
+            ))}
+         </select>
+        </div>
         <div className="flex items-center gap-2 pt-4 lg:pt-0 w-full lg:w-auto ml-auto">
           <button className="flex-1 lg:flex-none flex items-center justify-center gap-1 bg-white border border-slate-200 text-slate-600 font-bold text-xs px-3 py-2 rounded-xl hover:bg-slate-50">
             <Filter size={13} /> More Filters
           </button>
-          <button className="flex-1 lg:flex-none bg-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs hover:bg-blue-700 transition">
+          <button onClick={handleApplyFilters} className="flex-1 lg:flex-none bg-blue-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-xs hover:bg-blue-700 transition">
             Apply Filters
           </button>
-          <button className="text-slate-400 font-bold text-xs hover:text-slate-600 px-1">Reset</button>
+          <button onClick={handleResetFilters} className="text-slate-400 font-bold text-xs hover:text-slate-600 px-1">Reset</button>
         </div>
       </div>
 
@@ -152,15 +348,15 @@ export default function TradeOpportunity() {
                 <span className="col-span-2 text-right">Score</span>
               </div>
               <div className="divide-y divide-slate-50">
-                {countriesData.map((c) => (
-                  <div key={c.code} className="grid grid-cols-12 text-xs py-2.5 font-semibold items-center">
+                {topCountries.map((c) => (
+                  <div key={c._id} className="grid grid-cols-12 text-xs py-2.5 font-semibold items-center">
                     <div className="col-span-4 flex items-center gap-1.5 font-bold text-slate-700">
-                      <ReactCountryFlag countryCode={c.code} svg style={{ width: "14px", height: "10px", borderRadius: "2px", objectFit: "cover" }} />
-                      <span className="truncate">{c.name}</span>
+                      <ReactCountryFlag countryCode={COUNTRY_CODES[c._id] || "IN"} svg style={{ width: "14px", height: "10px", borderRadius: "2px", objectFit: "cover" }} />
+                      <span className="truncate">{c._id}</span>
                     </div>
-                    <span className="col-span-3 text-right text-slate-600 font-medium">{c.count}</span>
-                    <span className="col-span-3 text-right text-slate-800 font-bold">₹{c.value}</span>
-                    <span className="col-span-2 text-right text-blue-600 font-bold">{c.score}</span>
+                    <span className="col-span-3 text-right text-slate-600 font-medium">{c.opportunities || 0}</span>
+                    <span className="col-span-3 text-right text-slate-800 font-bold">₹{((c.tradeValue || 0) / 10000000).toFixed(2)} Cr</span>
+                    <span className="col-span-2 text-right text-blue-600 font-bold"> {(c.avgScore || 0).toFixed(1)}</span>
                   </div>
                 ))}
               </div>
@@ -174,40 +370,41 @@ export default function TradeOpportunity() {
         {/* CARD 2: DONUT / CIRCULAR CHART */}
         <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-xs flex flex-col justify-between">
           <div>
-            <h3 className="font-extrabold text-sm text-[#07156B] mb-4 flex items-center gap-1.5">
-              Opportunity Distribution
-            </h3>
+            <h3 className="font-extrabold text-sm text-[#07156B] mb-4">Opportunity Distribution</h3>
+            {/* PIE CHART */}
             <div className="relative flex justify-center items-center my-2">
-              <div className="w-32 h-32 rounded-full border-[14px] border-slate-100 flex flex-col items-center justify-center relative">
-                {/* Simulated Donut Segments with absolute clip borders */}
-                <div className="absolute inset-0 rounded-full border-[14px] border-transparent border-t-emerald-500 border-r-emerald-500 rotate-45"></div>
-                <div className="absolute inset-0 rounded-full border-[14px] border-transparent border-b-blue-500 border-l-blue-500 -rotate-45"></div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total</span>
-                <span className="text-lg font-black text-slate-800">1,245</span>
+              <div className="relative w-32 h-32">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={distribution} dataKey="count" nameKey="_id" innerRadius={45} outerRadius={64} paddingAngle={1} stroke="none">
+                      {distribution.map((item) => (
+                        <Cell key={item._id} fill={item._id === "High" ? "#10B981" : item._id === "Medium" ? "#3B82F6" : "#F59E0B" }/>
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+               </ResponsiveContainer>
+               {/* CENTER VALUE */}
+               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-[10px] font-bold text-slate-400 uppercase">Total</span>
+                <span className="text-lg font-black text-slate-800">{distribution.reduce((total, item) => total + Number(item.count || 0), 0).toLocaleString("en-IN")}</span>
+               </div>
               </div>
             </div>
+            {/* LEGEND */}
             <div className="space-y-2 mt-4 text-xs font-bold">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <span className="text-slate-500">High Potential</span>
-                </div>
-                <span className="text-slate-800">356 (28.5%)</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                  <span className="text-slate-500">Medium Potential</span>
-                </div>
-                <span className="text-slate-800">542 (43.4%)</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                  <span className="text-slate-500">Low Potential</span>
-                </div>
-                <span className="text-slate-800">350 (28.1%)</span>
-              </div>
+              {distribution.map((item) => {
+                const total = distribution.reduce((total, item) => total + Number(item.count || 0), 0);
+                const percent = total > 0 ? ((Number(item.count || 0) / total) * 100).toFixed(1) : "0.0";
+                return (
+                <div key={item._id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2.5 h-2.5 rounded-full ${ item._id === "High" ? "bg-emerald-500" : item._id === "Medium" ? "bg-blue-500" : "bg-amber-500"}`}/>
+                    <span className="text-slate-500">{item._id} Potential</span>
+                  </div>
+                  <span className="text-slate-800">{Number(item.count || 0).toLocaleString("en-IN")} ({percent}%)</span>
+                </div>);
+              })}
             </div>
           </div>
         </div>
@@ -217,63 +414,62 @@ export default function TradeOpportunity() {
           <div>
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-extrabold text-sm text-[#07156B]">Opportunity Score Trend</h3>
-              <div className="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-md text-[10px] font-bold text-slate-500 cursor-pointer">
-                <span>This Month</span> <ChevronDown size={10} />
+              <div className="flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-md text-[10px] font-bold text-slate-500">
+                <span>This Month</span>
+                <ChevronDown size={10} />
               </div>
             </div>
-            {/* Custom SVG Line Graph */}
+            {/* SCORE TREND */}
             <div className="h-28 w-full relative mt-2">
-              <svg className="w-full h-full overflow-visible" viewBox="0 0 100 40" preserveAspectRatio="none">
-                <path d="M 0 30 Q 20 22 40 25 T 80 18 T 100 12" fill="none" stroke="#10b981" strokeWidth="1.5" />
-                <path d="M 0 30 Q 20 22 40 25 T 80 18 T 100 12 L 100 40 L 0 40 Z" fill="url(#grad)" opacity="0.06" />
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={scoreTrend} margin={{ top: 10, right: 5, left: 0, bottom: 5 }}>
                 <defs>
-                  <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#10b981" />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
-                  </linearGradient>
+                  <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#10B981" stopOpacity={0.25} />
+                    <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
+                 </linearGradient>
                 </defs>
-                <circle cx="20" cy="24" r="1" fill="#10b981" />
-                <circle cx="40" cy="25" r="1" fill="#10b981" />
-                <circle cx="60" cy="20" r="1" fill="#10b981" />
-                <circle cx="80" cy="18" r="1" fill="#10b981" />
-              </svg>
-              <div className="absolute bottom-0 left-0 right-0 flex justify-between text-[8px] font-bold text-slate-400 px-1">
-                <span>01 Apr</span><span>06 Apr</span><span>11 Apr</span><span>16 Apr</span><span>21 Apr</span><span>24 Apr</span>
-              </div>
-            </div>
-            <div className="bg-emerald-50/60 border border-emerald-100 rounded-xl p-2.5 mt-4 flex items-center justify-between">
-              <div>
-                <span className="text-[9px] font-bold text-slate-400 block uppercase">Avg Opportunity Score</span>
-                <span className="text-sm font-black text-slate-800">78.6 / 100</span>
-              </div>
-              <span className="text-[10px] font-extrabold text-emerald-600 flex items-center gap-0.5">
-                <TrendingUp size={11} /> 6.8 pts vs last month
-              </span>
-            </div>
+                <CartesianGrid stroke="#F1F5F9" vertical={false}/>
+                <XAxis dataKey="_id" tick={{ fill: "#94a3b8", fontSize: 8 }} tickLine={false} axisLine={false}/>
+                <YAxis hide domain={[0, 100]}/>
+                <Tooltip />
+                <Area type="monotone" dataKey="avgScore" stroke="#10B981" strokeWidth={2} fill="url(#scoreGrad)"  connectNulls isAnimationActive={false} dot={{fill: "#10B981", stroke: "#10B981", strokeWidth: 1, r: 3}} activeDot={{ r: 5}}/>
+                </AreaChart>
+             </ResponsiveContainer>
+           </div>
+           {/* AVG SCORE */}
+           <div className="bg-emerald-50/60 border border-emerald-100 rounded-xl p-2.5 mt-4 flex items-center justify-between">
+           <div>
+            <span className="text-[9px] font-bold text-slate-400 block uppercase">Avg Opportunity Score</span>
+            <span className="text-sm font-black text-slate-800">
+              {scoreTrend.length > 0 ? (scoreTrend.reduce((total, item) => total + Number(item.avgScore || 0), 0) / scoreTrend.length).toFixed(1) : "0.0"}{" "} / 100
+           </span>
+           </div>
+           <span className="text-[10px] font-extrabold text-emerald-600 flex items-center gap-0.5"><TrendingUp size={11} /> Updated</span>
           </div>
-        </div>
-
+         </div>
+       </div>
         {/* CARD 4: OPPORTUNITY BY TYPE */}
         <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-xs flex flex-col justify-between">
           <div>
             <h3 className="font-extrabold text-sm text-[#07156B] mb-4">Opportunity by Type</h3>
             <div className="space-y-3">
-              {[
-                { title: "Unmet Demand", value: "512 (41.0%)", color: "bg-blue-50 text-blue-600" },
-                { title: "Supplier Gap", value: "318 (25.5%)", color: "bg-indigo-50 text-indigo-600" },
-                { title: "Price Advantage", value: "246 (19.7%)", color: "bg-emerald-50 text-emerald-600" },
-                { title: "Market Growth", value: "172 (13.8%)", color: "bg-orange-50 text-orange-600" }
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between">
+              {opportunityTypes.map((item, i) => { 
+                const total = opportunityTypes.reduce((sum, item) => sum + Number(item.count || 0),0);
+                const percentage = total > 0 ? ((Number(item.count || 0) / total) * 100).toFixed(1) : "0.0";
+                const colors = ["bg-blue-50 text-blue-600","bg-indigo-50 text-indigo-600", "bg-emerald-50 text-emerald-600","bg-orange-50 text-orange-600",];
+
+                return (
+                <div key={item._id} className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${item.color}`}>
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${colors[i % colors.length]}`}>
                       <Percent size={13} />
                     </div>
-                    <span className="text-xs font-bold text-slate-600">{item.title}</span>
+                    <span className="text-xs font-bold text-slate-600">{item._id}</span>
                   </div>
-                  <span className="text-xs font-extrabold text-slate-800">{item.value}</span>
-                </div>
-              ))}
+                  <span className="text-xs font-extrabold text-slate-800">{Number(item.count || 0).toLocaleString("en-IN")} ({percentage}%)</span>
+                </div>);
+              })}
             </div>
           </div>
           <button className="text-blue-600 text-xs font-bold text-center mt-3 pt-2 border-t border-slate-100 flex items-center justify-center gap-1 hover:text-blue-700">
@@ -307,43 +503,45 @@ export default function TradeOpportunity() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {opportunitiesData.map((row) => (
-                    <tr key={row.id} className="hover:bg-slate-50/50 transition">
+                  {topOpportunities.map((row) => (
+                    <tr key={row._id} className="hover:bg-slate-50/50 transition">
                       <td className="py-3 font-bold text-slate-800 flex items-center gap-1">
                         <Star size={12} className="text-slate-300 cursor-pointer hover:text-amber-400" />
                         <div className="flex flex-col">
-                          <span>{row.id}</span>
+                          <span>{row.opportunityId}</span>
                         </div>
                       </td>
                       <td className="py-3">
                         <div className="flex flex-col">
-                          <span className="font-bold text-slate-800">{row.code}</span>
-                          <span className="text-[10px] text-slate-400 font-medium">{row.prod}</span>
+                          <span className="font-bold text-slate-800">{row.hsCode?.hsCode || "-"}</span>
+                          <span className="text-[10px] text-slate-400 font-medium">{row.hsCode?.productName || row.product || "-"}</span>
                         </div>
                       </td>
                       <td className="py-3">
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${row.typeBg}`}>
-                          {row.type}
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${row.opportunityType === "Unmet Demand" ? "bg-blue-50 text-blue-600" : row.opportunityType === "Supplier Gap" ? "bg-indigo-50 text-indigo-600" : row.opportunityType === "Price Advantage" ? "bg-emerald-50 text-emerald-600" : "bg-orange-50 text-orange-600"}`}>
+                          {row.opportunityType}
                         </span>
                       </td>
                       <td className="py-3 font-bold text-slate-700">
                         <div className="flex items-center gap-1.5">
-                          <ReactCountryFlag countryCode={row.countryCode} svg style={{ width: "13px", height: "9px" }} />
-                          <span>{row.country}</span>
+                          <ReactCountryFlag countryCode={COUNTRY_CODES[row.country] || "IN"} svg style={{ width: "13px", height: "9px" }} />
+                          <span>{row.country || "-"}</span>
                         </div>
                       </td>
-                      <td className="py-3 font-black text-slate-800 text-right">₹{row.value}</td>
+                      <td className="py-3 font-black text-slate-800 text-right">₹{(Number(row.tradeValue || 0) / 10000000).toFixed(2)} Cr</td>
                       <td className="py-3 text-center">
                         <span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 font-extrabold text-[11px]">
-                          {row.score}
+                          {Number(row.opportunityScore || 0).toFixed(1)}
                         </span>
                       </td>
                       <td className="py-3 text-center">
-                        <span className="text-emerald-600 font-bold">{row.growth}</span>
+                        <span className={`font-bold ${ row.growthPotential === "High" ? "text-emerald-600" : row.growthPotential === "Medium" ? "text-amber-500" : "text-red-500"}`}>
+                          {row.growthPotential || "-"}
+                        </span>
                       </td>
                       <td className="py-3 text-center">
-                        <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold ${row.compColor}`}>
-                          {row.comp}
+                        <span className={`px-2 py-0.5 rounded-sm text-[10px] font-bold ${ row.competitionLevel === "Low" ? "bg-emerald-50 text-emerald-600" : row.competitionLevel === "Medium" ? "bg-amber-50 text-amber-600" : "bg-red-50 text-red-600"}`}>
+                          {row.competitionLevel || "-"}
                         </span>
                       </td>
                     </tr>
@@ -368,11 +566,11 @@ export default function TradeOpportunity() {
                 <span className="col-span-3 text-right">Est. Value</span>
               </div>
               <div className="divide-y divide-slate-100">
-                {hsCodesData.map((item, i) => (
-                  <div key={i} className="grid grid-cols-12 text-xs py-3 items-center">
-                    <span className="col-span-3 font-black text-slate-800">{item.code}</span>
-                    <span className="col-span-6 text-slate-500 font-semibold truncate pr-2">{item.desc}</span>
-                    <span className="col-span-3 text-right font-black text-slate-800">₹{item.value}</span>
+                {topHSCodes.map((item, i) => (
+                  <div key={item._id} className="grid grid-cols-12 text-xs py-3 items-center">
+                    <span className="col-span-3 font-black text-slate-800">{item._id}</span>
+                    <span className="col-span-6 text-slate-500 font-semibold truncate pr-2">{item.product || "-"}</span>
+                    <span className="col-span-3 text-right font-black text-slate-800">₹{(Number(item.tradeValue || 0) / 10000000).toFixed(2)} Cr</span>
                   </div>
                 ))}
               </div>
@@ -393,15 +591,15 @@ export default function TradeOpportunity() {
           <h3 className="font-extrabold text-sm text-[#07156B] mb-3">Demand-Supply Gap Insights</h3>
           <div className="space-y-2.5">
             {[
-              { label: "Total Demand (INR)", val: "₹ 2,458.60 Cr", trend: "15.6% vs last month", border: "border-slate-100 bg-slate-50/50" },
-              { label: "Total Supply (INR)", val: "₹ 1,245.80 Cr", trend: "10.2% vs last month", border: "border-slate-100 bg-slate-50/50" },
-              { label: "Total Gap (INR)", val: "₹ 1,212.80 Cr", trend: "20.5% vs last month", border: "border-amber-100 bg-amber-50/20" }
-            ].map((box, i) => (
+              {label: "Total Demand (INR)", val: `₹${(Number(demandSupply?.totalDemand || 0) / 10000000).toFixed(2)} Cr`, border: "border-slate-100 bg-slate-50/50"},
+              {label: "Total Supply (INR)", val: `₹${(Number(demandSupply?.totalSupply || 0) / 10000000).toFixed(2)} Cr`, border: "border-slate-100 bg-slate-50/50"},
+              {label: "Total Gap (INR)", val: `₹${(Number(demandSupply?.totalGap || 0) / 10000000).toFixed(2)} Cr`, border: "border-amber-100 bg-amber-50/20"}]
+              .map((box, i) => (
               <div key={i} className={`border rounded-xl p-2.5 ${box.border}`}>
                 <span className="text-[9px] font-bold text-slate-400 block uppercase">{box.label}</span>
                 <span className="text-sm font-black text-slate-800 mt-0.5 block">{box.val}</span>
                 <span className="text-[9px] font-bold text-emerald-600 flex items-center gap-0.5 mt-0.5">
-                  <TrendingUp size={9} /> {box.trend}
+                  <TrendingUp size={9} /> Updated
                 </span>
               </div>
             ))}
@@ -412,15 +610,15 @@ export default function TradeOpportunity() {
         <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-xs">
           <h3 className="font-extrabold text-sm text-[#07156B] mb-3">Top Opportunity Countries</h3>
           <div className="divide-y divide-slate-50">
-            {countriesData.slice(0, 3).map((c) => (
-              <div key={c.code} className="flex items-center justify-between py-3">
+            {topCountries.slice(0, 3).map((c) => (
+              <div key={c._id} className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-2 font-bold text-slate-700 text-xs">
-                  <ReactCountryFlag countryCode={c.code} svg style={{ width: "14px", height: "10px" }} />
-                  <span>{c.name}</span>
+                  <ReactCountryFlag countryCode={COUNTRY_CODES[c._id] || ""} svg style={{ width: "14px", height: "10px" }} />
+                  <span>{c._id}</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs font-black text-slate-800 block">₹{c.value}</span>
-                  <span className="text-[10px] text-slate-400 font-bold">{c.score} Score</span>
+                  <span className="text-xs font-black text-slate-800 block">₹{(Number(c.tradeValue || 0) / 10000000).toFixed(2)} Cr</span>
+                  <span className="text-[10px] text-slate-400 font-bold">{Number(c.avgScore || 0).toFixed(1)} Score</span>
                 </div>
               </div>
             ))}
@@ -432,18 +630,18 @@ export default function TradeOpportunity() {
           <div>
             <h3 className="font-extrabold text-sm text-[#07156B] mb-3">Recommended Actions</h3>
             <div className="space-y-2.5">
-              {[
-                { text: "Focus on 356 high potential opportunities", btn: "View Opportunities" },
-                { text: "Explore untapped markets in Africa & LATAM", btn: "View Markets" },
-                { text: "Strengthen position in 18 growing product categories", btn: "View Products" }
-              ].map((act, i) => (
-                <div key={i} className="flex items-start justify-between gap-2 border-b border-slate-50 pb-2 last:border-0">
+              {recommendedActions.map((act, i) => (
+                <div key={act._id || i} className="flex items-start justify-between gap-2 border-b border-slate-50 pb-2 last:border-0">
                   <div className="flex items-start gap-1.5">
                     <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0" />
-                    <p className="text-xs font-bold text-slate-600 leading-tight">{act.text}</p>
+                    <p className="text-xs font-bold text-slate-600 leading-tight">
+                      Focus on {act.opportunityType} opportunity for{" "}
+                      {act.hsCode?.productName || act.product || "this product"}{" "}
+                      in {act.country || "this market"}{" "}
+                     {Number(act.opportunityScore || 0).toFixed(1)} score</p>
                   </div>
                   <button className="text-[10px] font-black text-blue-600 bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-md shrink-0 transition">
-                    {act.btn}
+                    View Opportunity
                   </button>
                 </div>
               ))}
@@ -457,7 +655,7 @@ export default function TradeOpportunity() {
             <h3 className="font-extrabold text-sm text-[#07156B] mb-2">Saved Opportunities</h3>
             <div className="flex items-center justify-between bg-slate-50 border border-slate-100 rounded-2xl p-4 mt-2">
               <div>
-                <span className="text-3xl font-black text-slate-800">24</span>
+                <span className="text-3xl font-black text-slate-800">{savedOpportunities.length}</span>
                 <span className="text-[10px] font-bold text-slate-400 block uppercase mt-0.5">opportunities saved</span>
               </div>
               <div className="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
