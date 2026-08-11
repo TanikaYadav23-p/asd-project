@@ -1934,7 +1934,11 @@ export default function UserDashboard() {
                             </span>
                           </div>
                           <div className="">
-                            <button className="w-full  text-xs bg-[#00A896] px-4 py-3 rounded-lg text font-bold  text-white active:scale-95 transition-transform">
+                            <button onClick={() => {
+                                    setShipment('shipment')
+                                     setActiveTab("")
+                                  }
+                                  } className="w-full  text-xs bg-[#00A896] px-4 py-3 rounded-lg text font-bold  text-white active:scale-95 transition-transform">
                               Create Shipment from this Result
                             </button>
                           </div>
