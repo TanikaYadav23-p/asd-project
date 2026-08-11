@@ -1,5 +1,15 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { GiCutDiamond } from "react-icons/gi";
+import {
+  getDashboardMetrics,
+  getOperationalInsights,
+  getGlobalTradeOverview,
+  getTradeValueTrend,
+  getTopTradingPartners,
+  getTopImportedProducts,
+  getTopExportDestinations,
+  getRecentShipments
+} from '../../api/B2BDashboardApi';
 import {
   FiMenu,
   FiSearch,
@@ -690,7 +700,7 @@ export default function B2BDashboard() {
 
 
 
-const mockData = {
+/*const mockData = {
     userName: "Abhishek",
     period: "01 Apr 2025 - 24 Apr 2025",
     updateTime: "24 Apr 2025, 09:30 AM",
@@ -781,7 +791,7 @@ const chartData = [
   { month: "Apr", value: 740 },
   { month: "May", value: 690 },
   { month: "Jun", value: 900 },
-];
+];*/
 
 const DynamicIcon = ({ type, color, size = "4" }) => {
     const s = `w-${size} h-${size}`;
@@ -806,8 +816,9 @@ const DynamicIcon = ({ type, color, size = "4" }) => {
         default: return null;
     }
 };
+const updateTime= "24 Apr 2025, 09:30 AM";
 
-const geoUrl =
+/*const geoUrl =
   "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
 
 
@@ -837,52 +848,266 @@ const geoUrl =
           url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
         />
 
-        {markers.map((marker, index) => (
-          <CircleMarker
-            key={index}
-            center={marker.position}
-            radius={marker.radius}
-            pathOptions={{
-              fillColor: marker.color,
-              color: "#ffffff",
-              weight: 4,
-              fillOpacity: 1,
-            }}
-          />
-        ))}
+          {globalTradeOverview.map((item, index) => {
+          const marker = regionMarkers[item.region];
+
+          if (!marker) return null;
+
+          return (
+            <CircleMarker
+              key={index}
+              center={marker.position}
+              radius={13}
+              pathOptions={{
+                fillColor: marker.color,
+                color: "#ffffff",
+                weight: 4,
+                fillOpacity: 1,
+              }}
+            />
+          );
+        })}
       </MapContainer>
     </div>
   );
 }
 
-const markers = [
-  {
-    position: [22, 78], // India
+const regionMarkers = {
+  Asia: {
+    position: [22, 78],
     color: "#2563EB",
-    radius: 16,
   },
-  {
-    position: [22, 78], // Europe
+  Europe: {
+    position: [50, 10],
     color: "#10B981",
-    radius: 13,
   },
-  {
-    position: [40, -100], // North America
+  "North America": {
+    position: [40, -100],
     color: "#8B5CF6",
-    radius: 13,
   },
-  {
-    position: [-15, -60], // South America
+  "South America": {
+    position: [-15, -60],
     color: "#F59E0B",
-    radius: 13,
   },
-  {
-    position: [0, 20], // Africa
+  Africa: {
+    position: [0, 20],
     color: "#14B8A6",
-    radius: 13,
   },
-];
+};*/
+/*const DynamicPlottingMap = () => (
+  <div className="h-[200px] w-full bg-[#f8fafc] rounded-2xl">
+      {/* <ComposableMap projectionConfig={{ scale: 90 }}>
+        <Geographies geography={geoUrl}>
+          {({ geographies }) =>
+            geographies.map((geo) => (
+              <Geography
+                key={geo.rsmKey}
+                geography={geo}
+                fill="#E2E8F0"
+                stroke="#CBD5E1"
+                strokeWidth={0.3}
+              />
+            ))
+          }
+        </Geographies>
 
+        <Marker coordinates={[78, 22]}>
+          <circle r={5} fill="#3B82F6" />
+        </Marker>
+
+        <Marker coordinates={[10, 50]}>
+          <circle r={5} fill="#10B981" />
+        </Marker>
+
+        <Marker coordinates={[-100, 40]}>
+          <circle r={5} fill="#8B5CF6" />
+        </Marker>
+      </ComposableMap> 
+
+      <WorldMap/>
+
+  </div>
+);*/
+
+ function Dashboard() {
+    const [activeTab, setActiveTab] = useState('Overview');
+    const [selectedTrend] = useState('This Month');
+
+    const [dashboardMetrics, setDashboardMetrics] = useState({});
+    const [operationalInsights, setOperationalInsights] = useState({});
+    const [globalTradeOverview, setGlobalTradeOverview] = useState([]);
+    const [tradeValueTrend, setTradeValueTrend] = useState([]);
+    const [topTradingPartners, setTopTradingPartners] = useState([]);
+    const [topImportedProducts, setTopImportedProducts] = useState([]);
+    const [topExportDestinations, setTopExportDestinations] = useState([]);
+    const [recentShipments, setRecentShipments] = useState([]);
+const fetchDashboardMetrics = async () => {
+  try {
+    const res = await getDashboardMetrics();
+    console.log("Dashboard Metrics:", res.data);
+    setDashboardMetrics(res.data.data || {});
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+const fetchOperationalInsights = async () => {
+  try {
+    const res = await getOperationalInsights();
+    console.log("Operational Insights:", res.data);
+    setOperationalInsights(res.data.data || {});
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+const fetchGlobalTradeOverview = async () => {
+  try {
+    const res = await getGlobalTradeOverview();
+    console.log("Global Trade Overview:", res.data);
+    setGlobalTradeOverview(res.data.data || {});
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+const fetchTradeValueTrend = async () => {
+  try {
+    const res = await getTradeValueTrend();
+    console.log("Trade Value Trend:", res.data);
+    setTradeValueTrend(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+const fetchTopTradingPartners = async () => {
+  try {
+    const res = await getTopTradingPartners();
+    console.log("Top Trading Partners:", res.data);
+    setTopTradingPartners(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+const fetchTopImportedProducts = async () => {
+  try {
+    const res = await getTopImportedProducts();
+    console.log("Top Imported Products:", res.data);
+    setTopImportedProducts(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+const fetchTopExportDestinations = async () => {
+  try {
+    const res = await getTopExportDestinations();
+    console.log("Top Export Destinations:", res.data);
+    setTopExportDestinations(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+
+const fetchRecentShipments = async () => {
+  try {
+    const res = await getRecentShipments();
+    console.log("Recent Shipments:", res.data);
+    setRecentShipments(res.data.data || []);
+  } catch (err) {
+    console.error(err);
+  }
+};
+useEffect(() => {
+  fetchDashboardMetrics();
+  fetchOperationalInsights();
+  fetchGlobalTradeOverview();
+  fetchTradeValueTrend();
+  fetchTopTradingPartners();
+  fetchTopImportedProducts();
+  fetchTopExportDestinations();
+  fetchRecentShipments();
+}, []);
+const tabs= ['Overview', 'Business Performance', 'Partner Analysis', 'Trade Insights', 'Market Intelligence'];
+ const topMetrics= [
+        { id: 1, title: 'Total Shipments', value: dashboardMetrics.totalShipments?.toLocaleString() || "0", growth: '', isPositive: true, color: '#3B82F6', bgColor: '#F0F6FF', icon: 'shipment' },
+        { id: 2, title: 'Total Trade Value (INR)', value: dashboardMetrics.totalTradeValue ? `₹${(dashboardMetrics.totalTradeValue / 10000000).toFixed(2)} Cr` : '₹0.00 Cr', growth: '', isPositive: true, color: '#10B981', bgColor: '#ECFDF5', icon: 'trade' },
+        { id: 3, title: 'Active Business Partners', value: dashboardMetrics.activeBusinessPartners?.toLocaleString() || "0", growth: '', isPositive: true, color: '#4F46E5', bgColor: '#EEF2FF', icon: 'partner' },
+        { id: 4, title: 'New Business Inquiries', value:  dashboardMetrics.pendingBuyers?.toLocaleString() || "0", growth: '', isPositive: true, color: '#06B6D4', bgColor: '#ECFEFF', icon: 'inquiry' },
+        { id: 5, title: 'Avg. Shipment Value (INR)', value:  dashboardMetrics.averageShipmentValue ? `₹${(dashboardMetrics.averageShipmentValue / 100000).toFixed(2)} L` : '₹0.00 L', growth: '', isPositive: true, color: '#F59E0B', bgColor: '#FFFBEB', icon: 'avgVal' },
+        { id: 6, title: 'Avg. Lead Time (Days)', value: dashboardMetrics.averageLeadTime?.toFixed(1) || "0.0", growth: '', isPositive: false, color: '#EF4444', bgColor: '#FEF2F2', icon: 'leadTime' },
+    ];
+  const operationalInsightPills=[
+        { title: 'On-Time Shipments', value: `${operationalInsights.onTimeShipmentRate || 0}%`, growth: '', color: '#0D9488', bgColor: '#F0FDFA', icon: 'ontime' },
+        { title: 'Shipment Accuracy', value: `${operationalInsights.shipmentAccuracy || 0}%` , growth: '', color: '#EF4444', bgColor: '#FEF2F2', icon: 'accuracy' },
+        { title: 'Document Compliance', value: `${operationalInsights.documentCompliance || 0}%`, growth: '', color: '#2563EB', bgColor: '#EFF6FF', icon: 'compliance' },
+        { title: 'Repeat Business Rate', value: `${operationalInsights.repeatBusinessRate || 0}%`, growth: '', color: '#059669', bgColor: '#ECFDF5', icon: 'repeat' },
+        { title: 'Verified Buyer Rate', value: `${operationalInsights.verifiedBuyerRate || 0}%`, growth: '', color: '#F43F5E', bgColor: '#FFF1F2', icon: 'satisfaction' },
+    ];
+   const trackingServices= [
+        { title: 'Competitor Tracking', isNew: true, desc: 'Track competitors\' trade activities product-wise or company-wise.', bullets: ['Monitor competitor shipments', 'Analyze market share & trends'], action: 'Go to Competitor Tracking',path: '/', color: '#8B5CF6', bgColor: '#F5F3FF', icon: 'tracking' },
+        { title: 'Company Intelligence', isNew: true, desc: 'Get detailed insights on importer / exporter companies and trade performance.', bullets: ['Company profiles & financials', 'Trade history & performance'], action: 'Go to Company Intelligence', color: '#2563EB', bgColor: '#EFF6FF', icon: 'intel' },
+        { title: 'Trade Opportunity Engine', isNew: true, desc: 'Discover real trade opportunities with complete business insights.', bullets: ['Demand & trend analysis', 'HS Code & import/export data'], action: 'Explore Opportunities', isSolid: true, color: '#0D9488', bgColor: '#F0FDFA', icon: 'bulb' },
+        { title: 'AI Insights', isNew: false, desc: 'AI-powered insights to help you make smarter trade decisions.', bullets: ['Market trend predictions', 'Risk alerts & recommendations'], action: 'View AI Insights', isBorderAction: true, color: '#EF4444', bgColor: '#FEF2F2', icon: 'brain' },
+    ];
+    const geoUrl =
+  "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
+  function WorldMap() {
+  return (
+    <div className="w-full h-[300px] rounded-xl overflow-hidden bg-white">
+      <MapContainer
+        center={[20, 10]}
+        zoom={2}
+        zoomControl={false}
+        attributionControl={false}
+        dragging={false}
+        scrollWheelZoom={false}
+        doubleClickZoom={false}
+        touchZoom={false}
+        boxZoom={false}
+        keyboard={false}
+        style={{
+          height: "100%",
+          width: "100%",
+          background: "#fff",
+        }}
+      >
+        <TileLayer
+          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        />
+
+          {globalTradeOverview.map((item, index) => {
+          const marker = regionMarkers[item.region];
+
+          if (!marker) return null;
+
+          return (
+            <CircleMarker
+              key={index}
+              center={marker.position}
+              radius={13}
+              pathOptions={{
+                fillColor: marker.color,
+                color: "#ffffff",
+                weight: 4,
+                fillOpacity: 1,
+              }}
+            />
+          );
+        })}
+      </MapContainer>
+    </div>
+  );
+}
 const DynamicPlottingMap = () => (
   <div className="h-[200px] w-full bg-[#f8fafc] rounded-2xl">
       {/* <ComposableMap projectionConfig={{ scale: 90 }}>
@@ -918,9 +1143,28 @@ const DynamicPlottingMap = () => (
   </div>
 );
 
- function Dashboard() {
-    const [activeTab, setActiveTab] = useState('Overview');
-    const [selectedTrend] = useState('This Month');
+const regionMarkers = {
+  Asia: {
+    position: [22, 78],
+    color: "#2563EB",
+  },
+  Europe: {
+    position: [50, 10],
+    color: "#10B981",
+  },
+  "North America": {
+    position: [40, -100],
+    color: "#8B5CF6",
+  },
+  "South America": {
+    position: [-15, -60],
+    color: "#F59E0B",
+  },
+  Africa: {
+    position: [0, 20],
+    color: "#14B8A6",
+  },
+};
 
     return (
         <div className="min-h-screen bg-[#F7F9FC] text-[#334155] p-6 font-sans antialiased pt-14 ">
@@ -929,14 +1173,14 @@ const DynamicPlottingMap = () => (
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
                     <h1 className="text-[22px] font-bold text-[#0F172A] flex items-center gap-2 tracking-tight">
-                        Welcome back, {mockData.userName}! <span className="text-xl">👋</span>
+                        Welcome back ! <span className="text-xl">👋</span>
                     </h1>
                     <p className="text-xs text-[#64748B] mt-1 font-medium">Here's your B2B trade overview and key business insights.</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="bg-white border border-[#E2E8F0] px-3.5 py-2 rounded-lg text-xs font-semibold text-[#334155] flex items-center gap-2.5 shadow-sm">
                         <DynamicIcon type="calendar" color="#64748B" size="4" />
-                        <span>{mockData.period}</span>
+                        <span>01 Apr 2025 - 24 Apr 2025</span>
                     </div>
                     <button className="bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-xs font-bold text-[#334155] px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition">
                         <DynamicIcon type="bulb" color="#64748B" size="4" />
@@ -967,7 +1211,7 @@ const DynamicPlottingMap = () => (
                 ))}
             </div> */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
-            {mockData.topMetrics.map((m) => {
+            {topMetrics.map((m) => {
               const Icon = iconMap[m.icon];
 
               return (
@@ -1010,7 +1254,7 @@ const DynamicPlottingMap = () => (
 
             {/* --- TABS --- */}
             <div className="flex border-b border-[#E2E8F0] gap-6 mb-6 overflow-x-auto text-sm font-bold text-[#64748B] whitespace-nowrap scrollbar-none">
-                {mockData.tabs.map(tab => (
+                {tabs.map(tab => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
@@ -1029,13 +1273,13 @@ const DynamicPlottingMap = () => (
                     <h3 className="text-sm font-bold text-[#0F172A] mb-5 tracking-tight">Global Trade Overview</h3>
                     <div className="flex flex-row items-center justify-between gap-4">
                         <div className="space-y-3 shrink-0">
-                            {mockData.globalOverview.map(item => (
+                            {globalTradeOverview.map(item => (
                                 <div key={item.region} className="flex flex-col">
                                     <div className="flex items-center gap-2">
-                                        <div className={`w-2.5 h-2.5 rounded-full ${item.dot}`} />
+                                        <div className="w-2.5 h-2.5 rounded-full" style ={{backgroundColor: regionMarkers[item.region]?.color || "#94A3B8",}} />
                                         <span className="text-xs font-bold text-[#334155] tracking-tight">{item.region}</span>
                                     </div>
-                                    <span className="text-[11px] text-[#64748B] ml-4 font-semibold mt-0.5">{item.value} ({item.percent})</span>
+                                    <span className="text-[11px] text-[#64748B] ml-4 font-semibold mt-0.5">{item.value.toLocaleString()} ({item.percent})</span>
                                 </div>
                             ))}
                         </div>
@@ -1053,40 +1297,16 @@ const DynamicPlottingMap = () => (
                             </button>
                         </div>
                         <div className="flex items-baseline gap-2 mb-4">
-                            <span className="text-xl font-black text-[#0F172A]">₹1,876.45 Cr</span>
+                            <span className="text-xl font-black text-[#0F172A]"> ₹{((tradeValueTrend[tradeValueTrend.length - 1]?.tradeValue || 0) / 10000000).toFixed(2)} Cr</span>
                             <span className="text-[10px] font-bold text-[#10B981] bg-[#ECFDF5] px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
-                                ▲ 17.6% <span className="text-[#64748B] font-normal">vs last month</span>
+                                 ▲{" "}{tradeValueTrend.length > 1? (((tradeValueTrend[tradeValueTrend.length - 1].tradeValue -
+                                 tradeValueTrend[tradeValueTrend.length - 2].tradeValue) /
+                                 tradeValueTrend[tradeValueTrend.length - 2].tradeValue) *100).toFixed(1): "0"}%<span className="text-[#64748B] font-normal">vs last month</span>
                             </span>
                         </div>
-                        {/* <div className="w-full h-20 mb-2.5 relative">
-                            <svg viewBox="0 0 100 25" className="w-full h-full text-[#10B981]">
-                                <path d="M 5 18 Q 15 15 25 10 T 45 13 T 70 8 T 95 3" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                                <circle cx="95" cy="3" r="1.5" fill="currentColor" />
-                            </svg>
-                        </div> */}
-                        {/* <div className="w-full h-[140px]">
-  <ResponsiveContainer width="100%" height="100%">
-    <LineChart data={chartData}>
-      <XAxis
-        dataKey="month"
-        tick={{ fontSize: 11 }}
-        axisLine={false}
-        tickLine={false}
-      />
-      <Tooltip />
-      <Line
-        type="monotone"
-        dataKey="value"
-        stroke="#14B8A6"
-        strokeWidth={3}
-        dot={{ r: 4 }}
-      />
-    </LineChart>
-  </ResponsiveContainer>
-</div> */}
 <div className="w-full h-[170px]">
   <ResponsiveContainer width="100%" height="100%">
-    <AreaChart data={chartData}>
+    <AreaChart data={tradeValueTrend}>
       <defs>
         <linearGradient id="fillTrade" x1="0" y1="0" x2="0" y2="1">
           <stop offset="5%" stopColor="#14B8A6" stopOpacity={0.3}/>
@@ -1097,7 +1317,7 @@ const DynamicPlottingMap = () => (
       <CartesianGrid vertical={false} stroke="#F1F5F9" />
 
       <XAxis
-        dataKey="month"
+        dataKey="_id"
         tick={{ fontSize: 11 }}
         axisLine={false}
         tickLine={false}
@@ -1107,7 +1327,7 @@ const DynamicPlottingMap = () => (
 
       <Area
         type="monotone"
-        dataKey="value"
+        dataKey="tradeValue"
         stroke="#14B8A6"
         strokeWidth={3}
         fill="url(#fillTrade)"
@@ -1119,11 +1339,11 @@ const DynamicPlottingMap = () => (
                     <div className="grid grid-cols-2 gap-4 mt-3">
                         <div className="bg-[#F8FAFC] border border-[#F1F5F9] rounded-2xl p-3 text-center">
                             <div className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Export Value (INR)</div>
-                            <div className="text-sm font-black text-[#334155] mt-0.5">₹1,876.45 Cr</div>
+                            <div className="text-sm font-black text-[#334155] mt-0.5"> ₹{((tradeValueTrend[tradeValueTrend.length - 1]?.tradeValue || 0) / 10000000).toFixed(2)} Cr</div>
                         </div>
                         <div className="bg-[#F8FAFC] border border-[#F1F5F9] rounded-2xl p-3 text-center">
                             <div className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Export Shipments</div>
-                            <div className="text-sm font-black text-[#334155] mt-0.5">6,240</div>
+                            <div className="text-sm font-black text-[#334155] mt-0.5"> {(tradeValueTrend[tradeValueTrend.length - 1]?.shipments || 0).toLocaleString()}</div>
                         </div>
                     </div>
                 </div>
@@ -1139,16 +1359,16 @@ const DynamicPlottingMap = () => (
                                         <th className="pb-2 font-medium">Partner</th>
                                         <th className="pb-2 text-center font-medium">Shipments</th>
                                         <th className="pb-2 text-right font-medium">TradeValue</th>
-                                        <th className="pb-2 text-right font-medium">Growth</th>
+                                        <th className="pb-2 text-right font-medium">Country</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-[#F8FAFC] font-bold text-[#334155]">
-                                    {mockData.tradingPartners.map(p => (
-                                        <tr key={p.name} className="hover:bg-[#F8FAFC]/50 transition-colors">
-                                            <td className="py-2.5 font-extrabold text-[#0F172A] truncate max-w-[120px] tracking-tight">{p.name}</td>
-                                            <td className="py-2.5 text-center text-[#64748B] font-semibold">{p.ship}</td>
-                                            <td className="py-2.5 text-right font-black text-[#334155]">{p.val}</td>
-                                            <td className="py-2.5 text-right text-[#10B981] font-bold">▲{p.growth}</td>
+                                    {topTradingPartners.map(p => (
+                                        <tr key={p._id} className="hover:bg-[#F8FAFC]/50 transition-colors">
+                                            <td className="py-2.5 font-extrabold text-[#0F172A] truncate max-w-[120px] tracking-tight">{p._id}</td>
+                                            <td className="py-2.5 text-center text-[#64748B] font-semibold"> {p.shipments?.toLocaleString() || "0"}</td>
+                                            <td className="py-2.5 text-right font-black text-[#334155]"> ₹{(p.tradeValue / 10000000).toFixed(2)} Cr</td>
+                                            <td className="py-2.5 text-right text-[#10B981] font-bold">{p.country || "-"}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -1161,7 +1381,7 @@ const DynamicPlottingMap = () => (
 
             {/* --- INSIGHT PILLS --- */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
-                {mockData.operationalInsightPills.map(item => (
+                {operationalInsightPills.map(item => (
                     <div key={item.title} className="bg-white border border-[#E2E8F0] rounded-2xl p-4 shadow-sm flex items-center gap-3.5">
                         <div className="p-2 rounded-2xl" style={{ backgroundColor: item.bgColor }}>
                             <DynamicIcon type={item.icon} color={item.color} size="5" />
@@ -1177,7 +1397,7 @@ const DynamicPlottingMap = () => (
 
             {/* --- TRACKING SERVICES MODULES --- */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                {mockData.trackingServices.map(service => (
+                {trackingServices.map(service => (
                     <div key={service.title} className="bg-white border border-[#E2E8F0] rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow transition-shadow">
                         <div>
                             <div className="flex items-center justify-between mb-4">
@@ -1258,37 +1478,37 @@ const DynamicPlottingMap = () => (
                                     ))}
                                 </tbody> */}
                                 <tbody>
-                                    {mockData.importedProducts.map((p) => (
+                                    {topImportedProducts.map((p) => (
                                         <tr
-                                            key={p.hs}
+                                            key={p._id}
                                             className="border-b border-[#F1F5F9] last:border-0"
                                         >
                                             <td className="py-2 text-[11px] font-bold text-[#0F172A]">
-                                                {p.hs}
+                                               {p.hsCode || "-"}
                                             </td>
 
                                             <td className="py-2 text-[11px] text-[#64748B] truncate max-w-[140px]">
-                                                {p.name}
+                                                {p._id || "-"}
                                             </td>
 
                                             <td className="py-2 text-[11px] text-center text-[#475569]">
-                                                {p.shipments}
+                                                {p.shipments?.toLocaleString() || "0"}
                                             </td>
 
                                             <td className="py-2 text-[11px] text-right font-semibold text-[#334155]">
-                                                {p.value}
+                                                ₹{((p.tradeValue || 0) / 10000000).toFixed(2)} Cr
                                             </td>
 
                                             <td className="py-2">
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[10px] text-[#64748B] min-w-[35px]">
-                                                        {p.share}
+                                                        {topImportedProducts.length > 0 ? (((p.tradeValue || 0) / topImportedProducts.reduce((sum, item) => sum + (item.tradeValue || 0), 0)) * 100).toFixed(1) + "%" : "0%"}
                                                     </span>
 
                                                     <div className="w-14 h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
                                                         <div
                                                             className="h-full bg-[#14B8A6] rounded-full"
-                                                            style={{ width: p.share }}
+                                                            style={{ width: `${topImportedProducts.length > 0 ? (((p.tradeValue || 0) / topImportedProducts.reduce((sum, item) => sum + (item.tradeValue || 0), 0)) * 100).toFixed(1) : 0}%`, }}
                                                         />
                                                     </div>
                                                 </div>
@@ -1317,26 +1537,22 @@ const DynamicPlottingMap = () => (
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-[#F8FAFC] font-bold text-[#334155]">
-                                    {mockData.exportDestinations.map(d => (
-                                        <tr key={d.country} className="hover:bg-[#F8FAFC]/50 transition-colors">
+                                    {topExportDestinations.map(d => (
+                                        <tr key={d._id} className="hover:bg-[#F8FAFC]/50 transition-colors">
                                             {/* <td className="py-2.5 font-extrabold text-[#0F172A] flex items-center gap-1.5">
                                                 <span className="text-sm select-none">{d.flag}</span>
                                                 <span>{d.country}</span>
                                             </td> */}
                                             <td className="py-2">
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-semibold text-[11px] text-[#334155]">
-                                                        {d.flag}
-                                                    </span>
-
                                                     <span className="font-semibold text-[11px] text-[#0F172A]">
-                                                        {d.country}
+                                                        {d._id}
                                                     </span>
                                                 </div>
                                             </td>
                                             <td className="py-2.5 text-center text-[#64748B] font-semibold">{d.shipments}</td>
-                                            <td className="py-2.5 text-right font-black text-[#334155]">{d.value}</td>
-                                            <td className="py-2.5 text-right text-[#64748B]">{d.share}</td>
+                                            <td className="py-2.5 text-right font-black text-[#334155]">₹{((d.tradeValue || 0) / 10000000).toFixed(2)} Cr</td>
+                                            <td className="py-2.5 text-right text-[#64748B]">{topExportDestinations.length > 0 ? ((d.tradeValue / topExportDestinations.reduce((sum, item) => sum + (item.tradeValue || 0), 0)) * 100).toFixed(1) + "%" : "0%"}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -1360,16 +1576,14 @@ const DynamicPlottingMap = () => (
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-[#F8FAFC] font-bold text-[#334155]">
-                                    {mockData.recentShipments.map(s => (
-                                        <tr key={s.id} className="hover:bg-[#F8FAFC]/50 transition-colors">
-                                            <td className="py-2.5 text-[#2563EB] font-extrabold tracking-tight">{s.id}</td>
-                                            <td className="py-2.5 text-[#64748B] font-semibold max-w-[120px] truncate">{s.desc}</td>
+                                    {recentShipments.map(s => (
+                                        <tr key={s._id} className="hover:bg-[#F8FAFC]/50 transition-colors">
+                                            <td className="py-2.5 text-[#2563EB] font-extrabold tracking-tight">{s.sbNumber || s.referenceNumber}</td>
+                                            <td className="py-2.5 text-[#64748B] font-semibold max-w-[120px] truncate">{s.cargo?.description || s.cargo?.productName || "-"}</td>
                                             <td className="py-2.5 text-right">
-                                                <span className={`text-[9px] font-black px-2 py-0.5 border rounded-full uppercase tracking-wider ${s.type === 'delivered' ? 'bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]' :
-                                                        s.type === 'transit' ? 'bg-[#F0F6FF] text-[#3B82F6] border-[#BFDBFE]' :
-                                                            'bg-[#FFFBEB] text-[#D97706] border-[#FDE68A]'
-                                                    }`}>
-                                                    {s.status}
+                                                <span className={`text-[9px] font-black px-2 py-0.5 border rounded-full uppercase tracking-wider ${s.shipmentStatus === "Delivered" ? "bg-[#ECFDF5] text-[#10B981] border-[#A7F3D0]" : 
+                                                  s.shipmentStatus === "In Transit" ? "bg-[#F0F6FF] text-[#3B82F6] border-[#BFDBFE]" : "bg-[#FFFBEB] text-[#D97706] border-[#FDE68A]"}`}>
+                                                    {s.shipmentStatus}
                                                 </span>
                                             </td>
                                         </tr>
@@ -1384,7 +1598,7 @@ const DynamicPlottingMap = () => (
 
             {/* --- FOOTER STRIP --- */}
             <div className="flex flex-col sm:flex-row justify-between items-center text-[10px] text-[#94A3B8] font-semibold mt-8 border-t border-[#E2E8F0] pt-4 gap-2">
-                <div>ⓘ All data is updated daily. Last updated on {mockData.updateTime}</div>
+                <div>ⓘ All data is updated daily. Last updated on {updateTime}</div>
                 <button className="hover:text-[#64748B]">Help Center</button>
             </div>
         </div>
