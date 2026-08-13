@@ -1,5 +1,8 @@
 import React, { useState,useEffect } from "react";
 import ReactCountryFlag from "react-country-flag";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
 import {
   getSuppliers,
   getSuppliersByCountry,
@@ -37,6 +40,8 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import AddSupplier from "../../components/b2bComponent/AddSupplier";
+import AllSuppliers from "../../components/b2bComponent/AllSupplier";
 
 const HEADING = "text-[#07156B]";
 
@@ -152,11 +157,11 @@ function SectionCard({ children, className = "" }) {
   );
 }
 
-function ViewAllHeader({ title, extra }) {
+function ViewAllHeader({ title, extra , onClick}) {
   return (
     <div className="flex justify-between items-center mb-3">
       <h3 className={`font-bold text-sm ${HEADING}`}>{title} {extra}</h3>
-      <button className="text-blue-600 text-[11px] font-bold shrink-0">View All</button>
+      <button className="text-blue-600 text-[11px] font-bold shrink-0"  onClick={onClick} >View All</button>
     </div>
   );
 }
@@ -172,6 +177,13 @@ export default function SuppliersDashboard() {
   const [supplierInsights, setSupplierInsights] = useState({});
   const [filterOptions, setFilterOptions] = useState({});
   const [loading, setLoading] = useState(true);
+  const [addSupplier, setAddSupplier] = useState(false);
+  const [shipmentStartDate, setShipmentStartDate] = useState(null);
+  const [shipmentEndDate, setShipmentEndDate] = useState(null);
+  const [dateRange, setDateRange] = useState(false);
+  const [exportReport, setExportReport] = useState(false);
+  const [allSupplier, setAllSupplier] = useState(false)
+
 
   const fetchSuppliers = async () => {
     try {
@@ -249,15 +261,31 @@ export default function SuppliersDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto flex-wrap">
-            <button className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
-              <CalendarDays size={14} className="text-slate-400" />
-              01 Apr 2025 - 24 Apr 2025
-            </button>
-            <button className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
+            <div className="relative flex-1 md:flex-none">
+              <DatePicker
+                selected={shipmentStartDate}
+                onChange={(dates) => {
+                  const [start, end] = dates;
+                  setShipmentStartDate(start);
+                  setShipmentEndDate(end);
+                }}
+                startDate={shipmentStartDate}
+                endDate={shipmentEndDate}
+                selectsRange
+                dateFormat="dd MMM yyyy"
+                placeholderText="01 Apr 2025 - 24 Apr 2025"
+                className={`bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold pl-3 pr-9 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer ${HEADING}`}
+              />
+              <CalendarDays
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              />
+            </div>
+            <button onClick={() => setExportReport(true)} className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
               <Download size={14} className="text-slate-400" />
               Export Report
             </button>
-            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
+            <button onClick={() => setAddSupplier(true)} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
               <Plus size={14} />
               Add Supplier
             </button>
@@ -411,7 +439,7 @@ export default function SuppliersDashboard() {
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
           <SectionCard>
-            <ViewAllHeader title="Suppliers by Country" />
+            <ViewAllHeader title="Suppliers by Country" onClick={() => setAllSupplier(true)} />
             <div className="flex items-center gap-3">
               <div className="relative w-[120px] h-[120px] shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
@@ -443,7 +471,7 @@ export default function SuppliersDashboard() {
           </SectionCard>
 
           <SectionCard>
-            <ViewAllHeader title="Top Suppliers by Trade Value" />
+            <ViewAllHeader title="Top Suppliers by Trade Value" onClick={() => setAllSupplier(true)} />
             <div className="space-y-6">
               {TOP_SUPPLIERS_BY_VALUE.map((s, i) => (
                 <div key={i} className="flex items-center justify-between">
@@ -510,7 +538,7 @@ export default function SuppliersDashboard() {
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-4">
           <SectionCard>
-            <ViewAllHeader title="Supplier Verification Status" />
+            <ViewAllHeader title="Supplier Verification Status"  onClick={() => setAllSupplier(true)} />
             <div className="space-y-2.5">
               {VERIFICATION_STATUS.map((v, i) => {
                 const Icon = v.icon;
@@ -532,7 +560,7 @@ export default function SuppliersDashboard() {
           </SectionCard>
 
           <SectionCard>
-            <ViewAllHeader title="New Suppliers" extra={<span className="text-slate-400 font-normal">(This Month)</span>} />
+            <ViewAllHeader title="New Suppliers" onClick={() => setAllSupplier(true)} extra={<span className="text-slate-400 font-normal">(This Month)</span> } />
             <div className="overflow-x-auto">
               <table className="w-full text-[11px] min-w-[280px]">
                 <thead>
@@ -592,6 +620,19 @@ export default function SuppliersDashboard() {
           </span>
         </div>
       </div>
+
+      {addSupplier && (
+        <AddSupplier onClose={() => setAddSupplier(false)} />
+      )}
+
+      {exportReport && (
+        <ExportReport onClose={() => setExportReport(false)} />
+      )}
+
+      {allSupplier && (
+        <AllSuppliers onClose={() => setAllSupplier(false)} />
+
+      )}
     </div>
   );
 }

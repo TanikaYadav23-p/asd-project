@@ -10,11 +10,15 @@ import {
   getInsights,
   getFilterOptions
 } from '../../api/InvoiceApi';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
+
 import { 
   FileText, CheckCircle2, AlertCircle, Clock, BarChart3, Wallet, 
   Search, Calendar, ChevronDown, SlidersHorizontal, Sliders, Download, 
   Plus, MoreVertical, ChevronLeft, ChevronRight, ArrowUpRight, ArrowRight, 
-  Info, HelpCircle, FileJson, ArrowRightLeft, User2
+  Info, HelpCircle, FileJson, ArrowRightLeft, User2, CalendarDays
 } from 'lucide-react';
 import ReactCountryFlag from "react-country-flag";
 
@@ -30,7 +34,13 @@ export default function InvoicesDashboard() {
   const [insights,setInsights] = useState({});
   const [filterOptions,setFilterOptions] = useState({ types: [], countries: [], partyTypes: [], statuses: [],});
   const [loading, setLoading] = useState(true);
-
+  const [shipmentStartDate, setShipmentStartDate] = useState(null);
+  const [shipmentEndDate, setShipmentEndDate] = useState(null);
+  const [dateRange, setDateRange] = useState(false);
+  const [exportReport, setExportReport] = useState(false);
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null)
+    
   const fetchDashboard = async () => {  
     try {
       const res = await getDashboard();
@@ -204,11 +214,27 @@ export default function InvoicesDashboard() {
         </div>
         
         <div className="flex flex-wrap items-center gap-2.5 self-end md:self-auto">
-          <div className="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg font-medium text-slate-600 shadow-sm">
-            <Calendar size={13} className="text-slate-400" />
-            <span>01 Apr 2025 - 24 Apr 2025</span>
+          <div className="relative flex-1 md:flex-none">
+            <DatePicker
+              selected={shipmentStartDate}
+              onChange={(dates) => {
+                const [start, end] = dates;
+                setShipmentStartDate(start);
+                setShipmentEndDate(end);
+              }}
+              startDate={shipmentStartDate}
+              endDate={shipmentEndDate}
+              selectsRange
+              dateFormat="dd MMM yyyy"
+              placeholderText="01 Apr 2025 - 24 Apr 2025"
+              className="bg-white border border-slate-200 text-xs font-medium text-slate-600 pl-3 pr-9 py-1.5 rounded-lg shadow-sm hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer"
+            />
+            <CalendarDays
+              size={13}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
           </div>
-          <button className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-3 py-1.5 font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors">
+          <button onClick={() => setExportReport(true)} className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-3 py-1.5 font-semibold text-slate-700 shadow-sm hover:bg-slate-50 transition-colors">
             <Download size={13} className="text-slate-500" />
             Export Report
           </button>
@@ -571,6 +597,9 @@ export default function InvoicesDashboard() {
         </div>
       </div>
 
+      {exportReport && (
+        <ExportReport onClose={() => setExportReport(false)} />
+      )}
     </div>
   );
 }

@@ -1,6 +1,8 @@
 import React, { useState,useEffect } from "react";
 import ReactCountryFlag from "react-country-flag";
 import axios from "axios";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 //changes//
 import {
   getShipments,
@@ -41,7 +43,10 @@ import {
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 const HEADING = "text-[#07156B]";
-
+import ShipmentForm from "../../components/ShipmentForm";
+import RecentHighRiskAlertsModal from "../../components/b2bComponent/RecentHighRisk";
+import DateRangeModal from "../../components/b2bComponent/DateRange";
+import ExportReport from "../../components/b2bComponent/ExportReport";
 const COUNTRY_CODES = {
   China: "CN",
   India: "IN",
@@ -137,15 +142,15 @@ function SectionCard({ children, className = "" }) {
   );
 }
 
-function DropdownButton({ text }) {
+function DropdownButton({ text, onClick }) {
   return (
-    <button className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1 text-[10px] font-semibold text-slate-600 shrink-0">
+    <button   onClick={onClick} className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1 text-[10px] font-semibold text-slate-600 shrink-0">
       {text} <ChevronDown size={11} className="text-slate-400" />
     </button>
   );
 }
 
-export default function Shipment() {
+export default function Shipment({setActiveTab:setParentTab, activeTab:parentTab, currectTab}) {
   const [activeTab, setActiveTab] = useState("All Shipments");
   //changes//
   const [dashboard, setDashboard] = useState({});
@@ -156,8 +161,16 @@ export default function Shipment() {
   const [shipmentTracker, setShipmentTracker] = useState(null);
   const [destinationCountries, setDestinationCountries] = useState([]);
   const [recentAlerts, setRecentAlerts] = useState([]);
-  const [filters, setFilters] = useState({status: [], origins: [], destinations: [], modes: [],});
+  const [filters, setFilters] = useState({status: ["All Status", "Active", "Inactive" , "Pending", "Approved", "Completed","Expired", "Draft", "Under Review"], origins: ["India", "USA" , "China"], destinations: ["India", "USA" , "China"], modes: ["Sea freight", "Air Freight", "Rail Freight", "Road Freight", "Multimodal", "Express"],});
   const [loading, setLoading] = useState(false);
+  const [shipment, setShipment] = useState("")
+  const [highRisk, setHighRisk] = useState(false)
+    const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null)
+  const [shipmentStartDate, setShipmentStartDate] = useState(null);
+  const [shipmentEndDate, setShipmentEndDate] = useState(null);
+   const [dateRange, setDateRange] = useState(false)
+   const [exportReport, setExportReport] = useState(false)
 
   const fetchShipments = async () => {
   try {
@@ -361,7 +374,7 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600 font-sans antialiased pt-5">
-      <div className="max-w-[1500px] mx-auto p-3 sm:p-4 md:p-6">
+  {!shipment && ( <div className="max-w-[1500px] mx-auto p-3 sm:p-4 md:p-6">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
           <div>
             <h1 className={`text-xl sm:text-2xl font-bold tracking-tight ${HEADING}`}>Shipment</h1>
@@ -370,15 +383,39 @@ useEffect(() => {
             </p>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto flex-wrap">
-            <button className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
+            {/* <button className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
               <CalendarDays size={14} className="text-slate-400" />
               01 Apr 2025 - 24 Apr 2025
-            </button>
-            <button className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
+            </button> */}
+            <div className="relative flex-1 md:flex-none">
+              <DatePicker
+                selected={shipmentStartDate}
+                onChange={(dates) => {
+                  const [start, end] = dates;
+                  setShipmentStartDate(start);
+                  setShipmentEndDate(end);
+                }}
+                startDate={shipmentStartDate}
+                endDate={shipmentEndDate}
+                selectsRange
+                dateFormat="dd MMM yyyy"
+                placeholderText="01 Apr 2025 - 24 Apr 2025"
+                className={`bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold pl-3 pr-9 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer ${HEADING}`}
+              />
+              <CalendarDays
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              />
+            </div>
+            <button onClick={() => setExportReport(true)} className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
               <Download size={14} className="text-slate-400" />
               Export Report
             </button>
-            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
+            <button  onClick={() => {
+              //  console.log("heelo")
+                setShipment("shipment")
+                  
+              }} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
               <Plus size={14} />
               Shipment
             </button>
@@ -436,16 +473,32 @@ useEffect(() => {
                 <Search size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
             </div>
-            <div>
-              <label className="text-[10px] text-[#081B6B] font-bold block mb-1.5 uppercase">Date Range</label>
-              <div className="relative">
-                <input
-                  defaultValue="01 Apr 2025 - 24 Apr 2025"
-                  className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs focus:outline-none"
-                />
-                <CalendarDays size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-              </div>
-            </div>
+           <div>
+          <label className="text-[10px] text-[#081B6B] font-bold block mb-1.5 uppercase">
+            Date Range
+          </label>
+
+          <div className="relative">
+            <DatePicker
+              selected={startDate}
+              onChange={(dates) => {
+                const [start, end] = dates;
+                setStartDate(start);
+                setEndDate(end);
+              }}
+              startDate={startDate}
+              endDate={endDate}
+              selectsRange
+              dateFormat="dd MMM yyyy"
+              placeholderText="Select Date Range"
+              className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-9 text-xs focus:outline-none focus:ring-2 focus:ring-blue-100"
+            />
+            <CalendarDays
+              size={13}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
+          </div>
+        </div>
             <div>
               <label className="text-[10px] text-[#081B6B] font-bold block mb-1.5 uppercase">Shipment Status</label>
               <div className="relative">
@@ -591,7 +644,7 @@ useEffect(() => {
           <SectionCard>
             <div className="flex justify-between items-center mb-3">
               <h3 className={`font-bold text-sm ${HEADING}`}>Shipments by Mode</h3>
-              <DropdownButton text="This Month" />
+              <DropdownButton text="This Month" onClick={() => setDateRange(true)} />
             </div>
             <div className="flex items-center gap-3">
               <div className="relative w-[110px] h-[110px] shrink-0">
@@ -622,7 +675,7 @@ useEffect(() => {
           <SectionCard>
             <div className="flex justify-between items-center mb-3">
               <h3 className={`font-bold text-sm ${HEADING}`}>Top Origin Countries</h3>
-              <DropdownButton text="This Month" />
+              <DropdownButton text="This Month"   onClick={() => setDateRange(true)}/>
             </div>
             <div className="space-y-2.5">
               {TOP_ORIGINS.map((c, i) => (
@@ -642,7 +695,7 @@ useEffect(() => {
           <SectionCard>
             <div className="flex justify-between items-center mb-3">
               <h3 className={`font-bold text-sm ${HEADING}`}>Recent Alerts</h3>
-              <button className="text-blue-600 text-[11px] font-bold">View All →</button>
+              <button className="text-blue-600 text-[11px] font-bold" onClick={() => setHighRisk(true)}>View All →</button>
             </div>
             <div className="space-y-2.5">
               {RECENT_ALERTS.map((a, i) => {
@@ -734,7 +787,7 @@ useEffect(() => {
             <SectionCard>
               <div className="flex justify-between items-center mb-3">
                 <h3 className={`font-bold text-sm ${HEADING}`}>Shipment Status Overview</h3>
-                <DropdownButton text="This Month" />
+                <DropdownButton text="This Month"   onClick={() => setDateRange(true)}/>
               </div>
               <div className="flex items-center gap-3">
                 <div className="relative w-[110px] h-[110px] shrink-0">
@@ -769,7 +822,7 @@ useEffect(() => {
             <SectionCard>
               <div className="flex justify-between items-center mb-3">
                 <h3 className={`font-bold text-sm ${HEADING}`}>Top Destination Countries</h3>
-                <DropdownButton text="This Month" />
+                <DropdownButton text="This Month"  onClick={() => setDateRange(true)} />
               </div>
               <div className="space-y-2.5">
                 {TOP_DESTINATIONS.map((c, i) => (
@@ -789,7 +842,23 @@ useEffect(() => {
         </div>
 
        
-      </div>
+      </div> )}
+ 
+ 
+        {shipment === "shipment" && (
+            <ShipmentForm setActiveTab={setActiveTab} setShipment={setShipment} currentTab={"Shipments"} />
+          )}
+      
+        {highRisk && (<RecentHighRiskAlertsModal onClose={() => setHighRisk(false)}/>)}
+
+          {dateRange && (
+            <DateRangeModal onClose={() => setDateRange(false)}/>
+          )}
+
+          {exportReport && (
+            <ExportReport onClose={() => setExportReport(false)} />
+          )}
+      
     </div>
   );
 }

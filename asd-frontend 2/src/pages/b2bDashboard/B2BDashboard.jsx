@@ -208,9 +208,10 @@ import Settings from "./Settings";
 import UserRoles from "./UserRoles";
 
 import AuditsLogs from "./AuditsLogs";
+import SelectRangeModal from "../../components/b2bComponent/SelectDateRange";
+import MarketIntelligencePopup from "../../components/b2bComponent/MarketIntelligence";
 
-
-
+import ShipmentForm from "../../components/ShipmentForm"
 
 
 const iconMap = {
@@ -423,6 +424,7 @@ export default function B2BDashboard() {
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [activeSubTab, setActiveSubTab] = useState('Import Intelligence');
   const [openMenu, setOpenMenu] = useState("Import Intelligence"); // null
+  const [shipment, setShipment] = useState("")
 
   const [chatInput, setChatInput] = useState("");
   const riskColor = {
@@ -442,7 +444,7 @@ export default function B2BDashboard() {
              />
            )}
 
-           <header className="fixed top-0 w-full z-[9999] pr-3 bg-white border-b border-gray-200     py-0 flex items-center gap-3  ">
+           <header className="fixed top-0 w-full z-[20] pr-3 bg-white border-b border-gray-200     py-0 flex items-center gap-3  ">
              <button
                className="lg:hidden p-1.5 pl-4 rounded-md hover:bg-gray-100 text-gray-600"
                onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -645,7 +647,7 @@ export default function B2BDashboard() {
             )}
 
              {activeTab === "Shipments" && (
-              <Shipment />
+              <Shipment activeTab={activeTab}  setActiveTab={setActiveTab} currectTab={"Shipments"}/>
             )}
 
              {activeTab === "Documents" && (
@@ -653,7 +655,7 @@ export default function B2BDashboard() {
             )}
 
              {activeTab === "Supplier" && (
-              <Supplier />
+              <Supplier   />
             )}
 
 
@@ -691,8 +693,14 @@ export default function B2BDashboard() {
                 {activeTab === "Audit Logs" && (
               <AuditsLogs />
             )}  
+
+
         </main>   
       </div>
+
+
+      {/* <SelectRangeModal /> */}
+      {/* <MarketIntelligencePopup /> */}
     </div>
   );
 }

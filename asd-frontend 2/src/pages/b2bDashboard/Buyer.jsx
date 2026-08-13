@@ -10,14 +10,21 @@ import {
   getInsights,
   getFilterOptions
 } from "../../api/BuyerApi";
+import DateRangeModal from "../../components/b2bComponent/DateRange";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
+import BuyerList from '../../components/b2bComponent/BuyerList';
+
 import { 
   Users, UserPlus, Globe, BarChart3, TrendingUp, Search, ChevronDown, 
   SlidersHorizontal, LayoutGrid, Sliders, Download, Plus, MoreVertical, 
   ChevronLeft, ChevronRight, ArrowUpRight, ArrowRight, ShoppingBag, 
-  RefreshCw, Eye, Truck, CheckCircle, Clock, ShieldCheck, Info, HelpCircle
+  RefreshCw, Eye, Truck, CheckCircle, Clock, ShieldCheck, Info, HelpCircle, CalendarDays
 } from 'lucide-react';
 
 import ReactCountryFlag from "react-country-flag";
+import RecentBuyerActivityModal from '../../components/b2bComponent/RecentBuyerActivity';
 
 export default function BuyersDashboard() {
 
@@ -31,7 +38,13 @@ export default function BuyersDashboard() {
   const [insights, setInsights] = useState({});
   const [filterOptions, setFilterOptions] = useState({});
   const [loading, setLoading] = useState(true);
-
+  const [shipmentStartDate, setShipmentStartDate] = useState(null);
+  const [shipmentEndDate, setShipmentEndDate] = useState(null);
+  const [dateRange, setDateRange] = useState(false);
+  const [exportReport, setExportReport] = useState(false);
+   const [recentBuyer, setRecentBuyer] = useState(false)
+  const [showBuyerList, setShowBuyerList] = useState(false);
+  
   const fetchDashboard = async () => {
     try {
       const res = await getDashboard();
@@ -214,11 +227,27 @@ export default function BuyersDashboard() {
         </div>
         
         <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex items-center gap-2 bg-white px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-medium text-slate-600 shadow-sm">
-            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
-            <span>01 Apr 2025 - 24 Apr 2025</span>
+          <div className="relative flex-1 md:flex-none">
+            <DatePicker
+              selected={shipmentStartDate}
+              onChange={(dates) => {
+                const [start, end] = dates;
+                setShipmentStartDate(start);
+                setShipmentEndDate(end);
+              }}
+              startDate={shipmentStartDate}
+              endDate={shipmentEndDate}
+              selectsRange
+              dateFormat="dd MMM yyyy"
+              placeholderText="01 Apr 2025 - 24 Apr 2025"
+              className="bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold pl-3 pr-9 py-1.5 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer"
+            />
+            <CalendarDays
+              size={14}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
           </div>
-          <button className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
+          <button onClick={() => setExportReport(true)} className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
             <Download size={14} className="text-slate-500" />
             Export Report
           </button>
@@ -394,7 +423,9 @@ export default function BuyersDashboard() {
           <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-sm font-bold text-slate-900">Buyers by Country</h3>
-              <span className="text-xs font-semibold text-blue-600 cursor-pointer hover:underline">View All</span>
+              <button className="text-xs font-semibold text-blue-600 cursor-pointer hover:underline" 
+              onClick={() => setShowBuyerList(true)}
+              >View All</button>
             </div>
    
             <div className="h-32 bg-slate-50 rounded-lg relative overflow-hidden mb-3 border border-slate-100 flex items-center justify-center">
@@ -418,7 +449,7 @@ export default function BuyersDashboard() {
           <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-sm font-bold text-slate-900">Top Buyers by Trade Value</h3>
-              <span className="text-xs font-semibold text-blue-600 cursor-pointer hover:underline">View All</span>
+              <span className="text-xs font-semibold text-blue-600 cursor-pointer hover:underline" onClick={() => setRecentBuyer(true)}>View All</span>
             </div>
             <div className="space-y-4">
               {topBuyers.map((item, idx) => (
@@ -449,7 +480,7 @@ export default function BuyersDashboard() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-sm font-bold text-slate-900">Buyer Performance Overview</h3>
-              <div className="flex items-center gap-1 bg-slate-50 border px-2 py-1 rounded-md text-[11px] text-slate-500 cursor-pointer">
+              <div onClick={() => setDateRange(true)} className="flex items-center gap-1 bg-slate-50 border px-2 py-1 rounded-md text-[11px] text-slate-500 cursor-pointer">
                 <span>This Month</span> <ChevronDown size={12} />
               </div>
             </div>
@@ -491,7 +522,7 @@ export default function BuyersDashboard() {
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-sm font-bold text-slate-900">Top Products by Buyers</h3>
-              <div className="flex items-center gap-1 bg-slate-50 border px-2 py-1 rounded-md text-[11px] text-slate-500 cursor-pointer">
+              <div  onClick={() => setDateRange(true)} className="flex items-center gap-1 bg-slate-50 border px-2 py-1 rounded-md text-[11px] text-slate-500 cursor-pointer">
                 <span>This Month</span> <ChevronDown size={12} />
               </div>
             </div>
@@ -522,7 +553,7 @@ export default function BuyersDashboard() {
         <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-sm font-bold text-slate-900">Recent Buyer Activity</h3>
-            <span className="text-xs font-semibold text-emerald-600 cursor-pointer hover:underline">View All</span>
+            <span className="text-xs font-semibold text-emerald-600 cursor-pointer hover:underline" onClick={() => setRecentBuyer(true)}>View All</span>
           </div>
           
           <div className="space-y-3.5">
@@ -583,6 +614,23 @@ export default function BuyersDashboard() {
           <span>Help Center</span>
         </div>
       </div>
+
+      {exportReport && (
+        <ExportReport onClose={() => setExportReport(false)} />
+      )}
+
+      <BuyerList
+        isOpen={showBuyerList}
+        onClose={() => setShowBuyerList(false)}
+      />
+
+       {dateRange && (
+                  <DateRangeModal onClose={() => setDateRange(false)}/>
+                )}
+
+                 {recentBuyer && ( <RecentBuyerActivityModal onClose={() => setRecentBuyer(false)} />
+          ) }
+      
 
     </div>
   );

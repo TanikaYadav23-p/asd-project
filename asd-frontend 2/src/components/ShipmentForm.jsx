@@ -28,6 +28,7 @@ import {
   getHSCodes,
   uploadShipmentDocument
 } from "../services/shipmentApi";
+import { CloudCog } from "lucide-react";
 
 function Label({ children, required = true }) {
   return (
@@ -807,7 +808,9 @@ function Header({
   handleAnalyze,
   handleSubmit,
   loading,
+  currentTab
 }) {
+      // console.log("he", currentTab)
   return (
     <div>
       <p className="text-xs text-gray-500">
@@ -854,8 +857,8 @@ function Header({
           <button
             type="button"
             onClick={() => {
-              if (setShipment) setShipment("");
-              if (setActiveTab) setActiveTab("Dashboard");
+           setShipment("");
+              setActiveTab(currentTab);
             }}
             className="border border-red-300 text-red-600 text-sm font-semibold px-4 py-2 rounded-lg"
           >
@@ -880,7 +883,7 @@ function Footer() {
   );
 }
 
-export default function Shipment({ setActiveTab, setShipment }) {
+export default function Shipment({ setActiveTab, setShipment, currentTab }) {
   const [shipmentId, setShipmentId] = useState("");
   const [referenceNumber, setReferenceNumber] = useState("");
   const [currentStatus, setCurrentStatus] = useState("Draft");
@@ -888,8 +891,9 @@ export default function Shipment({ setActiveTab, setShipment }) {
   const [hsCodes, setHsCodes] = useState([]);
   const [analysis, setAnalysis] = useState(null);
   const [uploadedDocs, setUploadedDocs] = useState({});
-const fileInputRef = useRef({});
+  const fileInputRef = useRef({});
 
+ console.log("dd", currentTab)
   const fetchHsCodes = async () => {
     try {
       const res = await getHSCodes();
@@ -1119,7 +1123,7 @@ const fileInputRef = useRef({});
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-3 sm:p-6 mt-14">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-6 ">
       <div className="max-w-[1400px] mx-auto">
         <Header
           setActiveTab={setActiveTab}
@@ -1128,6 +1132,7 @@ const fileInputRef = useRef({});
           handleAnalyze={handleAnalyze}
           handleSubmit={handleSubmit}
           loading={loading}
+          currentTab={currentTab}
         />
 
         <div className="mt-6 grid grid-cols-1 xl:grid-cols-12 gap-2">
