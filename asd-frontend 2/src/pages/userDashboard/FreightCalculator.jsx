@@ -13,19 +13,7 @@ const Icon = ({ d, d2, className = "w-4 h-4", viewBox = "0 0 24 24", fill = "non
   </svg>
 );
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
-function Breadcrumb() {
-  return (
-    <nav aria-label="Breadcrumb" className="flex items-center text-sm text-gray-500 mb-4">
-      <span>Dashboard</span>
-      <span className="mx-2">›</span>
-      <span>Freight Calculator</span>
-      <span className="mx-2">›</span>
-      <span className="text-gray-900 font-medium">Result</span>
-    </nav>
-  );
-}
+ 
 
 function HeaderActions() {
   return (
@@ -456,7 +444,7 @@ export default function FreightCalculatorResult() {
 
         {/* Header */}
         <header className="mb-6">
-          <Breadcrumb />
+       
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
               <h1 className="text-xl font-bold text-gray-900">Freight Calculator</h1>

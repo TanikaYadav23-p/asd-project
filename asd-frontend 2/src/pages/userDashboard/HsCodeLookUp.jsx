@@ -67,11 +67,7 @@ export default function HSCodeLookup() {
   return (
     <div className=" bg-gray-50 font-sans  flex-1 overflow-y-auto pt-14">
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
-        <div className="flex items-center gap-1.5 text-xs text-gray-500 mb-3">
-          <span>Dashboard</span>
-          <FiChevronRight size={11} />
-          <span className="text-gray-800 font-medium">HS Code Lookup</span>
-        </div>
+      
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
             <h1 className="text-lg font-bold text-gray-900">HS Code Lookup</h1>

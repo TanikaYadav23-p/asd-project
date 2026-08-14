@@ -91,13 +91,8 @@ import crown from "../../assets/Images/webp/crown.webp"
     return (
         <div className="min-h-screen bg-gray-50 p-5 pt-20">
             {/* Header */}
-            <nav className="flex items-center text-sm mb-2">
-                <span className="text-gray-400">Dashboard</span>
-                <span className="mx-2 text-gray-300">&gt;</span>
-                <span className="font-semibold text-[#111827]">Subscription</span>
-            </nav>
             
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-between items-center ">
                 <div>
                     <h1 className="text-xl font-bold">Subscription</h1>
                     <p className="text-gray-500 font-xs  mt-2">
