@@ -3,8 +3,6 @@ import {
   FaPlus, FaMagnifyingGlass, FaXmark, FaChevronDown,
   FaStar, FaTruck, FaBoxOpen, FaWarehouse, FaFileContract
 } from "react-icons/fa6";
-import { useEffect } from "react";
-import API from "../../api/axios";
 
 const typeOptions = ["All Types", "Shipping Partner", "Freight Forwarder", "Custom Broker", "Warehouse Partner"];
 const statusOptions = ["All Status", "Active", "Inactive"];
@@ -18,7 +16,7 @@ const typeIcon = (type) => {
 };
 
 const initialVendors = Array.from({ length: 6 }, (_, i) => ({
-  id: i + 1,
+  id: i + 1, 
   name: "Global Logistic Inc.",
   email: "contact@globallog.com",
   type: "Shipping Partner",
@@ -41,30 +39,11 @@ function AddVendorModal({ onClose, onAdd }) {
     return e;
   };
 
-  const handleAdd = async () => {
+  const handleAdd = () => {
     const e = validate();
-    if (Object.keys(e).length) {
-      setErrors(e);
-      return;
-    }
-  
-    try {
-      await API.post("/vendors", {
-        name: form.name,
-        email: form.email,
-        type: form.type,
-        location: form.location,
-        rating: Number(form.rating || 0),
-        activeShipments: Number(form.activeShipment || 0),
-        status: form.status.toLowerCase() // 🔥 important
-      });
-  
-      onClose();
-      window.location.reload(); // simple for now
-    } catch (err) {
-      console.log(err);
-      alert("Error creating vendor");
-    }
+    if (Object.keys(e).length) { setErrors(e); return; }
+    onAdd({ ...form, id: Date.now(), rating: parseFloat(form.rating) || 0, activeShipment: parseInt(form.activeShipment) || 0 });
+    onClose();
   };
 
   const inp = (k) => `w-full border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all ${errors[k] ? "border-red-400" : "border-gray-200"}`;
@@ -139,13 +118,9 @@ function VendorCard({ vendor }) {
           <h3 className="text-sm font-bold text-gray-800 truncate">{vendor.name}</h3>
           <p className="text-xs text-gray-400 truncate">{vendor.email}</p>
         </div>
-        <span className={`text-xs px-2.5 py-1 rounded-lg font-medium ${
-  vendor.status === "active"
-    ? "bg-green-100 text-green-600"
-    : "bg-gray-100 text-gray-500"
-}`}>
-  {vendor.status}
-</span>
+        <span className={`text-xs px-2.5 py-1 rounded-lg font-medium flex-shrink-0 ${vendor.status === "Active" ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-500"}`}>
+          {vendor.status}
+        </span>
       </div>
       <div className="flex flex-col gap-2 mt-3">
         <div className="flex items-center justify-between">
@@ -166,7 +141,7 @@ function VendorCard({ vendor }) {
         </div>
         <div className="flex items-center justify-between">
           <span className="text-xs text-gray-400">Active Shipment</span>
-          <span className="text-xs font-semibold text-gray-700">{vendor.activeShipments}</span>
+          <span className="text-xs font-semibold text-gray-700">{vendor.activeShipment}</span>
         </div>
       </div>
       <button className="w-full mt-4 py-2 text-xs font-medium text-teal-500 border border-teal-200 rounded-xl hover:bg-teal-50 transition-colors">
@@ -177,23 +152,11 @@ function VendorCard({ vendor }) {
 }
 
 export default function VendorsPartners() {
-  const [vendors, setVendors] = useState([]);
+  const [vendors, setVendors] = useState(initialVendors);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All Types");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [showModal, setShowModal] = useState(false);
-  const fetchVendors = async () => {
-    try {
-      const res = await API.get("/vendors");
-      setVendors(res.data.data);
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  
-  useEffect(() => {
-    fetchVendors();
-  }, []);
 
   const handleAdd = (vendor) => setVendors(prev => [vendor, ...prev]);
 
@@ -203,7 +166,7 @@ export default function VendorsPartners() {
       ? v.name.toLowerCase().includes(q) || v.email.toLowerCase().includes(q) || v.location.toLowerCase().includes(q)
       : true;
     const matchType = typeFilter === "All Types" || v.type === typeFilter;
-    const matchStatus = statusFilter === "All Status" || v.status === statusFilter.toLowerCase();
+    const matchStatus = statusFilter === "All Status" || v.status === statusFilter;
     return matchSearch && matchType && matchStatus;
   });
 
@@ -262,3 +225,6 @@ export default function VendorsPartners() {
     </div>
   );
 }
+
+
+
