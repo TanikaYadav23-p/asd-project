@@ -1,5 +1,8 @@
 import React,{ useEffect,useState } from "react";
 import ReactCountryFlag from "react-country-flag";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
 import { 
   getDocumentDashboard,
   getDashboardDocuments,
@@ -30,7 +33,11 @@ import {
   Sparkles,
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import DateRangeModal from "../../components/b2bComponent/DateRange";
+import AllRecentUploadsModal from "../../components/b2bComponent/AllRecentUpload";
 
+import UploadShipment from "../../components/b2bComponent/UploadShipment";
+import RecentBuyerActivityModal from "../../components/b2bComponent/RecentBuyerActivity";
 const HEADING = "text-[#07156B]";
 
 const COUNTRY_CODES = {
@@ -155,11 +162,11 @@ function SectionCard({ children, className = "" }) {
   );
 }
 
-function ViewAllHeader({ title, text = "View All" }) {
+function ViewAllHeader({ title, text = "View All", onClick }) {
   return (
     <div className="flex justify-between items-center mb-3">
       <h3 className={`font-bold text-sm ${HEADING}`}>{title}</h3>
-      <button className="text-blue-600 text-[11px] font-bold shrink-0">{text} →</button>
+      <button className="text-blue-600 text-[11px] font-bold shrink-0" onClick={onClick}>{text} →</button>
     </div>
   );
 }
@@ -175,6 +182,14 @@ export default function DocumentsDashboard() {
   const [filterOptions, setFilterOptions] = useState({});
   const [storage, setStorage] = useState({});
   const [loading, setLoading] = useState(false);
+  const [shipmentStartDate, setShipmentStartDate] = useState(null);
+  const [shipmentEndDate, setShipmentEndDate] = useState(null);
+  const [dateRange, setDateRange] = useState(false);
+  const [exportReport, setExportReport] = useState(false);
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null)
+    const [uploadShipment, setUploadShipment] = useState(false)
+   const [recentUpload, setRecentUpload] = useState(false)
 
   const fetchDashboard = async () => {
     try {
@@ -311,15 +326,31 @@ export default function DocumentsDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto flex-wrap">
-            <button className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
-              <CalendarDays size={14} className="text-slate-400" />
-              01 Apr 2025 - 24 Apr 2025
-            </button>
-            <button className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
+            <div className="relative flex-1 md:flex-none">
+              <DatePicker
+                selected={shipmentStartDate}
+                onChange={(dates) => {
+                  const [start, end] = dates;
+                  setShipmentStartDate(start);
+                  setShipmentEndDate(end);
+                }}
+                startDate={shipmentStartDate}
+                endDate={shipmentEndDate}
+                selectsRange
+                dateFormat="dd MMM yyyy"
+                placeholderText="01 Apr 2025 - 24 Apr 2025"
+                className={`bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold pl-3 pr-9 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer ${HEADING}`}
+              />
+              <CalendarDays
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+              />
+            </div>
+            <button onClick={() => setExportReport(true)} className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
               <Download size={14} className="text-slate-400" />
               Export Report
             </button>
-            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
+            <button onClick={() => setUploadShipment(true)} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
               <Upload size={14} />
               Upload Shipment
             </button>
@@ -517,7 +548,7 @@ export default function DocumentsDashboard() {
           <SectionCard>
             <div className="flex justify-between items-center mb-3">
               <h3 className={`font-bold text-sm ${HEADING}`}>Documents by Type</h3>
-              <button className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1 text-[10px] font-semibold text-slate-600 shrink-0">
+              <button  onClick={() => setDateRange(true)}  className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1 text-[10px] font-semibold text-slate-600 shrink-0">
                 This Month <ChevronDown size={11} className="text-slate-400" />
               </button>
             </div>
@@ -557,7 +588,7 @@ export default function DocumentsDashboard() {
           <SectionCard>
             <div className="flex justify-between items-center mb-3">
               <h3 className={`font-bold text-sm ${HEADING}`}>Document Status Overview</h3>
-              <button className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1 text-[10px] font-semibold text-slate-600 shrink-0">
+              <button onClick={() => setDateRange(true) } className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2 py-1 text-[10px] font-semibold text-slate-600 shrink-0">
                 This Month <ChevronDown size={11} className="text-slate-400" />
               </button>
             </div>
@@ -641,7 +672,7 @@ export default function DocumentsDashboard() {
           </SectionCard>
 
           <SectionCard>
-            <ViewAllHeader title="Recent Uploads" />
+            <ViewAllHeader title="Recent Uploads"  onClick={() => setRecentUpload(true)} />
             <div className="overflow-x-auto">
               <table className="w-full text-[11px] min-w-[400px]">
                 <thead>
@@ -672,6 +703,25 @@ export default function DocumentsDashboard() {
           </SectionCard>
         </div>
       </div>
+
+      {exportReport && (
+        <ExportReport onClose={() => setExportReport(false)} />
+      )}
+
+       {dateRange && (
+             <DateRangeModal onClose={() => setDateRange(false)}/>
+           )}
+
+         { uploadShipment && (
+          <UploadShipment onClose={() => setUploadShipment(false)}/>
+         )}
+
+         {recentUpload && (
+          <AllRecentUploadsModal onClose={() => setRecentUpload(false)} />
+         )}
+
+        
+         
     </div>
   );
 }

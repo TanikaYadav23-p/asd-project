@@ -10,10 +10,14 @@ import {
   getExpiringContracts,
   getFilterOptions
 } from '../../api/ContractApi';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
+import DateRangeModal from "../../components/b2bComponent/DateRange";
 import { 
   Search, Calendar, ChevronDown, FileText,  SlidersHorizontal,
   CheckCircle, AlertTriangle, XCircle, DollarSign, 
-  Percent, Download, Plus, MoreVertical, ChevronLeft, ChevronRight 
+  Percent, Download, Plus, MoreVertical, ChevronLeft, ChevronRight, CalendarDays 
 } from 'lucide-react';
 import ReactCountryFlag from "react-country-flag";
 import {
@@ -25,6 +29,12 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import ContractsByStatus from '../../components/b2bComponent/ContractStatus';
+import AllContractsType from '../../components/b2bComponent/AllContractType';
+import TopContractingParties from '../../components/b2bComponent/TopContractingParties';
+import ContractsInsights from '../../components/b2bComponent/ContractInsight';
+import ExpiringContracts from '../../components/b2bComponent/ExpiringContract';
+import UploadContracts from '../../components/b2bComponent/UploadContract';
 
 export default function ContractDashboard() {
 
@@ -38,7 +48,19 @@ export default function ContractDashboard() {
   const [expiringContracts, setExpiringContracts] = useState([]);
   const [filterOptions, setFilterOptions] = useState({});
   const [loading, setLoading] = useState(true);
-  
+  const [shipmentStartDate, setShipmentStartDate] = useState(null);
+  const [shipmentEndDate, setShipmentEndDate] = useState(null);
+  const [dateRange, setDateRange] = useState(false);
+  const [exportReport, setExportReport] = useState(false);
+  const [contactStatus, setContactStatus] = useState(false)
+  const [allContactType, setAllContactType] = useState(false)
+  const [topContractParty, setTopContractParty] = useState(false)
+  const [contractInsight,  setContractInsight] = useState(false)
+   const [expiring,  setExpiring] = useState(false)
+   const [upload, setUpload] = useState(false)
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null)
+
   const fetchDashboard = async () => {
     try {
       const res = await getDashboard();
@@ -166,14 +188,30 @@ export default function ContractDashboard() {
           <p className="text-sm text-slate-500 mt-1">Manage, monitor and analyze all your trade contracts in one place.</p>
         </div>
         <div className="flex items-center text-[#0A146E] gap-3 mt-4 md:mt-0">
-          <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 py-2 rounded-lg text-sm text-slate-600 shadow-sm">
-            <Calendar size={16} />
-            <span>01 Apr 2025 - 24 Apr 2025</span>
+          <div className="relative flex-1 md:flex-none">
+            <DatePicker
+              selected={shipmentStartDate}
+              onChange={(dates) => {
+                const [start, end] = dates;
+                setShipmentStartDate(start);
+                setShipmentEndDate(end);
+              }}
+              startDate={shipmentStartDate}
+              endDate={shipmentEndDate}
+              selectsRange
+              dateFormat="dd MMM yyyy"
+              placeholderText="01 Apr 2025 - 24 Apr 2025"
+              className="bg-white border border-slate-200 text-sm text-slate-600 pl-3 pr-9 py-2 rounded-lg shadow-sm hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer"
+            />
+            <CalendarDays
+              size={16}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+            />
           </div>
-          <button className="flex items-center gap-2  border border-slate-200 bg-white hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-medium shadow-sm">
+          <button onClick={() => setExportReport(true)} className="flex items-center gap-2  border border-slate-200 bg-white hover:bg-slate-50 px-4 py-2 rounded-lg text-sm font-medium shadow-sm">
             <Download size={16} /> Export Report
           </button>
-          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition">
+          <button onClick={() => setUpload(true)} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition">
             <Plus size={16} /> Add Contracts
           </button>
         </div>
@@ -314,7 +352,7 @@ export default function ContractDashboard() {
                   })}
               </div>
             </div>
-            <button className="w-full text-center text-xs font-semibold text-blue-600 mt-4 pt-3 border-t border-slate-100 hover:underline">View All Status →</button>
+            <button className="w-full text-center text-xs font-semibold text-blue-600 mt-4 pt-3 border-t border-slate-100 hover:underline" onClick={() => setContactStatus(true)}>View All Status →</button>
           </div>
 
           {/* CONTRACTS BY TYPE */}
@@ -348,7 +386,7 @@ export default function ContractDashboard() {
                 })}
               </div>
             </div>
-            <button className="w-full text-center text-xs font-semibold text-blue-600 mt-4 pt-3 border-t border-slate-100 hover:underline">View All Types →</button>
+            <button className="w-full text-center text-xs font-semibold text-blue-600 mt-4 pt-3 border-t border-slate-100 hover:underline" onClick={() => setAllContactType(true)}>View All Types →</button>
           </div>
 
           {/* TOP CONTRACTING PARTIES */}
@@ -365,7 +403,7 @@ export default function ContractDashboard() {
                 : "w-[40%] bg-blue-200" }`}/>
               ))}
             </div>
-            <button className="w-full text-center text-xs font-semibold text-blue-600 mt-4 pt-3 border-t border-slate-100 hover:underline">View All Parties →</button>
+            <button className="w-full text-center text-xs font-semibold text-blue-600 mt-4 pt-3 border-t border-slate-100 hover:underline" onClick={() => setTopContractParty(true)}>View All Parties →</button>
           </div>
 
           {/* CONTRACT INSIGHTS */}
@@ -385,7 +423,7 @@ export default function ContractDashboard() {
                 <p className="text-slate-600"><strong className="text-slate-900 font-semibold">{insights.expiringSoon}</strong>{" "} will expire in the next 60 days.</p>
               </div>
             </div>
-            <button className="w-full text-center text-xs font-semibold text-blue-600 mt-4 pt-3 border-t border-slate-100 hover:underline">View Detailed Insights →</button>
+            <button className="w-full text-center text-xs font-semibold text-blue-600 mt-4 pt-3 border-t border-slate-100 hover:underline" onClick={() => setContractInsight(true)}>View Detailed Insights →</button>
           </div>
 
         </div>
@@ -398,7 +436,7 @@ export default function ContractDashboard() {
         <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
           <div className="flex justify-between items-center mb-6">
             <h3 className="font-bold text-sm text-[#06155F]">Contract Value Trend (INR)</h3>
-            <div className="flex items-center gap-1 text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 cursor-pointer text-slate-700 font-medium">
+            <div onClick={() => setDateRange(true)} className="flex items-center gap-1 text-xs border border-slate-200 rounded-lg px-2.5 py-1.5 bg-slate-50 cursor-pointer text-slate-700 font-medium">
               <span>This Month</span>
               <ChevronDown size={14} className="text-slate-400" />
             </div>
@@ -470,7 +508,7 @@ export default function ContractDashboard() {
               })}
             </div>
           </div>
-          <button className="w-full text-center text-xs font-semibold text-blue-600 mt-4 pt-3 border-t border-slate-100 hover:underline">View All Expiring Soon →</button>
+          <button className="w-full text-center text-xs font-semibold text-blue-600 mt-4 pt-3 border-t border-slate-100 hover:underline" onClick={() => setExpiring(true)}>View All Expiring Soon →</button>
         </div>
 
       </div>
@@ -480,6 +518,40 @@ export default function ContractDashboard() {
         <span>© All data is updated daily. Last updated on 24 Apr 2025, 08:30 AM</span>
         <span className="hover:underline cursor-pointer">Help Center</span>
       </div>
+
+      {exportReport && (
+        <ExportReport onClose={() => setExportReport(false)} />
+      )}
+      
+             {dateRange && (
+                <DateRangeModal onClose={() => setDateRange(false)}/>
+             )}
+
+              {contactStatus && (
+                 <ContractsByStatus  onClose={() => setContactStatus(false)}/>
+              )}
+
+
+              {allContactType && (
+                <AllContractsType onClose={() => setAllContactType(false)} />
+              )}
+
+             {topContractParty && (
+              <TopContractingParties  onClose={() => setTopContractParty(false)}/>
+             )}
+
+
+                {contractInsight && (
+              <ContractsInsights  onClose={() => setContractInsight(false)}/>
+             )}
+
+             {expiring && (
+              <ExpiringContracts onClose={() => setExpiring(false)} />
+             )}
+
+             {upload && (
+              <UploadContracts onClose={() => setUpload(false)}/>
+             )}
 
     </div>
   );

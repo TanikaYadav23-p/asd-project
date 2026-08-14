@@ -1,4 +1,4 @@
-import   React, {useState} from 'react'
+import React, { useState, useTransition } from 'react'
 import {
   FiArrowLeft,
   FiSave,
@@ -38,6 +38,15 @@ import { BsAirplane } from "react-icons/bs";
 import { MdOutlineRocketLaunch } from "react-icons/md";
 import NeedHelp from '../../components/core/NeedHelp';
 import chat from '../../assets/Images/webp/chat.webp';
+import Shipment from '../../components/ShipmentForm';
+import DownloadReportModal from '../../components/userComponent/DownloadReport';
+import NewQueryModal from '../../components/userComponent/NewQuery';
+import SaveReportModal from '../../components/userComponent/SaveReport';
+import SaveReportPopup from '../../components/userComponent/SaveReportPopup';
+import ShareReportModal from '../../components/userComponent/ShareReport';
+import DataSourceModal from '../../components/userComponent/DataSource';
+
+
 
 const recCards = [
   {
@@ -266,467 +275,489 @@ const tabContent = {
 
 const AiCargoMateAssistant = () => {
 
-    const [activeTab, setActiveTab] = useState("AI CargoMate Assistant");
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [analysisTab, setAnalysisTab] = useState("HS Code Analysis");
-    const content = tabContent[analysisTab];
+  const [activeTab, setActiveTab] = useState("AI CargoMate Assistant");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [analysisTab, setAnalysisTab] = useState("HS Code Analysis");
+  const content = tabContent[analysisTab];
+  const [newQuery, setNewQuery] = useState(false)
+  const [saveReportPopup, setSaveReportPopup] = useState(false)
+  const [downloadReport, setDownloadReport] = useState(false)
+  const [shipment, setShipment] = useState("")
+  const [saveReport, setSaveReport] = useState(false)
+  const [shareReport, setShareReport] = useState(false)
+  const [dataSource, setDataSource] = useState(false)
 
   return (
-     <div className="flex-1 flex flex-col min-w-0 overflow-hidden pt-14">
-              <header className="bg-white border-b border-gray-200 px-4 py-2.5 flex items-center gap-3 flex-shrink-0">
-                {/* <button
-                  className="lg:hidden p-1.5 rounded-md hover:bg-gray-100 text-gray-600"
-                  onClick={() => setSidebarOpen(true)}
-                >
-                  <FiSettings size={18} />
-                </button> */}
-                <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                  <span>Dashboard</span>
-                  <FiChevronRight size={12} />
-                  <h1 className="">AI CargoMate Assistant</h1>
-                  <FiChevronRight size={12} />
-                  <span className=" font-medium">AI Result</span>
-                </div>
-              </header>
-    
-              <main className="flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-4 lg:p-5">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
-                  <div>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h1 className="text-sm sm:text-lg font-bold text-gray-900">
-                        AI CargoMate Assistant
-                      </h1>
-                      <span className="flex items-center gap-1 bg-[#EEF2FF] text-[#4338CA] text-[10px] font-semibold px-2 py-0.5 rounded-full border border-[#EEF2FF]">
-                        <FiStar size={10} className="text-[#4338CA]" /> Core Module
-                      </span>
+    <div className="flex-1 flex flex-col min-w-0 overflow-hidden pt-14">
+      {activeTab === "AI CargoMate Assistant" && (<div>
+        <header className="bg-white border-b border-gray-200 px-4 py-2.5 flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-1.5 text-sm text-gray-500">
+            <span>Dashboard</span>
+            <FiChevronRight size={12} />
+            <h1 className="">AI CargoMate Assistant</h1>
+            <FiChevronRight size={12} />
+            <span className=" font-medium">AI Result</span>
+          </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-4 lg:p-5">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-sm sm:text-lg font-bold text-gray-900">
+                  AI CargoMate Assistant
+                </h1>
+                <span className="flex items-center gap-1 bg-[#EEF2FF] text-[#4338CA] text-[10px] font-semibold px-2 py-0.5 rounded-full border border-[#EEF2FF]">
+                  <FiStar size={10} className="text-[#4338CA]" /> Core Module
+                </span>
+              </div>
+              <p className="text-xs font-normal  text-gray-500 mt-0.5">
+                Your AI trade assistant for smarter decisions
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button onClick={() => setNewQuery(true)} className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold  px-3 py-1.5 rounded-lg hover:bg-gray-50">
+                <FiArrowLeft size={13} /> New Query
+              </button>
+              <button onClick={() => setSaveReportPopup(true)} className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold  px-3 py-1.5 rounded-lg hover:bg-gray-50">
+                <FiSave size={13} /> Save Report
+              </button>
+              <button onClick={() => setDownloadReport(true)} className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold  px-3 py-1.5 rounded-lg hover:bg-gray-50">
+                <FiDownload size={13} /> Download Report (PDF)
+              </button>
+              <button onClick={() => {
+                setShipment("shipment")
+                setActiveTab("")
+              }} className="flex items-center gap-1.5 bg-[#0D9488] text-white text-xs  font-bold px-3 py-1.5 rounded-lg">
+                <FiPlus size={13} /> Create Shipment from this Result
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5 mb-4 text-xs font-medium text-blue-800">
+            <FiInfo
+              size={14}
+              className="text-blue-500 flex-shrink-0 mt-0.5"
+            />
+            This result is AI-generated based on the data sources and
+            assumptions listed below. Please review before making any trade
+            decisions.
+          </div>
+
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-4">
+            <div className="flex flex-col gap-4">
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="text-xs font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  Your Query
+                </p>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                      <FiMap className="text-blue-500 text-base" />
                     </div>
-                    <p className="text-xs font-normal  text-gray-500 mt-0.5">
-                      Your AI trade assistant for smarter decisions
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold  px-3 py-1.5 rounded-lg hover:bg-gray-50">
-                      <FiArrowLeft size={13} /> New Query
-                    </button>
-                    <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold  px-3 py-1.5 rounded-lg hover:bg-gray-50">
-                      <FiSave size={13} /> Save Report
-                    </button>
-                    <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold  px-3 py-1.5 rounded-lg hover:bg-gray-50">
-                      <FiDownload size={13} /> Download Report (PDF)
-                    </button>
-                    <button className="flex items-center gap-1.5 bg-[#0D9488] text-white text-xs  font-bold px-3 py-1.5 rounded-lg">
-                      <FiPlus size={13} /> Create Shipment from this Result
-                    </button>
-                  </div>
-                </div>
-    
-                <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5 mb-4 text-xs font-medium text-blue-800">
-                  <FiInfo
-                    size={14}
-                    className="text-blue-500 flex-shrink-0 mt-0.5"
-                  />
-                  This result is AI-generated based on the data sources and
-                  assumptions listed below. Please review before making any trade
-                  decisions.
-                </div>
-    
-                <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-4">
-                  <div className="flex flex-col gap-4">
-                    <div className="bg-white rounded-xl border border-gray-200 p-4">
-                      <p className="text-xs font-bold text-gray-900 mb-3 flex items-center gap-2">
-                        Your Query
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-gray-800 leading-relaxed">
+                        Best shipment option for exporting 500kg of cotton
+                        t-shirt (100% cotton, knitted) from Tirupur, India to
+                        Dubai, UAE by air. Include HS code, duty, incentives,
+                        and total landed cost.
                       </p>
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                        <div className="flex items-start gap-3">
-                          <div className="w-9 h-9 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
-                            <FiMap className="text-blue-500 text-base" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-gray-800 leading-relaxed">
-                              Best shipment option for exporting 500kg of cotton
-                              t-shirt (100% cotton, knitted) from Tirupur, India to
-                              Dubai, UAE by air. Include HS code, duty, incentives,
-                              and total landed cost.
-                            </p>
-                            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-xs font-medium  text-gray-400">
-                              <span className="">
-                                Query ID:{" "}
-                                <span className="t">
-                                  {" "}
-                                  AIQ-2025-04-24-000123
-                                </span>{" "}
-                              </span>
-                              <span>• 24 Apr 2025, 09:25 AM</span>
-                              <span>• User: Arjun Soni</span>
-                            </div>
-                          </div>
-                          <button className="flex-shrink-0 flex items-center text-xs gap-1 border border-gray-200 bg-white text-gray-500 text-[10px] px-2 py-1 rounded-md hover:bg-gray-50">
-                            <FiCopy size={14} /> Copy Query
-                          </button>
-                        </div>
+                      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 text-xs font-medium  text-gray-400">
+                        <span className="">
+                          Query ID:{" "}
+                          <span className="t">
+                            {" "}
+                            AIQ-2025-04-24-000123
+                          </span>{" "}
+                        </span>
+                        <span>• 24 Apr 2025, 09:25 AM</span>
+                        <span>• User: Arjun Soni</span>
                       </div>
                     </div>
-    
-                    <div className="bg-white rounded-xl border border-gray-200 p-4">
-                      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-                        <p className="text-xs sm:text-sm  font-bold text-gray-900 flex items-center gap-2">
-                          <FiStar className="text-teal-500 text-base" /> AI Recommended Summary
-                        </p>
-                        <div className="flex gap-3">
-                          <button className="flex items-center  gap-1 text-xs text-blue-500 font-medium">
-                            <FiDatabase size={12} /> Data Sources (6)
-                          </button>
-                          <button className="flex items-center gap-1 text-xs font-medium text-gray-400">
-                            <FiAlertCircle size={12} /> Disclaimer
-                          </button>
-                        </div>
-                      </div>
-    
-                      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-                        {recCards.map((card, i) => (
+                    <button className="flex-shrink-0 flex items-center text-xs gap-1 border border-gray-200 bg-white text-gray-500 text-[10px] px-2 py-1 rounded-md hover:bg-gray-50">
+                      <FiCopy size={14} /> Copy Query
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+                  <p className="text-xs sm:text-sm  font-bold text-gray-900 flex items-center gap-2">
+                    <FiStar className="text-teal-500 text-base" /> AI Recommended Summary
+                  </p>
+                  <div className="flex gap-3">
+                    <button className="flex items-center  gap-1 text-xs text-blue-500 font-medium">
+                      <FiDatabase size={12} /> Data Sources (6)
+                    </button>
+                    <button className="flex items-center gap-1 text-xs font-medium text-gray-400">
+                      <FiAlertCircle size={12} /> Disclaimer
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                  {recCards.map((card, i) => (
+                    <div
+                      key={i}
+                      className="bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-col"
+                    >
+                      <p className="text-xs text-[#222222] font-medium mb-1">
+                        {card.label}
+                      </p>
+                      {card.route ? (
+                        <>
+                          <p className="text-[11px] font-bold text-gray-800 mb-0.5">
+                            Route
+                          </p>
+                          <p className="text-sm font-bold text-gray-900 mb-2">
+                            {card.route}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p
+                            className={`text-base font-bold mb-1 ${card.mainColor || "text-gray-900"
+                              }`}
+                          >
+                            {card.main}
+                          </p>
+                          <p className="text-xs font-medium  text-gray-500 mb-2 leading-tight">
+                            {card.sub}
+                          </p>
+                        </>
+                      )}
+                      <div className="flex flex-col gap-1 flex-1">
+                        {card.rows.map(([k, v], j) => (
                           <div
-                            key={i}
-                            className="bg-gray-50 border border-gray-200 rounded-xl p-3 flex flex-col"
+                            key={j}
+                            className="flex justify-between text-xs"
                           >
-                            <p className="text-xs text-[#222222] font-medium mb-1">
-                              {card.label}
-                            </p>
-                            {card.route ? (
-                              <>
-                                <p className="text-[11px] font-bold text-gray-800 mb-0.5">
-                                  Route
-                                </p>
-                                <p className="text-sm font-bold text-gray-900 mb-2">
-                                  {card.route}
-                                </p>
-                              </>
-                            ) : (
-                              <>
-                                <p
-                                  className={`text-base font-bold mb-1 ${
-                                    card.mainColor || "text-gray-900"
-                                  }`}
-                                >
-                                  {card.main}
-                                </p>
-                                <p className="text-xs font-medium  text-gray-500 mb-2 leading-tight">
-                                  {card.sub}
-                                </p>
-                              </>
-                            )}
-                            <div className="flex flex-col gap-1 flex-1">
-                              {card.rows.map(([k, v], j) => (
-                                <div
-                                  key={j}
-                                  className="flex justify-between text-xs"
-                                >
-                                  <span className="text-gray-500 text-xs font-medium">
-                                    {k}
-                                  </span>
-                                  <span className="text-gray-800   text-xs font-medium">
-                                    {v}
-                                  </span>
-                                </div>
-                              ))}
-                              {card.freightCost && (
-                                <p className="text-base font-bold text-gray-900 mt-1">
-                                  {card.freightCost}
-                                </p>
-                              )}
-                            </div>
-                            <button className="text-teal-500 text-xs  font-medium text-left mt-2 hover:underline">
-                              {card.link}
-                            </button>
-                            <button className="mt-2 w-full border border-teal-500 text-teal-500 text-xs    font-semibold py-1.5 rounded-lg hover:bg-teal-50">
-                              Create Shipment from this Result
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-    
-                    <div className="bg-white rounded-xl border border-gray-200 p-4">
-                      <p className="text-sm  font-bold text-gray-900 mb-3 flex items-center gap-2">
-                        <FiClipboard className="text-teal-500 text-base" /> Detailed AI Analysis
-                      </p>
-    
-                      <div className="flex overflow-x-auto border-b border-gray-200 mb-5 sm:mb-8 gap-1 pb-0">
-                        {analysisTabs.map((tab) => (
-                          <button
-                            key={tab}
-                            onClick={() => setAnalysisTab(tab)}
-                            className={`px-3 py-2 text-xs font-bold  whitespace-nowrap border-b-2 -mb-px transition-colors
-                            ${
-                              analysisTab === tab
-                                ? "border-teal-500 text-teal-500"
-                                : "border-transparent text-gray-500 hover:text-gray-700"
-                            }`}
-                          >
-                            {tab}
-                          </button>
-                        ))}
-                      </div>
-  
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
-                        <div>
-                          {content.left.map(([k, v], i) => (
-                            <div
-                              key={i}
-                              className="flex justify-between space-y-2 py-2 border-b border-gray-100 last:border-0 text-xs"
-                            >
-                              <span className="text-gray-500  font-medium text-xs">
-                                {k}
-                              </span>
-    
-                              <span
-                                className={`font-medium text-xs text-right max-w-[55%] ${
-                                  k === "Total Landed Cost" ||
-                                  k === "Total Incentive"
-                                    ? "text-teal-600"
-                                    : "text-gray-800"
-                                }`}
-                              >
-                                {v}
-                              </span>
-                            </div>
-                          ))}
-    
-                          <button className="mt-3 xl:mb-16 text-xs font-semibold text-blue-600 hover:text-blue-700">
-                            {content.tariffLink}
-                          </button>
-    
-                        
-                        </div>
-    
-                        <div className="space-y-5">
-                          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
-                            <p className="flex items-center gap-1.5 text-sm font-bold text-emerald-800 mb-2">
-                              <FiStar size={12} className="text-emerald-500" />
-                              AI Insight
-                            </p>
-    
-                            <p className="text-xs font-normal text-emerald-900 leading-relaxed">
-                              {content.insight}
-                            </p>
-                          </div>
-    
-                          <div className="bg-[#DBDBDB] border border-gray-200 rounded-lg p-3">
-                            <p className="flex items-center gap-1.5 t text-sm font-bold text-gray-700 mb-2">
-                              <FiClipboard size={12} />
-                              Assumptions
-                            </p>
-    
-                            <p className="text-xs font-normal text-gray-600 leading-relaxed">
-                              {content.assumption}
-                            </p>
-                          </div>
-    
-                          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                            <p className="flex items-center gap-1.5 text-sm font-bold text-orange-700 mb-2">
-                              <FiAlertCircle size={12} />
-                              Disclaimer
-                            </p>
-    
-                            <p className="text-xs font-normal text-orange-800 leading-relaxed">
-                              {content.disclaimer}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-    
-                  <div className="flex flex-col gap-4">
-                    <div className="bg-white rounded-xl border border-gray-200 p-4">
-                      <p className="text-sm sm:text-base font-bold text-gray-900 mb-3">
-                        Result Summary
-                      </p>
-                      {resultSummary.map(
-                        (
-                          {
-                            icon: Icon,
-                            label,
-                            value,
-                            iconColor,
-                            small,
-                            valueColor,
-                          },
-                          i,
-                        ) => (
-                          <div
-                            key={i}
-                            className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0 text-xs font-medium"
-                          >
-                            <div
-                              className={`flex items-center text-xs font-medium gap-2 text-gray-500`}
-                            >
-                              <Icon size={14} className={iconColor} /> {label}
-                            </div>
-                            <span
-                              className={`font-medium text-right max-w-[50%] ${
-                                valueColor || "text-gray-900"
-                              } ${small ? "text-xs font-medium " : "text-xs font-medium"}`}
-                            >
-                              {value}
+                            <span className="text-gray-500 text-xs font-medium">
+                              {k}
+                            </span>
+                            <span className="text-gray-800   text-xs font-medium">
+                              {v}
                             </span>
                           </div>
-                        ),
-                      )}
-                      <button className="mt-3 w-full bg-[#0D9488] text-white text-sm   font-semibold py-2.5 rounded-xl">
+                        ))}
+                        {card.freightCost && (
+                          <p className="text-base font-bold text-gray-900 mt-1">
+                            {card.freightCost}
+                          </p>
+                        )}
+                      </div>
+                      <button className="text-teal-500 text-xs  font-medium text-left mt-2 hover:underline">
+                        {card.link}
+                      </button>
+                      <button onClick={() => {
+                        setShipment("shipment")
+                        setActiveTab("")
+                      }} className="mt-2 w-full border border-teal-500 text-teal-500 text-xs    font-semibold py-1.5 rounded-lg hover:bg-teal-50">
                         Create Shipment from this Result
                       </button>
                     </div>
-    
-                    <div className="bg-white rounded-xl border border-gray-200 p-4">
-                      <p className="text-sm  font-bold   text-gray-900 mb-3">
-                        Report Information
-                      </p>
-                      {[
-                        ["Report ID", "AIR-2025-04-24-000123"],
-                        ["Generated On", "24 Apr 2025, 09:25 AM"],
-                        ["Generated By", "Arjun Soni"],
-                        ["Plan", "Pro Plan"],
-                        ["AI Model Version", "v2.1.0"],
-                      ].map(([k, v]) => (
-                        <div
-                          key={k}
-                          className="flex justify-between py-1.5 text-[11px]"
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="text-sm  font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <FiClipboard className="text-teal-500 text-base" /> Detailed AI Analysis
+                </p>
+
+                <div className="flex overflow-x-auto border-b border-gray-200 mb-5 sm:mb-8 gap-1 pb-0">
+                  {analysisTabs.map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setAnalysisTab(tab)}
+                      className={`px-3 py-2 text-xs font-bold  whitespace-nowrap border-b-2 -mb-px transition-colors
+                            ${analysisTab === tab
+                          ? "border-teal-500 text-teal-500"
+                          : "border-transparent text-gray-500 hover:text-gray-700"
+                        }`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
+                  <div>
+                    {content.left.map(([k, v], i) => (
+                      <div
+                        key={i}
+                        className="flex justify-between space-y-2 py-2 border-b border-gray-100 last:border-0 text-xs"
+                      >
+                        <span className="text-gray-500  font-medium text-xs">
+                          {k}
+                        </span>
+
+                        <span
+                          className={`font-medium text-xs text-right max-w-[55%] ${k === "Total Landed Cost" ||
+                              k === "Total Incentive"
+                              ? "text-teal-600"
+                              : "text-gray-800"
+                            }`}
                         >
-                          <span className="text-gray-500 text-xs  font-medium">
-                            {k}
-                          </span>
-                          <span className="text-gray-800  text-xs font-medium">
-                            {v}
-                          </span>
-                        </div>
-                      ))}
-                      <button className="mt-3 w-full flex items-center justify-center gap-2 border text-sm  border-gray-200 bg-white text-gray-700 t s font-medium py-2 rounded-lg hover:bg-gray-50">
-                        <FiDownload size={13} /> Download Report (PDF)
-                      </button>
-                    </div>
-    
-                    <div className="bg-white rounded-xl border border-gray-200 p-4">
-                      <p className="text-sm font-bold text-gray-900 mb-3">
-                        Save & Share
+                          {v}
+                        </span>
+                      </div>
+                    ))}
+
+                    <button className="mt-3 xl:mb-16 text-xs font-semibold text-blue-600 hover:text-blue-700">
+                      {content.tariffLink}
+                    </button>
+
+
+                  </div>
+
+                  <div className="space-y-5">
+                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3">
+                      <p className="flex items-center gap-1.5 text-sm font-bold text-emerald-800 mb-2">
+                        <FiStar size={12} className="text-emerald-500" />
+                        AI Insight
                       </p>
-                      <div className="grid grid-cols-1 gap-2 pz">
-                       
-                        <button className="flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-sm font-medium py-2 rounded-lg hover:bg-gray-50">
-                          <FiShare2 size={16} /> Share Report
-                        </button>
-                         <button className="flex items-center justify-center whitespace-nowrap  gap-1.5 border border-gray-200 bg-white text-gray-700 text-sm font-medium py-2 rounded-lg hover:bg-gray-50">
-                          <FiBookmark size={16} /> Save  Reports
-                        </button>
-                      </div>
+
+                      <p className="text-xs font-normal text-emerald-900 leading-relaxed">
+                        {content.insight}
+                      </p>
                     </div>
-    
-                    <div className="bg-white rounded-xl border border-gray-200 p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-sm  font-bold text-gray-900">
-                          Audit Log (This Query)
-                        </p>
-                        <button className="text-teal-500 text-xs font-medium hover:underline">
-                          View All
-                        </button>
-                      </div>
-                      {auditLog.map((entry, i) => (
-                        <div
-                          key={i}
-                          className="flex  gap-2 py-1.5 border-b border-gray-100 last:border-0"
-                        >
-                          <span
-                            className={`w-2 h-2 rounded-full bg-green-500 flex-shrink-0 mt-1`}
-                          />
-                          
-                          <span className=" flex-1 text-xs font-medium   text-gray-600">
-                            {entry.text}
-                          </span>
-                          <span className="text-xs text-left text-gray-400 whitespace-nowrap">
-                            {entry.time}
-                          </span>
-                        </div>
-                      ))}
+
+                    <div className="bg-[#DBDBDB] border border-gray-200 rounded-lg p-3">
+                      <p className="flex items-center gap-1.5 t text-sm font-bold text-gray-700 mb-2">
+                        <FiClipboard size={12} />
+                        Assumptions
+                      </p>
+
+                      <p className="text-xs font-normal text-gray-600 leading-relaxed">
+                        {content.assumption}
+                      </p>
+                    </div>
+
+                    <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                      <p className="flex items-center gap-1.5 text-sm font-bold text-orange-700 mb-2">
+                        <FiAlertCircle size={12} />
+                        Disclaimer
+                      </p>
+
+                      <p className="text-xs font-normal text-orange-800 leading-relaxed">
+                        {content.disclaimer}
+                      </p>
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-3">
-                  <div className="bg-white  flex flex-col justify-center gap-10 rounded-xl border border-gray-200  px-3 py-4">
-                    <div className=' flex flex-row items-center justify-between'>
-                       <h3 className="text-xs  font-bold text-gray-900 ">
-                      Data Sources Used
-                    </h3>
-                      <button className=" text-teal-500 text-xs  font-medium hover:underline">
-                      View All Sources
-                    </button>
-                   </div>
-                   
-    
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                      <div className="flex items-center gap-2  text-gray-700">
-                        <FiDatabase size={14} />
-                        DGFT (India)
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="text-sm sm:text-base font-bold text-gray-900 mb-3">
+                  Result Summary
+                </p>
+                {resultSummary.map(
+                  (
+                    {
+                      icon: Icon,
+                      label,
+                      value,
+                      iconColor,
+                      small,
+                      valueColor,
+                    },
+                    i,
+                  ) => (
+                    <div
+                      key={i}
+                      className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0 text-xs font-medium"
+                    >
+                      <div
+                        className={`flex items-center text-xs font-medium gap-2 text-gray-500`}
+                      >
+                        <Icon size={14} className={iconColor} /> {label}
                       </div>
-    
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <FiDatabase size={14} />
-                        ICEGATE
-                      </div>
-    
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <FiDatabase size={14} />
-                        Shipping Lines
-                      </div>
-    
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <FiDatabase size={14} />
-                        Customs (UAE)
-                      </div>
-    
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <FiDatabase size={14} />
-                        Trade APIs
-                      </div>
-    
-                      <div className="flex items-center gap-2 text-gray-700">
-                        <FiDatabase size={14} />
-                        Market Data
-                      </div>
-                    </div>
-    
-                  
-                  </div>
-    
-                  <div className="bg-white rounded-xl border border-gray-200 p-4">
-                    <h3 className="text-xs  font-bold text-gray-900 mb-4">
-                      Connected To Live Data
-                    </h3>
-    
-                    <p className="text-xs  text-[#64748B] leading-relaxed mb-4">
-                      All modules are connected to backend systems and databases for
-                      real-time, accurate information.
-                    </p>
-    
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5    b0">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                      <span className="text-xs sm:text-sm font-medium text-emerald-700">
-                        Connected
+                      <span
+                        className={`font-medium text-right max-w-[50%] ${valueColor || "text-gray-900"
+                          } ${small ? "text-xs font-medium " : "text-xs font-medium"}`}
+                      >
+                        {value}
                       </span>
                     </div>
-                  </div>
-    
-                  <div className="bg-white flex rounded-xl border border-gray-200 px-4">
+                  ),
+                )}
+                <button onClick={() => {
+                  setShipment("shipment")
+                  setActiveTab("")
+                }} className="mt-3 w-full bg-[#0D9488] text-white text-sm   font-semibold py-2.5 rounded-xl">
+                  Create Shipment from this Result
+                </button>
+              </div>
 
-                    <NeedHelp mobile={"+91 22 1234 5678"} para={" Our trade experts are here to help you."} heading={"Need help ?"}  />
-                  
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="text-sm  font-bold   text-gray-900 mb-3">
+                  Report Information
+                </p>
+                {[
+                  ["Report ID", "AIR-2025-04-24-000123"],
+                  ["Generated On", "24 Apr 2025, 09:25 AM"],
+                  ["Generated By", "Arjun Soni"],
+                  ["Plan", "Pro Plan"],
+                  ["AI Model Version", "v2.1.0"],
+                ].map(([k, v]) => (
+                  <div
+                    key={k}
+                    className="flex justify-between py-1.5 text-[11px]"
+                  >
+                    <span className="text-gray-500 text-xs  font-medium">
+                      {k}
+                    </span>
+                    <span className="text-gray-800  text-xs font-medium">
+                      {v}
+                    </span>
                   </div>
-                
+                ))}
+                <button onClick={() => setDownloadReport(true)} className="mt-3 w-full flex items-center justify-center gap-2 border text-sm  border-gray-200 bg-white text-gray-700 t s font-medium py-2 rounded-lg hover:bg-gray-50">
+                  <FiDownload size={13} /> Download Report (PDF)
+                </button>
+              </div>
+
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <p className="text-sm font-bold text-gray-900 mb-3">
+                  Save & Share
+                </p>
+                <div className="grid grid-cols-1 gap-2 pz">
+
+                  <button onClick={() => setShareReport(true)} className="flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-sm font-medium py-2 rounded-lg hover:bg-gray-50">
+                    <FiShare2 size={16} /> Share Report
+                  </button>
+                  <button onClick={() => setSaveReport(true)} className="flex items-center justify-center whitespace-nowrap  gap-1.5 border border-gray-200 bg-white text-gray-700 text-sm font-medium py-2 rounded-lg hover:bg-gray-50">
+                    <FiBookmark size={16} /> Save  Reports
+                  </button>
                 </div>
-              </main>
+              </div>
 
-               <div className='] fixed right-5 bottom-5'>
-                 <img src={chat} />
-               </div>
-       </div>
+              <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm  font-bold text-gray-900">
+                    Audit Log (This Query)
+                  </p>
+                  <button className="text-teal-500 text-xs font-medium hover:underline">
+                    View All
+                  </button>
+                </div>
+                {auditLog.map((entry, i) => (
+                  <div
+                    key={i}
+                    className="flex  gap-2 py-1.5 border-b border-gray-100 last:border-0"
+                  >
+                    <span
+                      className={`w-2 h-2 rounded-full bg-green-500 flex-shrink-0 mt-1`}
+                    />
+
+                    <span className=" flex-1 text-xs font-medium   text-gray-600">
+                      {entry.text}
+                    </span>
+                    <span className="text-xs text-left text-gray-400 whitespace-nowrap">
+                      {entry.time}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-3">
+            <div className="bg-white  flex flex-col justify-center gap-10 rounded-xl border border-gray-200  px-3 py-4">
+              <div className=' flex flex-row items-center justify-between'>
+                <h3 className="text-xs  font-bold text-gray-900 ">
+                  Data Sources Used
+                </h3>
+                <button onClick={() => setDataSource(true)} className=" text-teal-500 text-xs  font-medium hover:underline">
+                  View All Sources
+                </button>
+              </div>
+
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+                <div className="flex items-center gap-2  text-gray-700">
+                  <FiDatabase size={14} />
+                  DGFT (India)
+                </div>
+
+                <div className="flex items-center gap-2 text-gray-700">
+                  <FiDatabase size={14} />
+                  ICEGATE
+                </div>
+
+                <div className="flex items-center gap-2 text-gray-700">
+                  <FiDatabase size={14} />
+                  Shipping Lines
+                </div>
+
+                <div className="flex items-center gap-2 text-gray-700">
+                  <FiDatabase size={14} />
+                  Customs (UAE)
+                </div>
+
+                <div className="flex items-center gap-2 text-gray-700">
+                  <FiDatabase size={14} />
+                  Trade APIs
+                </div>
+
+                <div className="flex items-center gap-2 text-gray-700">
+                  <FiDatabase size={14} />
+                  Market Data
+                </div>
+              </div>
+
+
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <h3 className="text-xs  font-bold text-gray-900 mb-4">
+                Connected To Live Data
+              </h3>
+
+              <p className="text-xs  text-[#64748B] leading-relaxed mb-4">
+                All modules are connected to backend systems and databases for
+                real-time, accurate information.
+              </p>
+
+              <div className="inline-flex items-center gap-2 px-3 py-1.5    b0">
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span className="text-xs sm:text-sm font-medium text-emerald-700">
+                  Connected
+                </span>
+              </div>
+            </div>
+
+            <div className="bg-white flex rounded-xl border border-gray-200 px-4">
+
+              <NeedHelp mobile={"+91 22 1234 5678"} para={" Our trade experts are here to help you."} heading={"Need help ?"} />
+
+            </div>
+
+          </div>
+        </main></div>)}
+
+      <div className='fixed right-5 bottom-5'>
+        <img src={chat} />
+      </div>
+
+      {shipment === "shipment" && (
+        <div>
+          <Shipment setActiveTab={setActiveTab} setShipment={setShipment} currentTab={"AI CargoMate Assistant"} />
+        </div>
+      )
+      }
+
+      {downloadReport && (<DownloadReportModal onClose={() => setDownloadReport(false)} />)}
+      {newQuery && (<NewQueryModal onClose={() => setNewQuery(false)} />)}
+      {saveReportPopup && (<SaveReportPopup onClose={() => setSaveReportPopup(false)} />)}
+      {saveReport && (<SaveReportModal onClose={() => setSaveReport(false)} />)}
+      {shareReport && (<ShareReportModal onClose={() => setShareReport(false)} />)}
+      {dataSource && (<DataSourceModal onClose={() => setDataSource(false)} />)}
+
+    </div>
   )
 }
 

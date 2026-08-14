@@ -137,6 +137,7 @@ const Navbar = ({show, setShow}) => {
           >
             <div className="flex flex-col px-6 py-4 gap-4 text-[15px] font-medium border-t border-gray-100">
               {navItems.map((item, index) => (
+                <button key={index}> 
               <NavLink
                 to={item.path}
                 onClick={() => setMobileMenuOpen(false)}
@@ -152,7 +153,7 @@ const Navbar = ({show, setShow}) => {
                     {item.name}
                   </span>
                 )}
-              </NavLink> ))}              
+              </NavLink></button> ))}              
 
 
               <div className="flex flex-col items-start gap-3 mb-1 ">
