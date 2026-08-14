@@ -573,7 +573,9 @@ export default function B2BDashboard() {
           {activeTab === "Export Intelligence" &&  (
            <ExportIntelligence   />
           )}
-
+          {activeTab === "HS code Intelligence" &&  (
+           <HSCodeIntelligence   />
+          )}
 
          {activeTab === "Shipment Database" && (
            <ShipmentDatabase   />
