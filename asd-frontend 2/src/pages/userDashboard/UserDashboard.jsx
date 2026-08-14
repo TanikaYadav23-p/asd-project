@@ -884,18 +884,17 @@ export default function UserDashboard() {
         {activeTab === "Shipment Planning" && <ShipmentPlanning />}
         {activeTab === "Freight Calculator" && <FreightCalculator />}
 
-        {activeTab === "Saved Reports" && <SavedReports />}
-
+        {/* {activeTab === "Saved Reports" && <SavedReports />}
         {activeTab === "Audit Logs" && <AuditLogs />}
-        {activeTab === "Analytics & Trends" && <AnalyticsTrends />}
+        {activeTab === "Analytics & Trends" && <AnalyticsTrends />} */}
 
       
        
 
         {activeTab === "Subscription" && <Subscription />}
-        {activeTab === "Notifications" && <NotificationDashboard />}
+        {/* {activeTab === "Notifications" && <NotificationDashboard />}
         {activeTab === "Help & Support" && <HelpSupportDashboard />}
-        {activeTab === "Profile Settings" && <ProfileSettingsDashboard />}
+        {activeTab === "Profile Settings" && <ProfileSettingsDashboard />} */}
 
         {activeTab === "UpgradePlan" && <UpgradePlan />}
 
