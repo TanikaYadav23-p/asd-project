@@ -185,27 +185,15 @@ import graph from '../../assets/icon/graph.png'
 import file from '../../assets/icon/file.png'
 import android from '../../assets/icon/android.png'
 
-import BuyerIntelligence from "./BuyerIntelligence";
 import HSCodeIntelligence from "./HsCodeIntelligence";
-import SupplierDiscovery from "./SupplierDiscovery";
-import TradeMap from "./TradeMap";
-import MarketTrends from "./MarketTrends";
-import CompetitorTracking from "./CompetitorTracking";
-import CompanyIntelligence from "./CompanyIntelligence";
-import TradeOpportunity from "./TradeOpportunity";
 import RiskAnalysis from "./RiskAnalysis";
 import AiInsight from "./AiInsight";
 import Shipment from "./Shipment";
 import Documents from "./Documents";
-
-import Supplier from "./Suppliers";
-import Buyer from "./Buyer";
-import Contrast from "./Contract";
 import Invoices from "./Invoice";
 import Reports from "./Reports";
 import AlertNotification from "./AlertNotification";
 import Settings from "./Settings";
-import UserRoles from "./UserRoles";
 
 import AuditsLogs from "./AuditsLogs";
 import SelectRangeModal from "../../components/b2bComponent/SelectDateRange";
@@ -319,13 +307,6 @@ const sidebarSections = [
       { icon: FiHash, label: "Export Intelligence" },
       { icon: SquareChartGantt , label: "HS code Intelligence" },
       { icon: FiMap, label: "Shipment Database" },
-         { icon: FiTruck, label: "Supplier Discovery" },
-      { icon: FaUsers, label: "Buyer Intelligence" },
-      { icon: FiMap, label: "Trade Map" },
-         { icon: LuChartNoAxesCombined , label: "Market Trends" },
-      { icon: Binoculars , label: "Competitor Tracking" ,  badge: "New", badgeColor: "bg-[#7C3AED]", },
-      { icon: FiMap, label: "Company Intelligence",  badge: "New", badgeColor: "bg-[#7C3AED]", },
-         { icon: LuLightbulb  , label: "Trade Opportunity Engine",  badge: "New", badgeColor: "bg-[#7C3AED]", },
       { icon: FiTruck, label: "Risk Analysis" },
       { icon: FaRobot , label: "Ai Insight" },
     ],
@@ -334,10 +315,7 @@ const sidebarSections = [
     title: "Manage",
     items: [
       { icon: FiPackage, label: "Shipments" },
-      { icon: FiRadio, label: "Supplier" },
       { icon: FiFileText, label: "Documents" },
-      { icon: FiUsers, label: "Buyers" },
-           { icon: TbContract, label: "Contracts" },
       { icon: FiFileText, label: "Invoices" },
     
     ],
@@ -369,8 +347,6 @@ const sidebarSections = [
         badge: "Pro Plan",
         badgeColor: "bg-[#00BBA7]",
       },
-     
-      { icon: FiHelpCircle, label: "User Roles" },
       { icon: FiSettings, label: "Audit Logs" },
     ],
   },
@@ -597,46 +573,13 @@ export default function B2BDashboard() {
           {activeTab === "Export Intelligence" &&  (
            <ExportIntelligence   />
           )}
-
+          {activeTab === "HS code Intelligence" &&  (
+           <HSCodeIntelligence   />
+          )}
 
          {activeTab === "Shipment Database" && (
            <ShipmentDatabase   />
           )}
-
-      
-           {activeTab === "HS code Intelligence" && (
-             <HSCodeIntelligence />
-          )}
-
-           {activeTab === "Supplier Discovery" && (
-             <SupplierDiscovery />
-          )}
-
-          {activeTab === "Buyer Intelligence" && (
-                      <BuyerIntelligence />
-            )}
-
-
-            {activeTab === "Trade Map" && (
-              <TradeMap />
-            )}
-
-                {activeTab === "Market Trends" && (
-                <MarketTrends />
-              )}
-
-
-            {activeTab === "Competitor Tracking" && (
-              <CompetitorTracking />
-            )}
-
-             {activeTab === "Company Intelligence" && (
-              <CompanyIntelligence />
-            )}
-
-             {activeTab === "Trade Opportunity Engine" && (
-              <TradeOpportunity />
-            )}
 
              {activeTab === "Risk Analysis" && (
               <RiskAnalysis />
@@ -654,21 +597,6 @@ export default function B2BDashboard() {
               <Documents />
             )}
 
-             {activeTab === "Supplier" && (
-              <Supplier   />
-            )}
-
-
-          
-             {activeTab === "Buyers" && (
-              <Buyer />
-            )}
-
-             {activeTab === "Contracts" && (
-              <Contrast />
-            )} 
-
-
               {activeTab === "Invoices" && (
               <Invoices />
             )}  
@@ -685,11 +613,7 @@ export default function B2BDashboard() {
             
               {activeTab === "Settings" && (
               <Settings />
-            )}  
-
-                {activeTab === "User Roles" && (
-              <UserRoles />
-            )}  
+            )}   
                 {activeTab === "Audit Logs" && (
               <AuditsLogs />
             )}  
@@ -720,21 +644,7 @@ export default function B2BDashboard() {
         { id: 5, title: 'Avg. Shipment Value (INR)', value: '₹14.26 L', growth: '▲ 9.4% vs last month', isPositive: true, color: '#F59E0B', bgColor: '#FFFBEB', icon: 'avgVal' },
         { id: 6, title: 'Avg. Lead Time (Days)', value: '18.6', growth: '▼ 3.2% vs last month', isPositive: false, color: '#EF4444', bgColor: '#FEF2F2', icon: 'leadTime' },
     ],
-    tabs: ['Overview', 'Business Performance', 'Partner Analysis', 'Trade Insights', 'Market Intelligence'],
-    globalOverview: [
-        { region: 'Asia', value: '4,125', percent: '47.2%', dot: 'bg-[#3B82F6]' },
-        { region: 'Europe', value: '1,842', percent: '21.1%', dot: 'bg-[#10B981]' },
-        { region: 'North America', value: '1,258', percent: '14.4%', dot: 'bg-[#8B5CF6]' },
-        { region: 'South America', value: '892', percent: '10.2%', dot: 'bg-[#F97316]' },
-        { region: 'Africa', value: '627', percent: '7.1%', dot: 'bg-[#0D9488]' },
-    ],
-    tradingPartners: [
-        { name: 'ABC Exports Pvt. Ltd.', ship: '1,245', val: '₹152.45 Cr', growth: '18.9%' },
-        { name: 'Global Supplies Inc.', ship: '1,021', val: '₹128.75 Cr', growth: '15.2%' },
-        { name: 'Omega Traders', ship: '812', val: '₹98.60 Cr', growth: '11.4%' },
-        { name: 'Shree Impex', ship: '708', val: '₹86.20 Cr', growth: '9.8%' },
-        { name: 'Prime Logistics LLP', ship: '462', val: '₹54.30 Cr', growth: '7.6%' },
-    ],
+   
     operationalInsightPills: [
         { title: 'On-Time Shipments', value: '92.6%', growth: '▲ 3.5%', color: '#0D9488', bgColor: '#F0FDFA', icon: 'ontime' },
         { title: 'Shipment Accuracy', value: '96.3%', growth: '▲ 2.7%', color: '#EF4444', bgColor: '#FEF2F2', icon: 'accuracy' },
@@ -742,12 +652,7 @@ export default function B2BDashboard() {
         { title: 'Repeat Business Rate', value: '78.4%', growth: '▲ 4.2%', color: '#059669', bgColor: '#ECFDF5', icon: 'repeat' },
         { title: 'Customer Satisfaction', value: '4.6/5', growth: '▲ 0.3', color: '#F43F5E', bgColor: '#FFF1F2', icon: 'satisfaction' },
     ],
-    trackingServices: [
-        { title: 'Competitor Tracking', isNew: true, desc: 'Track competitors\' trade activities product-wise or company-wise.', bullets: ['Monitor competitor shipments', 'Analyze market share & trends'], action: 'Go to Competitor Tracking', color: '#8B5CF6', bgColor: '#F5F3FF', icon: 'tracking' },
-        { title: 'Company Intelligence', isNew: true, desc: 'Get detailed insights on importer / exporter companies and trade performance.', bullets: ['Company profiles & financials', 'Trade history & performance'], action: 'Go to Company Intelligence', color: '#2563EB', bgColor: '#EFF6FF', icon: 'intel' },
-        { title: 'Trade Opportunity Engine', isNew: true, desc: 'Discover real trade opportunities with complete business insights.', bullets: ['Demand & trend analysis', 'HS Code & import/export data'], action: 'Explore Opportunities', isSolid: true, color: '#0D9488', bgColor: '#F0FDFA', icon: 'bulb' },
-        { title: 'AI Insights', isNew: false, desc: 'AI-powered insights to help you make smarter trade decisions.', bullets: ['Market trend predictions', 'Risk alerts & recommendations'], action: 'View AI Insights', isBorderAction: true, color: '#EF4444', bgColor: '#FEF2F2', icon: 'brain' },
-    ],
+    
     importedProducts: [
         { hs: '85', name: 'Electrical Machinery & Equipment', shipments: '2,145', value: '₹320.45 Cr', share: '25.7%' },
         { hs: '84', name: 'Machinery & Mechanical Appliances', shipments: '1,896', value: '₹285.70 Cr', share: '22.9%' },
@@ -1045,7 +950,7 @@ useEffect(() => {
   fetchTopExportDestinations();
   fetchRecentShipments();
 }, []);
-const tabs= ['Overview', 'Business Performance', 'Partner Analysis', 'Trade Insights', 'Market Intelligence'];
+
  const topMetrics= [
         { id: 1, title: 'Total Shipments', value: dashboardMetrics.totalShipments?.toLocaleString() || "0", growth: '', isPositive: true, color: '#3B82F6', bgColor: '#F0F6FF', icon: 'shipment' },
         { id: 2, title: 'Total Trade Value (INR)', value: dashboardMetrics.totalTradeValue ? `₹${(dashboardMetrics.totalTradeValue / 10000000).toFixed(2)} Cr` : '₹0.00 Cr', growth: '', isPositive: true, color: '#10B981', bgColor: '#ECFDF5', icon: 'trade' },
@@ -1060,12 +965,6 @@ const tabs= ['Overview', 'Business Performance', 'Partner Analysis', 'Trade Insi
         { title: 'Document Compliance', value: `${operationalInsights.documentCompliance || 0}%`, growth: '', color: '#2563EB', bgColor: '#EFF6FF', icon: 'compliance' },
         { title: 'Repeat Business Rate', value: `${operationalInsights.repeatBusinessRate || 0}%`, growth: '', color: '#059669', bgColor: '#ECFDF5', icon: 'repeat' },
         { title: 'Verified Buyer Rate', value: `${operationalInsights.verifiedBuyerRate || 0}%`, growth: '', color: '#F43F5E', bgColor: '#FFF1F2', icon: 'satisfaction' },
-    ];
-   const trackingServices= [
-        { title: 'Competitor Tracking', isNew: true, desc: 'Track competitors\' trade activities product-wise or company-wise.', bullets: ['Monitor competitor shipments', 'Analyze market share & trends'], action: 'Go to Competitor Tracking',path: '/', color: '#8B5CF6', bgColor: '#F5F3FF', icon: 'tracking' },
-        { title: 'Company Intelligence', isNew: true, desc: 'Get detailed insights on importer / exporter companies and trade performance.', bullets: ['Company profiles & financials', 'Trade history & performance'], action: 'Go to Company Intelligence', color: '#2563EB', bgColor: '#EFF6FF', icon: 'intel' },
-        { title: 'Trade Opportunity Engine', isNew: true, desc: 'Discover real trade opportunities with complete business insights.', bullets: ['Demand & trend analysis', 'HS Code & import/export data'], action: 'Explore Opportunities', isSolid: true, color: '#0D9488', bgColor: '#F0FDFA', icon: 'bulb' },
-        { title: 'AI Insights', isNew: false, desc: 'AI-powered insights to help you make smarter trade decisions.', bullets: ['Market trend predictions', 'Risk alerts & recommendations'], action: 'View AI Insights', isBorderAction: true, color: '#EF4444', bgColor: '#FEF2F2', icon: 'brain' },
     ];
     const geoUrl =
   "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
@@ -1259,134 +1158,7 @@ const regionMarkers = {
               );
             })}
           </div>
-
-            {/* --- TABS --- */}
-            <div className="flex border-b border-[#E2E8F0] gap-6 mb-6 overflow-x-auto text-sm font-bold text-[#64748B] whitespace-nowrap scrollbar-none">
-                {tabs.map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`pb-3 transition relative ${activeTab === tab ? 'text-[#0D9488]' : 'hover:text-[#334155]'}`}
-                    >
-                        {tab}
-                        {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#0D9488] rounded-t-full" />}
-                    </button>
-                ))}
-            </div>
-            {/* --- DATA PANELS ROW 1 --- */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-
-                {/* Global Trade Card */}
-                <div className="bg-white border border-[#E2E8F0] rounded-3xl p-6 shadow-sm">
-                    <h3 className="text-sm font-bold text-[#0F172A] mb-5 tracking-tight">Global Trade Overview</h3>
-                    <div className="flex flex-row items-center justify-between gap-4">
-                        <div className="space-y-3 shrink-0">
-                            {globalTradeOverview.map(item => (
-                                <div key={item.region} className="flex flex-col">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2.5 h-2.5 rounded-full" style ={{backgroundColor: regionMarkers[item.region]?.color || "#94A3B8",}} />
-                                        <span className="text-xs font-bold text-[#334155] tracking-tight">{item.region}</span>
-                                    </div>
-                                    <span className="text-[11px] text-[#64748B] ml-4 font-semibold mt-0.5">{item.value.toLocaleString()} ({item.percent})</span>
-                                </div>
-                            ))}
-                        </div>
-                        <DynamicPlottingMap />
-                    </div>
-                </div>
-
-                {/* Trend Card */}
-                <div className="bg-white border border-[#E2E8F0] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-bold text-[#0F172A] tracking-tight">Trade Value Trend (INR)</h3>
-                            <button className="text-[11px] font-bold border border-[#E2E8F0] rounded-lg bg-white px-2.5 py-1.5 text-[#64748B] flex items-center gap-1.5 shadow-sm">
-                                {selectedTrend} <DynamicIcon type="chevron" color="#94A3B8" />
-                            </button>
-                        </div>
-                        <div className="flex items-baseline gap-2 mb-4">
-                            <span className="text-xl font-black text-[#0F172A]"> ₹{((tradeValueTrend[tradeValueTrend.length - 1]?.tradeValue || 0) / 10000000).toFixed(2)} Cr</span>
-                            <span className="text-[10px] font-bold text-[#10B981] bg-[#ECFDF5] px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
-                                 ▲{" "}{tradeValueTrend.length > 1? (((tradeValueTrend[tradeValueTrend.length - 1].tradeValue -
-                                 tradeValueTrend[tradeValueTrend.length - 2].tradeValue) /
-                                 tradeValueTrend[tradeValueTrend.length - 2].tradeValue) *100).toFixed(1): "0"}%<span className="text-[#64748B] font-normal">vs last month</span>
-                            </span>
-                        </div>
-<div className="w-full h-[170px]">
-  <ResponsiveContainer width="100%" height="100%">
-    <AreaChart data={tradeValueTrend}>
-      <defs>
-        <linearGradient id="fillTrade" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="5%" stopColor="#14B8A6" stopOpacity={0.3}/>
-          <stop offset="95%" stopColor="#14B8A6" stopOpacity={0}/>
-        </linearGradient>
-      </defs>
-
-      <CartesianGrid vertical={false} stroke="#F1F5F9" />
-
-      <XAxis
-        dataKey="_id"
-        tick={{ fontSize: 11 }}
-        axisLine={false}
-        tickLine={false}
-      />
-
-      <Tooltip />
-
-      <Area
-        type="monotone"
-        dataKey="tradeValue"
-        stroke="#14B8A6"
-        strokeWidth={3}
-        fill="url(#fillTrade)"
-      />
-    </AreaChart>
-  </ResponsiveContainer>
-</div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 mt-3">
-                        <div className="bg-[#F8FAFC] border border-[#F1F5F9] rounded-2xl p-3 text-center">
-                            <div className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Export Value (INR)</div>
-                            <div className="text-sm font-black text-[#334155] mt-0.5"> ₹{((tradeValueTrend[tradeValueTrend.length - 1]?.tradeValue || 0) / 10000000).toFixed(2)} Cr</div>
-                        </div>
-                        <div className="bg-[#F8FAFC] border border-[#F1F5F9] rounded-2xl p-3 text-center">
-                            <div className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Export Shipments</div>
-                            <div className="text-sm font-black text-[#334155] mt-0.5"> {(tradeValueTrend[tradeValueTrend.length - 1]?.shipments || 0).toLocaleString()}</div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Top Trading Partners */}
-                <div className="bg-white border border-[#E2E8F0] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <h3 className="text-sm font-bold text-[#0F172A] mb-4 tracking-tight">Top Trading Partners</h3>
-                        <div className="overflow-x-auto w-full">
-                            <table className="w-full text-left text-xs">
-                                <thead>
-                                    <tr className="text-[#94A3B8] border-b border-[#F1F5F9] font-bold">
-                                        <th className="pb-2 font-medium">Partner</th>
-                                        <th className="pb-2 text-center font-medium">Shipments</th>
-                                        <th className="pb-2 text-right font-medium">TradeValue</th>
-                                        <th className="pb-2 text-right font-medium">Country</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-[#F8FAFC] font-bold text-[#334155]">
-                                    {topTradingPartners.map(p => (
-                                        <tr key={p._id} className="hover:bg-[#F8FAFC]/50 transition-colors">
-                                            <td className="py-2.5 font-extrabold text-[#0F172A] truncate max-w-[120px] tracking-tight">{p._id}</td>
-                                            <td className="py-2.5 text-center text-[#64748B] font-semibold"> {p.shipments?.toLocaleString() || "0"}</td>
-                                            <td className="py-2.5 text-right font-black text-[#334155]"> ₹{(p.tradeValue / 10000000).toFixed(2)} Cr</td>
-                                            <td className="py-2.5 text-right text-[#10B981] font-bold">{p.country || "-"}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <button className="text-xs font-bold text-[#2563EB] text-center mt-3 pt-3 border-t border-[#F1F5F9]">View All Partners →</button>
-                </div>
-            </div>
-
+           
             {/* --- INSIGHT PILLS --- */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
                 {operationalInsightPills.map(item => (
@@ -1403,36 +1175,7 @@ const regionMarkers = {
                 ))}
             </div>
 
-            {/* --- TRACKING SERVICES MODULES --- */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                {trackingServices.map(service => (
-                    <div key={service.title} className="bg-white border border-[#E2E8F0] rounded-3xl p-6 shadow-sm flex flex-col justify-between hover:shadow transition-shadow">
-                        <div>
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="p-2.5 rounded-2xl" style={{ backgroundColor: service.bgColor }}>
-                                    <DynamicIcon type={service.icon} color={service.color} size="5" />
-                                </div>
-                                {service.isNew && (
-                                    <span className="text-[9px] font-extrabold tracking-wider text-white bg-[#A855F7] px-2 py-0.5 rounded-md uppercase">New</span>
-                                )}
-                            </div>
-                            <h4 className="text-sm font-extrabold text-[#0F172A] tracking-tight">{service.title}</h4>
-                            <p className="text-[11px] text-[#64748B] font-medium mt-1.5 leading-relaxed">{service.desc}</p>
-                            <ul className="mt-3.5 space-y-1.5">
-                                {service.bullets.map(bullet => (
-                                    <li key={bullet} className="text-[11px] font-bold text-[#0D9488] flex items-center gap-2">✓ {bullet}</li>
-                                ))}
-                            </ul>
-                        </div>
-                        <button className={`w-full text-xs font-bold py-2.5 rounded-xl mt-5 transition text-center ${service.isSolid ? 'bg-[#0D9488] text-white hover:bg-[#0F766E]' :
-                                service.isBorderAction ? 'border border-[#EF4444] text-[#EF4444] hover:bg-[#FEF2F2]' :
-                                    'bg-[#F1F5F9] text-[#334155] hover:bg-[#E2E8F0]'}`}>
-                            {service.action} →
-                        </button>
-                    </div>
-                ))}
-            </div>
-
+           
             {/* --- DATA PANELS ROW 2 (Imported, Exported, & Recent Shipments Tables) --- */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
