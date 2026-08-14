@@ -19,3 +19,12 @@
 .light-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
+
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

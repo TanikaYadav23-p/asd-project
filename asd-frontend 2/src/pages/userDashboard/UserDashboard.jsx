@@ -808,7 +808,7 @@ export default function UserDashboard() {
                   }
                 }}
                 className={`px-4 py-2 text-[0.7rem] font-normal cursor-pointer uppercase tracking-widest
-                    ${section.items.length === 0 && activeTab === "Dashboard" ? " bg-teal-500 rounded-r-lg text-white" : "text-white hover:bg-teal-500 rounded-r-lg hover:text-white"}
+                    ${section.items.length === 0 && activeTab === "AI CargoMate Assistant" ? " bg-teal-500 rounded-r-lg text-white" : "text-white hover:bg-teal-500 rounded-r-lg hover:text-white"}
                   `}
               >
                 {section.title}

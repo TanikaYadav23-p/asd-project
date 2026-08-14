@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Clock, FileText, FileClock, Timer, Search } from "lucide-react";
-
+import {
+  FaPlus, FaMagnifyingGlass, FaXmark, FaChevronDown,
+  FaStar, FaTruck, FaBoxOpen, FaWarehouse, FaFileContract
+} from "react-icons/fa6";
+import ReviewShipment from "./ReviewShipment"
 const initialRequests = [
   {
     id: "REQ-2505-0012",
@@ -24,13 +28,13 @@ const stats = [
   { icon: Clock, iconColor: "text-green-500", bg: "bg-green-50", label: "Avg. Review time", value: "3.5 Hours", sub: "Approx." },
 ];
 
-export default function PendingReviews() {
+export default function PendingReviews({setPendingReview,}) {
   const [requests, setRequests] = useState(
     Array.from({ length: 8 }, (_, i) => ({ ...initialRequests[0], key: i }))
   );
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState(requests[0]);
-
+  const [reviews, setReviews] = useState(false)
   const filtered = requests.filter((r) => {
     const term = search.toLowerCase();
     return (
@@ -47,8 +51,9 @@ export default function PendingReviews() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-3 gap-4">
+   <><div className="w-full  mx-auto grid lg:grid-cols-3 gap-4">
       <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+        <div className="flex  justify-between items-start"> 
         <div className="flex items-center gap-3 mb-6">
           <div className="w-11 h-11 rounded-full bg-yellow-50 flex items-center justify-center shrink-0">
             <Clock className="w-5 h-5 text-yellow-500" />
@@ -57,6 +62,8 @@ export default function PendingReviews() {
             <h2 className="text-xl font-bold text-gray-900">Pending Reviews</h2>
             <p className="text-sm text-gray-500">Review and verify shipment requests submitted by users.</p>
           </div>
+        </div>
+        <div> <button onClick={() => setPendingReview(false)}> <FaXmark className="text-lg"/></button></div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
@@ -118,7 +125,8 @@ export default function PendingReviews() {
                 <span className="text-xs text-left text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full w-fit">
                   {r.status}
                 </span>
-                <button className="text-xs border border-gray-300 rounded-lg px-3 py-1.5">
+                <button onClick={() => {  
+                  setReviews(true)}} className="text-xs border border-gray-300 rounded-lg px-3 py-1.5">
                   Review
                 </button>
               </div>
@@ -191,6 +199,14 @@ export default function PendingReviews() {
           </div>
         </div>
       )}
+
+      
+      
     </div>
+     {reviews && 
+       <ReviewShipment onClose={() => setReviews(false)} />
+       }
+
+     </> 
   );
 }

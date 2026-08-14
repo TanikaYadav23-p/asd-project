@@ -7,6 +7,7 @@ import {
 } from "react-icons/fa6";
 import { useEffect } from "react";
 import API from "../../api/axios";
+import PendingReview  from "./PendingReview"
 
 const Toggle = ({ checked, onChange }) => (
   <div onClick={() => onChange(!checked)}
@@ -456,6 +457,7 @@ function NewBookingPage({ onCancel }) {
 export default function Shipment() {
   const [showBooking, setShowBooking] = useState(false);
   const [shipments, setShipments] = useState([]);
+  const [pendingReview, setPendingReview ] = useState(false)
   const [stats, setStats] = useState({
     total: 0,
     inTransit: 0,
@@ -469,7 +471,7 @@ export default function Shipment() {
   const [modeFilter, setModeFilter] = useState("All Modes");
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-  
+   
 
   const statsData = [
     { label: "Total Shipment", value: stats.total },
@@ -538,114 +540,125 @@ export default function Shipment() {
         <NewBookingPage onCancel={() => setShowBooking(false)} />
       ) : (
         <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
-      <div className="max-w-7xl mx-auto">
+           {!pendingReview && ( <div className="max-w-7xl mx-auto">
 
-        <div className="flex items-start justify-between mb-5 gap-3">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Shipment</h1>
-            <p className="text-[0.8rem] sm:text-sm text-gray-400 mt-1">Government schemes list, benefits and policies</p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-2">
-            <button className="flex items-center gap-2 border border-gray-200 text-gray-600 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
-              <FaDownload className="text-xs" /> Export CSV
-            </button>
-            <button onClick={() => setShowBooking(true)}
-              className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors whitespace-nowrap">
-              New Booking
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
-          {statsData.map(s => (
-            <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 sm:p-4 flex flex-col gap-2">
-              <p className="text-xs text-gray-400">{s.label}</p>
-              <div className="flex items-center justify-between">
-                <p className={`text-lg sm:text-2xl font-bold ${s.color}`}>{s.value}</p>
-                {s.icon}
+              <div className="flex items-start justify-between mb-5 gap-3">
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Shipment</h1>
+                  <p className="text-[0.8rem] sm:text-sm text-gray-400 mt-1">Government schemes list, benefits and policies</p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button onClick={() => {setPendingReview(true)
+                        
+                  }} className="flex items-center gap-2 border border-teal-500 text-gray-600 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
+                    Request
+                  </button>
+                  <button className="flex items-center gap-2 border border-gray-200 text-gray-600 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
+                    <FaDownload className="text-xs" /> Export CSV
+                  </button>
+                  <button onClick={() => setShowBooking(true)}
+                    className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors whitespace-nowrap">
+                    New Booking
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5">
-          <div className="flex flex-col sm:flex-row gap-3 mb-2">
-            <div className="flex items-center border border-gray-200 rounded-xl px-3 py-2.5 gap-2 focus-within:border-teal-500 transition-all flex-1">
-              <FaMagnifyingGlass className="text-gray-400 text-sm flex-shrink-0" />
-              <input className="flex-1 text-sm outline-none bg-transparent" placeholder="Search by SB No., exporter"
-                value={search} onChange={e => handleSearch(e.target.value)} />
-            </div>
-            <select className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 bg-white transition-all"
-              value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}>
-              <option>All Status</option><option>In Transit</option><option>Delivered</option><option>Pending Docs</option><option>Custom Hold</option>
-            </select>
-            <select className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 bg-white transition-all"
-              value={modeFilter} onChange={e => { setModeFilter(e.target.value); setPage(1); }}>
-              <option>All Modes</option><option>Sea FCL</option><option>Air</option><option>Land</option>
-            </select>
-            <select className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 bg-white transition-all">
-              <option>This Month</option><option>Last Month</option><option>This Year</option>
-            </select>
-          </div>
-          {searchError && <p className="text-xs text-red-500 mb-2 px-1">{searchError}</p>}
-
-          <div className="overflow-x-auto mt-4">
-            <table className="w-full min-w-[700px]">
-              <thead>
-                <tr className="bg-teal-50">
-                  {["SB / AWB NO.", "EXPORTER", "ORIGIN - DESTINATION", "HS CODE", "CARRIER", "MODE", "ETD/ETA", "STATUS", "ACTIONS"].map((h, i) => (
-                    <th key={h} className={`text-left text-xs font-semibold text-teal-600 px-3 py-3 ${i === 0 ? "rounded-l-xl" : ""} ${i === 8 ? "rounded-r-xl" : ""}`}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {pageItems.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center text-sm text-gray-400 py-10">No results found</td></tr>
-                ) : pageItems.map(row => (
-                  <tr key={row._id} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
-                    <td className="px-3 py-3">
-                      <p className="text-xs font-semibold text-gray-800">{row.sbNumber}</p>
-                      <p className="text-xs text-gray-400">{row.bol}</p>
-                    </td>
-                    <td className="px-3 py-3">
-                      <p className="text-xs font-semibold text-gray-800">{row.exporter?.companyName}</p>
-                      <p className="text-xs text-gray-400">{row.exporter?.iecNumber}</p>
-                    </td>
-                    <td className="text-xs text-gray-600 px-3 py-3">{row.route?.origin}</td>
-                    <td className="px-3 py-3"><span className="text-xs bg-teal-100 text-teal-600 px-2 py-1 rounded-lg font-medium">{row.cargo?.hsCode?.hsCode}</span></td>
-                    <td className="text-xs text-gray-700 px-3 py-3">{row.route?.carrier}</td>
-                    <td className="text-xs text-gray-700 px-3 py-3">{row.route?.mode}</td>
-                    <td className="px-3 py-3 flex">
-                      <p className="text-xs text-gray-600">{new Date(row.etd).toLocaleDateString()}</p>
-                      <p className="text-xs text-gray-400">{new Date(row.eta).toLocaleDateString()}</p>
-                    </td>
-                    <td className="px-3 py-3"><span className={`text-xs px-2.5 py-1 rounded-lg font-medium whitespace-nowrap ${statusStyle(row.status)}`}>{row.status}</span></td>
-                    <td className="px-3 py-3"><button className="text-teal-500 hover:text-teal-600 text-xs font-medium">View</button></td>
-                  </tr>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+                {statsData.map(s => (
+                  <div key={s.label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 sm:p-4 flex flex-col gap-2">
+                    <p className="text-xs text-gray-400">{s.label}</p>
+                    <div className="flex items-center justify-between">
+                      <p className={`text-lg sm:text-2xl font-bold ${s.color}`}>{s.value}</p>
+                      {s.icon}
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4">
-            <p className="text-xs text-gray-400">Showing 1 to {pageItems.length} of {filtered.length.toLocaleString()},999 result</p>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors">
-                <FaChevronLeft className="text-xs" />
-              </button>
-              {Array.from({ length: Math.min(totalPages, 3) }, (_, i) => i + 1).map(p => (
-                <button key={p} onClick={() => setPage(p)}
-                  className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${page === p ? "bg-teal-500 text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>{p}</button>
-              ))}
-              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors">
-                <FaChevronRight className="text-xs" />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-5">
+                <div className="flex flex-col sm:flex-row gap-3 mb-2">
+                  <div className="flex items-center border border-gray-200 rounded-xl px-3 py-2.5 gap-2 focus-within:border-teal-500 transition-all flex-1">
+                    <FaMagnifyingGlass className="text-gray-400 text-sm flex-shrink-0" />
+                    <input className="flex-1 text-sm outline-none bg-transparent" placeholder="Search by SB No., exporter"
+                      value={search} onChange={e => handleSearch(e.target.value)} />
+                  </div>
+                  <select className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 bg-white transition-all"
+                    value={statusFilter} onChange={e => { setStatusFilter(e.target.value); setPage(1); }}>
+                    <option>All Status</option><option>In Transit</option><option>Delivered</option><option>Pending Docs</option><option>Custom Hold</option>
+                  </select>
+                  <select className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 bg-white transition-all"
+                    value={modeFilter} onChange={e => { setModeFilter(e.target.value); setPage(1); }}>
+                    <option>All Modes</option><option>Sea FCL</option><option>Air</option><option>Land</option>
+                  </select>
+                  <select className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 bg-white transition-all">
+                    <option>This Month</option><option>Last Month</option><option>This Year</option>
+                  </select>
+                </div>
+                {searchError && <p className="text-xs text-red-500 mb-2 px-1">{searchError}</p>}
+
+                <div className="overflow-x-auto mt-4">
+                  <table className="w-full min-w-[700px]">
+                    <thead>
+                      <tr className="bg-teal-50">
+                        {["SB / AWB NO.", "EXPORTER", "ORIGIN - DESTINATION", "HS CODE", "CARRIER", "MODE", "ETD/ETA", "STATUS", "ACTIONS"].map((h, i) => (
+                          <th key={h} className={`text-left text-xs font-semibold text-teal-600 px-3 py-3 ${i === 0 ? "rounded-l-xl" : ""} ${i === 8 ? "rounded-r-xl" : ""}`}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pageItems.length === 0 ? (
+                        <tr><td colSpan={9} className="text-center text-sm text-gray-400 py-10">No results found</td></tr>
+                      ) : pageItems.map(row => (
+                        <tr key={row._id} className="border-t border-gray-100 hover:bg-gray-50 transition-colors">
+                          <td className="px-3 py-3">
+                            <p className="text-xs font-semibold text-gray-800">{row.sbNumber}</p>
+                            <p className="text-xs text-gray-400">{row.bol}</p>
+                          </td>
+                          <td className="px-3 py-3">
+                            <p className="text-xs font-semibold text-gray-800">{row.exporter?.companyName}</p>
+                            <p className="text-xs text-gray-400">{row.exporter?.iecNumber}</p>
+                          </td>
+                          <td className="text-xs text-gray-600 px-3 py-3">{row.route?.origin}</td>
+                          <td className="px-3 py-3"><span className="text-xs bg-teal-100 text-teal-600 px-2 py-1 rounded-lg font-medium">{row.cargo?.hsCode?.hsCode}</span></td>
+                          <td className="text-xs text-gray-700 px-3 py-3">{row.route?.carrier}</td>
+                          <td className="text-xs text-gray-700 px-3 py-3">{row.route?.mode}</td>
+                          <td className="px-3 py-3 flex">
+                            <p className="text-xs text-gray-600">{new Date(row.etd).toLocaleDateString()}</p>
+                            <p className="text-xs text-gray-400">{new Date(row.eta).toLocaleDateString()}</p>
+                          </td>
+                          <td className="px-3 py-3"><span className={`text-xs px-2.5 py-1 rounded-lg font-medium whitespace-nowrap ${statusStyle(row.status)}`}>{row.status}</span></td>
+                          <td className="px-3 py-3"><button className="text-teal-500 hover:text-teal-600 text-xs font-medium">View</button></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4">
+                  <p className="text-xs text-gray-400">Showing 1 to {pageItems.length} of {filtered.length.toLocaleString()},999 result</p>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                      className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors">
+                      <FaChevronLeft className="text-xs" />
+                    </button>
+                    {Array.from({ length: Math.min(totalPages, 3) }, (_, i) => i + 1).map(p => (
+                      <button key={p} onClick={() => setPage(p)}
+                        className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${page === p ? "bg-teal-500 text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>{p}</button>
+                    ))}
+                    <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                      className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors">
+                      <FaChevronRight className="text-xs" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div> )}
+
+      {pendingReview && (
+        <PendingReview setPendingReview={setPendingReview}  />
+      )}
+
+      
     </div>
     
   )}

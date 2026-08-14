@@ -7,7 +7,10 @@ import {
   Share2,
   RefreshCcw,
 } from "lucide-react";
-
+import {
+  FaPlus, FaMagnifyingGlass, FaXmark, FaChevronDown,
+  FaStar, FaTruck, FaBoxOpen, FaWarehouse, FaFileContract
+} from "react-icons/fa6";
 const tabs = ["Shipment Details", "Parties & Contacts", "Cargo Details", "Documents", "Charges"];
 
 const actions = [
@@ -18,7 +21,7 @@ const actions = [
   { icon: RefreshCcw, bg: "bg-blue-50", color: "text-blue-500", title: "Change Status", desc: "Change Shipment status." },
 ];
 
-export default function ReviewShipment() {
+export default function ReviewShipment({onClose}) {
   const [activeTab, setActiveTab] = useState("Shipment Details");
 
   const handleProceed = async () => {
@@ -28,8 +31,12 @@ export default function ReviewShipment() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-3 gap-4">
-      <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+  <div className="w-full max-w-7xl max-h-[90vh] overflow-y-auto hide-scrollbar">
+    
+    <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-[70%_30%] gap-4">
+      <div className=" bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+        <div className="flex justify-between items-start"> 
         <div className="flex items-center gap-3 mb-4">
           <div className="w-11 h-11 rounded-full bg-purple-50 flex items-center justify-center shrink-0">
             <MapPin className="w-5 h-5 text-purple-600" />
@@ -38,6 +45,8 @@ export default function ReviewShipment() {
             <h2 className="text-xl font-bold text-gray-900">Review Shipment</h2>
             <p className="text-sm text-gray-500">Review, edit shipment details, create invoice or share quotation.</p>
           </div>
+        </div>
+            <div> <button onClick={onClose}> <FaXmark className="text-lg"/></button></div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 border border-gray-100 rounded-lg p-3 mb-4 text-xs">
@@ -309,6 +318,9 @@ export default function ReviewShipment() {
           </button>
         </div>
       </div>
+    </div>
+
+    </div>
     </div>
   );
 }
