@@ -27,6 +27,7 @@ export default function HsCodeSearch({ onClose }) {
   };
 
   return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"> 
     <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center shrink-0">
@@ -76,6 +77,6 @@ export default function HsCodeSearch({ onClose }) {
           Close
         </button>
       </div>
-    </div>
+    </div></div>
   );
 }

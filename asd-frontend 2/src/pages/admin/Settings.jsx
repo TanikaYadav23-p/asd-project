@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { FiSettings, FiGlobe, FiMail, FiCreditCard, FiFileText, FiSliders, FiShield, FiMoreHorizontal, FiBell, FiMessageCircle, FiX, FiUpload, FiUser } from "react-icons/fi";
+import { FiSettings, FiGlobe, FiMail, FiCreditCard, FiFileText, FiSliders, FiShield, FiMoreHorizontal, FiBell, FiMessageCircle, FiX, FiUpload, FiUser,  FiCheckCircle,
+  FiCpu,
+  FiTruck,
+   } from "react-icons/fi";
 import { FaFacebook, FaGoogle } from "react-icons/fa";
 
 import { FiChevronDown } from "react-icons/fi";
@@ -12,8 +15,10 @@ import { FiRotateCcw } from "react-icons/fi";
 
 import API from "../../api/axios";
 import { toast } from "react-toastify";
-
- 
+import ComplienceRiskSetting from "./ComplienceRiskSetting"
+import AIAnalysisSettings from "./AiAnalysisSetting";
+import ShipmentFormSettings from "./ShipmentFormSettings";
+import DocumentsUploadSetting from "./DocumentsUploadSetting";
 
 const tabs = [
   { id: "general", label: "General Settings", icon: <FiSettings /> },
@@ -28,6 +33,26 @@ const tabs = [
   { id: "misc", label: "Miscellaneous", icon: <FiMoreHorizontal /> },
   { id: "notice", label: "Notice Board Setting", icon: <FiBell /> },
   { id: "whatsapp", label: "Whatsapp API", icon: <FiMessageCircle /> },
+    {
+    id: "compliance",
+    label: "Compliance & Risk Settings",
+    icon: <FiCheckCircle />,
+  },
+  {
+    id: "ai-analysis",
+    label: "AI Analysis Setting",
+    icon: <FiCpu />,
+  },
+  {
+    id: "shipment",
+    label: "Shipment Form Settings",
+    icon: <FiTruck />,
+  },
+  {
+    id: "document-upload",
+    label: "Documents Upload Setting",
+    icon: <FiUpload />,
+  },
 ];
 
 function Toggle({ checked, onChange }) {
@@ -2425,8 +2450,10 @@ export default function Settings() {
       case "notice": return <NoticeBoardSetting />; 
       case "whatsapp": return <WhatsAppAPI />; 
 
-
-
+      case "compliance": return <ComplienceRiskSetting />;
+      case "ai-analysis": return <AIAnalysisSettings />;
+      case "shipment": return <ShipmentFormSettings />; 
+      case "document-upload": return <DocumentsUploadSetting />; 
 
       
 

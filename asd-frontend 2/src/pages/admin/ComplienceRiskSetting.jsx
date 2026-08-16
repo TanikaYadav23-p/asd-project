@@ -74,7 +74,7 @@ export default function ComplianceRiskSettings() {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-2xl   p-4 sm:p-6">
       <div className="flex items-center justify-between mb-6 gap-3">
         <div>
           <h2 className="text-lg sm:text-xl font-bold text-gray-900 uppercase">

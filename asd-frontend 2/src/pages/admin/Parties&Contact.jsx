@@ -37,7 +37,7 @@ export default function PartiesContact() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6"
+      className="w-full max-w-2xl mx-auto bg-white rounded-2xl  p-4 sm:p-6"
     >
       <div className="flex items-center justify-between mb-6 gap-3">
         <div className="flex items-center gap-3 min-w-0">

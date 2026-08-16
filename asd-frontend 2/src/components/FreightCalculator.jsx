@@ -1,5 +1,5 @@
-import ModalShell from "./ModalShell";
-import Field from "./Field";
+import ModalShell from "./userComponent/ModalShell";
+import Field from "./userComponent/Field";
 import {
   FiX,
   FiTruck,
@@ -63,15 +63,15 @@ import {
   FiMessageSquare,
 } from "react-icons/fi";
 
-export default function IncentivesCheckerModal({ onClose }) {
 
+export default function FreightCalculatorModal({ onClose }) {
   return (
-    <ModalShell width="max-w-lg">
+    <ModalShell width="max-w-lg ">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <FiGift size={20} className="text-gray-900" />
+          <FiTruck size={20} className="text-gray-900" />
           <h2 className="text-lg sm:text-xl font-bold text-gray-900">
-            Incentives Checker
+            Freight Calculator
           </h2>
         </div>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
@@ -79,39 +79,42 @@ export default function IncentivesCheckerModal({ onClose }) {
         </button>
       </div>
       <p className="text-sm text-gray-500 mt-1">
-        Check available incentives for your shipment.
+        Calculate estimated freight cost for your shipment.
       </p>
  
       <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Origin" placeholder="Enter origin city or port" />
         <Field label="Destination" placeholder="Enter destination city or port" />
         <Field label="Select shipment type" placeholder="Select shipment type" select />
-        <Field label="Cargo Type" placeholder="Select cargo type" select />
-        <Field label="Weight" placeholder="Enter weight in kg" />
-        <Field label="Value (₹)" placeholder="Enter value" select />
+        <Field label="Weight (kg)" placeholder="Enter weight in kg" />
+        <Field label="Volume (CBM)" placeholder="Enter volume in CBM" />
+        <Field label="Incoterms" placeholder="Select Incoterms" select />
       </div>
  
       <div className="mt-5 bg-cyan-50 rounded-xl p-4 flex items-center justify-between">
         <div>
           <p className="text-sm font-semibold text-teal-600">
-            Eligible Incentives
+            Estimated Freight Cost
           </p>
           <p className="text-2xl font-bold text-gray-900 mt-1">₹0.00</p>
         </div>
-        <FiGift size={32} className="text-gray-400" />
+        <FiTruck size={32} className="text-gray-400" />
       </div>
  
       <div className="mt-3 flex items-start gap-1.5 text-xs text-gray-500">
         <FiInfo size={14} className="mt-0.5 shrink-0" />
-        <p>Incentives are subject to terms and conditions.</p>
+        <p>
+          This is an estimated cost. Actual cost may vary based on carrier and
+          market conditions.
+        </p>
       </div>
  
       <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
         <button onClick={onClose} className="order-2 sm:order-1 border border-gray-200 text-gray-700 text-sm font-medium px-5 py-2.5 rounded-full">
           Cancel
         </button>
-        <button  className="order-1 sm:order-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium px-5 py-2.5 rounded-full">
-          Check Incentives
+        <button className="order-1 sm:order-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium px-5 py-2.5 rounded-full">
+          Calculate
         </button>
       </div>
     </ModalShell>

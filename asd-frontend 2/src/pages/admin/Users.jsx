@@ -36,6 +36,7 @@ import {
     FiLock,
     FiSend,
   } from "react-icons/fi";
+  import { LuUsers, LuSearch, LuChevronDown, LuActivity } from "react-icons/lu";
   import {
     FaTrash,
     FaCheck,
@@ -82,7 +83,38 @@ import {
   import { FaCalendarAlt, FaTimes } from "react-icons/fa";
   import API from "../../api/axios";
 import { toast } from "react-toastify";
-  
+
+  const stats = [
+  { label: "Total Users", value: "1,248", sub: "12.5% from last 30 days", subColor: "text-green-600", iconColor: "text-green-400" },
+  { label: "Active Users", value: "1,048", sub: "84.0% of total users", subColor: "text-green-600", iconColor: "text-green-400" },
+  { label: "Inactive Users", value: "200", sub: "16.0% of total users", subColor: "text-red-500", iconColor: "text-red-400" },
+  { label: "New Users(This week)", value: "48", sub: "20.0% from last week", subColor: "text-purple-500", iconColor: "text-purple-400" },
+];
+
+const initialUsers = [
+  { name: "Arjun Soni", email: "arjunsoni@gmail.com", phone: "1234567890", type: "B2b user", typeColor: "green", company: "example.pvt.ltd", status: "Active", joined: "12 May 2024", lastLogin: "12 May 2024" },
+  { name: "Arjun Soni", email: "arjunsoni@gmail.com", phone: "1234567890", type: "B2b user", typeColor: "green", company: "example.pvt.ltd", status: "Active", joined: "12 May 2024", lastLogin: "12 May 2024" },
+  { name: "Arjun Soni", email: "arjunsoni@gmail.com", phone: "1234567890", type: "B2b user", typeColor: "purple", company: "example.pvt.ltd", status: "Active", joined: "12 May 2024", lastLogin: "12 May 2024" },
+  { name: "Arjun Soni", email: "arjunsoni@gmail.com", phone: "1234567890", type: "B2b user", typeColor: "purple", company: "example.pvt.ltd", status: "Active", joined: "12 May 2024", lastLogin: "12 May 2024" },
+  { name: "Arjun Soni", email: "arjunsoni@gmail.com", phone: "1234567890", type: "Admin", typeColor: "blue", company: "example.pvt.ltd", status: "Active", joined: "12 May 2024", lastLogin: "12 May 2024" },
+];
+ 
+
+const userByType = [
+  { label: "B2B Users", value: "1,248", percent: "52.2%", color: "bg-purple-500" },
+  { label: "B2C Users", value: "1,248", percent: "52.2%", color: "bg-blue-500" },
+  { label: "Admins", value: "1,248", percent: "52.2%", color: "bg-green-500" },
+  { label: "Permission", value: "1,248", percent: "52.2%", color: "bg-gray-300" },
+];
+ 
+const registrationData = [
+  { day: "12 May", value: 55 },
+  { day: "13 May", value: 40 },
+  { day: "14 May", value: 68 },
+  { day: "15 May", value: 30 },
+  { day: "16 May", value: 62 },
+  { day: "17 May", value: 45 },
+];
 
 function DeleteModal({ setDeleteUser, handleDelete }) {
   return (
@@ -464,7 +496,52 @@ function AddUserModal({ setShowModal, setUsers }) {
   );
 }
 
+ 
+function StatCard({ stat }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
+      <div>
+        <p className="text-sm text-gray-500">{stat.label}</p>
+        <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
+        <p className={`text-xs mt-1 ${stat.subColor}`}>{stat.sub}</p>
+      </div>
+      <LuActivity className={stat.iconColor} size={32} strokeWidth={1.5} />
+    </div>
+  );
+}
 
+function DonutRing({ segments, centerValue, centerLabel, onClick }) {
+  let cumulative = 0;
+
+  const gradientParts = segments.map((s) => {
+    const start = cumulative;
+    cumulative += s.percent;
+
+    return `${s.hex} ${start}% ${cumulative}%`;
+  });
+
+  const gradient = `conic-gradient(${gradientParts.join(",")})`;
+
+  return (
+    <div
+      onClick={onClick}
+      className="relative w-32 h-32 min-w-32 min-h-32 aspect-square shrink-0 rounded-full flex items-center justify-center cursor-pointer"
+      style={{
+        background: gradient,
+      }}
+    >
+      <div className="absolute w-10 h-10 min-w-24 min-h-24 aspect-square bg-white rounded-full flex flex-col items-center justify-center">
+        <span className="text-lg font-semibold text-gray-900">
+          {centerValue}
+        </span>
+
+        <span className="text-xs text-gray-500">
+          {centerLabel}
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export default function UsersSection({ setShowNotice }) {
  
@@ -483,6 +560,8 @@ const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
 
   const currentData = users;
+
+  const maxReg = Math.max(...registrationData.map((r) => r.value)); 
 
   useEffect(() => {
     fetchUsers();
@@ -546,6 +625,86 @@ const [loading, setLoading] = useState(false);
         </button>
       </div>
 
+       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {stats.map((s) => (
+          <StatCard key={s.label} stat={s} />
+        ))}
+      </div>
+       
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <p className="text-sm font-medium text-gray-700 mb-4">User by type</p>
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <DonutRing
+              segments={[
+                { hex: "#a855f7", percent: 25 },
+                { hex: "#3b82f6", percent: 25 },
+                { hex: "#22c55e", percent: 25 },
+                { hex: "#e5e7eb", percent: 25 },
+              ]}
+              centerValue="1,248"
+              centerLabel="Total"
+            />
+            <div className="space-y-2 w-full">
+              {userByType.map((t) => (
+                <div key={t.label} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <span className={`w-2 h-2 rounded-full ${t.color}`} />
+                    {t.label}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-900">{t.value}</span>
+                    <span className="text-gray-400">({t.percent})</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+ 
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <p className="text-sm font-medium text-gray-700 mb-4">User Registration</p>
+          <div className="flex items-end justify-between h-40 gap-2">
+            {registrationData.map((r) => (
+              <div key={r.day} className="flex flex-col items-center flex-1 h-full justify-end gap-2">
+                <div
+                  className="w-full max-w-6 bg-green-400 rounded-sm"
+                  style={{ height: `${(r.value / maxReg) * 100}%` }}
+                />
+                <span className="text-[10px] text-gray-400">{r.day}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+ 
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <p className="text-sm font-medium text-gray-700 mb-4">User by Status</p>
+          <div className="flex flex-col items-center gap-4">
+            <DonutRing
+              segments={[
+                { hex: "#22c55e", percent: 84 },
+                { hex: "#ef4444", percent: 16 },
+              ]}
+              centerValue="84%"
+              centerLabel="Active"
+            />
+            <div className="w-full space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <span className="w-2 h-2 rounded-full bg-green-500" /> Active
+                </div>
+                <span className="text-gray-900">1,048 <span className="text-gray-400">84%</span></span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <span className="w-2 h-2 rounded-full bg-red-500" /> Inactive
+                </div>
+                <span className="text-gray-900">200 <span className="text-gray-400">16%</span></span>
+              </div>
+            </div>
+          </div>
+         </div>
+        </div>
       <div className="bg-white rounded-xl shadow p-4">
         <div className="relative mb-4">
           <FiSearch className="absolute left-3 top-3 text-gray-400" />

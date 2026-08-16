@@ -38,7 +38,7 @@ export default function Charges() {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white rounded-2xl shadow-xl">
+    <div className="w-full max-w-3xl mx-auto bg-white rounded-2xl ">
       <div className="flex items-center justify-between gap-3 p-4 sm:p-6 border-b border-gray-100">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center shrink-0">

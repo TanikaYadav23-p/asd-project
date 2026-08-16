@@ -129,6 +129,8 @@ import document from '../../assets/icon/document.png'
 import order from '../../assets/icon/orders.png'
 
 import logo from "../../assets/Images/logo.png";
+import AIModulesBackendScope from "./AiModules";
+
 
 const fabActions = [
   { label: "New Booking", icon: <BsCalendarCheck size={22} className="text-teal-600" /> },
@@ -414,11 +416,12 @@ function CreateNotice({ setShowNotice }) {
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeNav, setActiveNav] = useState("Users");
+  const [activeNav, setActiveNav] = useState("Admin Dashboard");
   const [showNotice, setShowNotice] = useState(false);
   const [showAddPlan, setShowAddPlan] = useState(false);
    const [showBot, setShowBot] = useState(false);
      const [fabOpen, setFabOpen] = useState(false);
+   
   // console.log('ac', activeNav)
   
   const handleFabAction = (label) => {
@@ -874,6 +877,9 @@ export default function AdminDashboard() {
            {activeNav === "Settings" && <Settings/>}
             {showBot && <WhatsappBot showBot={showBot} setShowBot={setShowBot} fabOpen={fabOpen} setFabOpen={setFabOpen}/>  }
 
+
+           <AIModulesBackendScope />
+          
         </main>
       </div>
 
@@ -901,6 +907,8 @@ export default function AdminDashboard() {
           {fabOpen ? <FiX size={22} /> : <FiPlus size={24} />}
         </button>
       </div>
+
+      
     </div>
   );
 }

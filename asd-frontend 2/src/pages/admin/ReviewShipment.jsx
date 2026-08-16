@@ -12,6 +12,11 @@ import {
   FaStar, FaTruck, FaBoxOpen, FaWarehouse, FaFileContract
 } from "react-icons/fa6";
 const tabs = ["Shipment Details", "Parties & Contacts", "Cargo Details", "Documents", "Charges"];
+import PartiesContact from "./Parties&Contact"
+import CargoDetails from "./CargoDetails"
+import Documents from "./Documents"
+import Charges from "./Charges"
+import ShipmentDetails from "./ShipmentDetails"
 
 const actions = [
   { icon: Pencil, bg: "bg-purple-50", color: "text-purple-600", title: "Edit Shipment", desc: "Make changes to shipment details." },
@@ -23,6 +28,7 @@ const actions = [
 
 export default function ReviewShipment({onClose}) {
   const [activeTab, setActiveTab] = useState("Shipment Details");
+  const [viewShipmentDetail, setViewShipmentDetail] = useState(false)
 
   const handleProceed = async () => {
     try {
@@ -31,8 +37,9 @@ export default function ReviewShipment({onClose}) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-  <div className="w-full max-w-7xl max-h-[90vh] overflow-y-auto hide-scrollbar">
+  <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 p-4">
+   {!viewShipmentDetail && (  
+    <div className="w-full max-w-7xl max-h-[90vh] overflow-y-auto hide-scrollbar">
     
     <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-[70%_30%] gap-4">
       <div className=" bg-white rounded-2xl shadow-xl p-4 sm:p-6">
@@ -73,9 +80,9 @@ export default function ReviewShipment({onClose}) {
         </div>
 
         <div className="flex gap-4 overflow-x-auto border-b border-gray-200 mb-4">
-          {tabs.map((tab) => (
+          {tabs.map((tab, i) => (
             <button
-              key={tab}
+              key={i}
               onClick={() => setActiveTab(tab)}
               className={`whitespace-nowrap text-sm pb-2 border-b-2 ${
                 activeTab === tab
@@ -250,6 +257,19 @@ export default function ReviewShipment({onClose}) {
         {activeTab !== "Shipment Details" && (
           <p className="text-sm text-gray-500">{activeTab} content goes here.</p>
         )}
+
+        {activeTab === "Parties & Contacts" && (
+          <PartiesContact />
+        )}
+         {activeTab === "Cargo Details" && (
+          <CargoDetails />
+         )}
+          {activeTab === "Documents" && (
+            <Documents />
+          )}
+           {activeTab === "Charges" && (
+            <Charges />
+           )}                            
       </div>
 
       <div className="space-y-4">
@@ -313,14 +333,19 @@ export default function ReviewShipment({onClose}) {
           </div>
           <p className="text-xs text-gray-500 mt-2">aarav.sharma@gmail.com</p>
           <p className="text-xs text-gray-500 mb-4">+91 74833 65549</p>
-          <button className="w-full py-2.5 rounded-lg border border-gray-300 text-gray-800 text-sm font-medium">
+          <button onClick={() => setViewShipmentDetail(true)} className="w-full py-2.5 rounded-lg border border-gray-300 text-gray-800 text-sm font-medium">
             View Full Details
           </button>
         </div>
       </div>
     </div>
+    </div> )}
 
-    </div>
+    {
+      viewShipmentDetail && (
+          <ShipmentDetails  onClose={() => setViewShipmentDetail(false)}/>
+      )
+    }
     </div>
   );
 }

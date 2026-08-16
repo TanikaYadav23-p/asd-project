@@ -15,6 +15,26 @@ const typeIcon = (type) => {
   return <FaTruck className="text-blue-400 text-xs" />;
 };
 
+ const stats = [
+  { label: "Total Vendors", value: "1,248", sub: "All vendors",  subColor: "text-green-600", iconColor: "text-green-400" },
+  { label: "Active Vendors", value: "1,048", sub: "Active vendors", subColor: "text-green-600", iconColor: "text-green-400" },
+  { label: "Total Shipments", value: "200", sub: "This month", subColor: "text-red-500", iconColor: "text-red-400" },
+  { label: "Active Ratings", value: "48", sub: "Out of 5", subColor: "text-purple-500", iconColor: "text-purple-400" },
+];
+
+function StatCard({ stat }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
+      <div>
+        <p className="text-sm text-gray-500">{stat.label}</p>
+        <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
+        <p className={`text-xs mt-1 ${stat.subColor}`}>{stat.sub}</p>
+      </div>
+      {/* <LuActivity className={stat.iconColor} size={32} strokeWidth={1.5} /> */}
+    </div>
+  );
+}
+
 const initialVendors = Array.from({ length: 6 }, (_, i) => ({
   id: i + 1, 
   name: "Global Logistic Inc.",
@@ -185,6 +205,12 @@ export default function VendorsPartners() {
             <FaPlus className="text-xs" /> Add Vendor
           </button>
         </div>
+
+         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {stats.map((s) => (
+          <StatCard key={s.label} stat={s} />
+        ))}
+      </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="flex items-center border border-gray-200 rounded-xl px-3 py-2.5 gap-2 bg-white focus-within:border-teal-500 transition-all flex-1">

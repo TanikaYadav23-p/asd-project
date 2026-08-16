@@ -8,6 +8,15 @@ import {
   Building2,
   Radar,
 } from "lucide-react";
+import { useState } from "react";
+import HsCodeSearch from "./HsCodeSearch"
+import AiAssistant from "./AiAssistant";
+import FreightCalculator from "../../components/FreightCalculator";
+import AiInsight from "../../components/AiInsight"
+import IncentiveChecker from "../../components/IncentiveChecker";
+
+
+
 
 const modules = [
   {
@@ -38,30 +47,11 @@ const modules = [
     title: "Freight Calculator",
     desc: "Calculate freight costs for multiple routes.",
   },
-  {
-    icon: Truck,
-    color: "text-gray-500",
-    bg: "bg-gray-100",
-    title: "Trade Opportunity engine",
-    desc: "Discover new trade opportunities and markets",
-  },
-  {
-    icon: Building2,
-    color: "text-blue-500",
-    bg: "bg-blue-50",
-    title: "Company Intelligence",
-    desc: "Get insights and financials of companies",
-  },
-  {
-    icon: Radar,
-    color: "text-green-500",
-    bg: "bg-green-50",
-    title: "Competitor Tracking",
-    desc: "Track Competitors and their shipment activities",
-  },
 ];
 
 export default function AIModulesBackendScope() {
+    const [hsCodeSearch, setHsCodeSearch] = useState(false)
+   const [activeModal, setActiveModal] = useState(null);
   return (
     <div className="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6">
       <div className="flex items-center gap-3 mb-6">
@@ -80,7 +70,8 @@ export default function AIModulesBackendScope() {
           return (
             <div
               key={i}
-              className="min-w-[200px] sm:min-w-0 border border-gray-200 rounded-xl p-4 shrink-0"
+                 onClick={() => setActiveModal(i)}
+              className="min-w-[200px] sm:min-w-0 border  border-gray-200  cursor-pointer rounded-xl p-4 shrink-0"
             >
               <div className={`w-9 h-9 rounded-full ${m.bg} flex items-center justify-center mb-3`}>
                 <Icon className={`w-4 h-4 ${m.color}`} />
@@ -91,6 +82,23 @@ export default function AIModulesBackendScope() {
           );
         })}
       </div>
+
+           {
+            activeModal === 0 && (<AiInsight onClose={() => setActiveModal(null)} />)
+           }
+
+           {
+            activeModal === 1 && (<HsCodeSearch onClose={() => setActiveModal(null)} />)
+           }
+
+            {
+            activeModal === 2 && (<IncentiveChecker onClose={() => setActiveModal(null)} />)
+           }
+
+            {
+            activeModal === 3 && (<FreightCalculator onClose={() => setActiveModal(null)} />)
+           }
+
     </div>
   );
 }

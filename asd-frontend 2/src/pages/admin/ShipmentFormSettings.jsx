@@ -76,7 +76,7 @@ export default function ShipmentFormSettings() {
   };
 
   return (
-    <div className="w-full max-w-xl mx-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+    <div className="w-full max-w-xl mx-auto bg-white rounded-2xl  p-4 sm:p-6">
       <div className="flex items-center justify-between mb-4 gap-3">
         <div>
           <h2 className="text-lg sm:text-xl font-bold text-gray-900">Shipment Form Settings</h2>
