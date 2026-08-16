@@ -12,9 +12,9 @@ export const getStatusSummary = () => {
     return API.get("/trade-invoices/status-summary");
 };
 
-export const getValueTrend = () => {
+/*export const getValueTrend = () => {
     return API.get("/trade-invoices/value-trend");
-};
+};*/
 
 export const getRecentInvoices = () => {
     return API.get("/trade-invoices/recent");

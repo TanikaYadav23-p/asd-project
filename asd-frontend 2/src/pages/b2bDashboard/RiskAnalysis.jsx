@@ -254,6 +254,12 @@ export default function RiskAnalysis() {
   const [topRiskHSCodes, setTopRiskHSCodes] = useState([]);
   const [shipmentsAtRisk, setShipmentsAtRisk] = useState([]);
   const [riskFilters, setRiskFilters] = useState({countries: [], riskLevels: [], riskCategories: [], hsCodes: []});
+  const [appliedRiskFilters, setAppliedRiskFilters] = useState({
+  country: "",
+  riskLevel: "",
+  riskCategory: "",
+  hsCode: ""
+});
   const [selectedCountry, setSelectedCountry] = useState("");
   const [selectedRiskLevel, setSelectedRiskLevel] = useState("");
   const [selectedRiskCategory, setSelectedRiskCategory] = useState("");
@@ -357,7 +363,7 @@ export default function RiskAnalysis() {
     }
   };
   const handleApplyFilters = () => {
-    console.log("Selected Filters:", {
+    setAppliedRiskFilters({
      country: selectedCountry,
      riskLevel: selectedRiskLevel,
      riskCategory: selectedRiskCategory,
@@ -369,6 +375,13 @@ export default function RiskAnalysis() {
     setSelectedRiskLevel("");
     setSelectedRiskCategory("");
     setSelectedHSCode("");
+
+    setAppliedRiskFilters({
+    country: "",
+    riskLevel: "",
+    riskCategory: "",
+    hsCode: ""
+  });
   };
 
   useEffect(() => {
@@ -399,6 +412,94 @@ export default function RiskAnalysis() {
         return "#CBD5E1";
     }
   };
+  const filteredShipmentsAtRisk = useMemo(() => {
+  return shipmentsAtRisk.filter((s) => {
+
+    const country =
+      s.shipment?.route?.destinationCountry || s.country || "";
+
+    const riskLevel =
+      s.riskLevel || "";
+
+    const hsCode =
+      s.hsCode?.hsCode ||
+      s.shipment?.cargo?.hsCode?.hsCode ||
+      "";
+
+    const riskCategory =
+      s.riskCategory ||
+      s.riskFactors?.[0] ||
+      "";
+
+    return (
+      (appliedRiskFilters.country === "" ||
+        country === appliedRiskFilters.country) &&
+
+      (appliedRiskFilters.riskLevel === "" ||
+        riskLevel === appliedRiskFilters.riskLevel) &&
+
+      (appliedRiskFilters.riskCategory === "" ||
+        riskCategory === appliedRiskFilters.riskCategory) &&
+
+      (appliedRiskFilters.hsCode === "" ||
+        hsCode === appliedRiskFilters.hsCode)
+    );
+  });
+}, [shipmentsAtRisk, appliedRiskFilters]);
+const filteredRiskDistribution = useMemo(() => {
+  const distribution = {};
+
+  filteredShipmentsAtRisk.forEach((item) => {
+    const level = item.riskLevel || "Unknown";
+
+    distribution[level] = (distribution[level] || 0) + 1;
+  });
+
+  return Object.entries(distribution).map(([riskLevel, count]) => ({
+    _id: riskLevel,
+    count
+  }));
+}, [filteredShipmentsAtRisk]);
+
+const filteredRiskTopCountries = useMemo(() => {
+  const countries = {};
+
+  filteredShipmentsAtRisk.forEach((item) => {
+    const country =
+      item.shipment?.route?.destinationCountry ||
+      item.country ||
+      "";
+
+    if (!country) return;
+
+    if (!countries[country]) {
+      countries[country] = {
+        riskScores: [],
+        alerts: 0
+      };
+    }
+
+    countries[country].riskScores.push(
+      Number(item.riskScore || 0)
+    );
+
+    countries[country].alerts += 1;
+  });
+
+  return Object.entries(countries)
+    .map(([country, data]) => ({
+      _id: country,
+      riskScore:
+        data.riskScores.length > 0
+          ? data.riskScores.reduce((a, b) => a + b, 0) /
+            data.riskScores.length
+          : 0,
+      alerts: data.alerts
+    }))
+    .sort((a, b) => b.riskScore - a.riskScore)
+    .slice(0, 10);
+}, [filteredShipmentsAtRisk]);
+
   const riskLegend = [...new Set(riskMap.map((item) => item.riskLevel).filter(Boolean)),].map((level) => ({ label: level, color: getRiskColor(level),}));
   //const totalCountries = RISK_DISTRIBUTION.reduce((a, b) => a + b.value, 0);
 
@@ -587,8 +688,8 @@ export default function RiskAnalysis() {
               <div className="relative w-[130px] h-[130px] shrink-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={riskDistribution} innerRadius={38} outerRadius={58} dataKey="count" stroke="none">
-                      {riskDistribution.map((entry, index) => (
+                    <Pie data={filteredRiskDistribution} innerRadius={38} outerRadius={58} dataKey="count" stroke="none">
+                      {filteredRiskDistribution.map((entry, index) => (
                         <Cell key={index} fill={getRiskColor(entry._id)} />
                       ))}
                     </Pie>
@@ -596,18 +697,18 @@ export default function RiskAnalysis() {
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <span className="text-[8px] text-slate-400 font-bold uppercase leading-none">Total</span>
-                  <span className={`font-black text-lg ${HEADING}`}>{riskDistribution.reduce((total, item) => total + Number(item.count || 0),0)}</span>
+                  <span className={`font-black text-lg ${HEADING}`}>{filteredRiskDistribution.reduce((total, item) => total + Number(item.count || 0),0)}</span>
                   <span className="text-[8px] text-slate-400 font-bold uppercase leading-none">Risks</span>
                 </div>
               </div>
               <div className="space-y-2 flex-1 text-[10px]">
-                {riskDistribution.map((r, i) => (
+                {filteredRiskDistribution.map((r, i) => (
                   <div key={i} className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
                       <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: getRiskColor(r._id) }} />
                       <span className="text-slate-600 font-semibold">{r._id}</span>
                     </div>
-                    <span className={`font-bold ${HEADING}`}>{r.count} ({riskDistribution.reduce((total, item) => total + Number(item.count || 0), 0) > 0 ? ((Number(r.count) / riskDistribution.reduce((total, item) => total + Number(item.count || 0), 0)) * 100).toFixed(1) : 0}%)</span>
+                    <span className={`font-bold ${HEADING}`}>{r.count} ({filteredRiskDistribution.reduce((total, item) => total + Number(item.count || 0), 0) > 0 ? ((Number(r.count) / filteredRiskDistribution.reduce((total, item) => total + Number(item.count || 0), 0)) * 100).toFixed(1) : 0}%)</span>
                   </div>
                 ))}
               </div>
@@ -627,7 +728,7 @@ export default function RiskAnalysis() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {riskTopCountries.map((country, i) => (
+                  {filteredRiskTopCountries.map((country, i) => (
                     <tr key={i}>
                       <td className={`py-2 font-semibold whitespace-nowrap ${HEADING}`}>
                         <div className="flex items-center gap-2">
@@ -640,7 +741,7 @@ export default function RiskAnalysis() {
                       <td className="py-2 text-right font-bold text-rose-500 whitespace-nowrap"> {country.alerts || 0}</td>
                     </tr>
                   ))}
-                  {riskTopCountries.length === 0 && (
+                  {filteredRiskTopCountries.length === 0 && (
                     <tr>
                       <td colSpan="3" className="py-6 text-center text-slate-400 text-xs">No risk data available</td>
                     </tr>
@@ -760,7 +861,7 @@ export default function RiskAnalysis() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {shipmentsAtRisk.map((s, i) => (
+                {filteredShipmentsAtRisk.map((s, i) => (
                   <tr key={s._id || i}>
                     <td className={`py-2.5 font-semibold whitespace-nowrap ${HEADING}`}>{s.shipment?.sbNumber || "-"}</td>
                     <td className="py-2.5 text-slate-500 whitespace-nowrap"> {s.shipment?.shipmentDate ? new Date(s.shipment.shipmentDate).toLocaleDateString(): "-"}</td>

@@ -1,9 +1,9 @@
-import React,{ useState,useEffect } from 'react';
+import React,{ useState,useEffect,useMemo } from 'react';
 import {
   getDashboard,
   getInvoices,
   getStatusSummary,
-  getValueTrend,
+ // getValueTrend,
   getRecentInvoices,
   getTopParties,
   getOverdueInvoices,
@@ -20,6 +20,13 @@ import {
   Plus, MoreVertical, ChevronLeft, ChevronRight, ArrowUpRight, ArrowRight, 
   Info, HelpCircle, FileJson, ArrowRightLeft, User2, CalendarDays
 } from 'lucide-react';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Tooltip
+} from "recharts";
 import ReactCountryFlag from "react-country-flag";
 
 export default function InvoicesDashboard() {
@@ -27,7 +34,7 @@ export default function InvoicesDashboard() {
   const [dashboard, setDashboard] = useState({});
   const [invoices, setInvoices] = useState([]);
   const [statusSummary,setStatusSummary] = useState([]);
-  const [valueTrend,setValueTrend] = useState([]);
+  ///const [valueTrend,setValueTrend] = useState([]);
   const [recentInvoices,setRecentInvoices] = useState([]);
   const [topParties,setTopParties] = useState([]);
   const [overdueInvoices,setOverdueInvoices] = useState([]);
@@ -40,11 +47,18 @@ export default function InvoicesDashboard() {
   const [exportReport, setExportReport] = useState(false);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null)
+
+    const [filters, setFilters] = useState({
+  search: "",
+  type: "",
+  country: "",
+  status: "",
+});
     
   const fetchDashboard = async () => {  
     try {
       const res = await getDashboard();
-      console.log("Dashboard:", res.data);
+      console.log("Dashboard:", res.data.data);
       setDashboard(res.data.data || {});
     } catch (err) {
       console.error(err);
@@ -52,8 +66,13 @@ export default function InvoicesDashboard() {
   };
   const fetchInvoices = async () => {
     try {
-      const res = await getInvoices();
-      console.log("Invoices:", res.data);
+      const res = await getInvoices({
+      search: filters.search,
+      type: filters.type,
+      country: filters.country,
+      status: filters.status,
+    });
+      console.log("Invoices:", res.data.data);
       setInvoices(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -62,25 +81,25 @@ export default function InvoicesDashboard() {
   const fetchStatusSummary = async () => {
     try {
       const res = await getStatusSummary();
-      console.log("Status Summary:", res.data);
+      console.log("Status Summary:", res.data.data);
       setStatusSummary(res.data.data || []);
     } catch (err) {
       console.error(err);
     }
   };
-  const fetchValueTrend = async () => {
+ /* const fetchValueTrend = async () => {
     try {
       const res = await getValueTrend();
-      console.log("Value Trend:", res.data);
+      console.log("Value Trend:", res.data.data);
       setValueTrend(res.data.data || []);
     } catch (err) {
       console.error(err);
     }
-  };
+  };*/
   const fetchRecentInvoices = async () => {
     try {
       const res = await getRecentInvoices();
-      console.log("Recent Invoices:", res.data);
+      console.log("Recent Invoices:", res.data.data);
       setRecentInvoices(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -89,7 +108,7 @@ export default function InvoicesDashboard() {
   const fetchTopParties = async () => {
     try {
       const res = await getTopParties();
-      console.log("Top Parties:", res.data);
+      console.log("Top Parties:", res.data.data);
      setTopParties(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -98,7 +117,7 @@ export default function InvoicesDashboard() {
   const fetchOverdueInvoices = async () => {
     try {
       const res = await getOverdueInvoices();
-      console.log("Overdue Invoices:", res.data);
+      console.log("Overdue Invoices:", res.data.data);
       setOverdueInvoices(res.data.data || []);
     } catch (err) {
       console.error(err);
@@ -107,7 +126,7 @@ export default function InvoicesDashboard() {
   const fetchInsights = async () => {
     try {
       const res = await getInsights();
-      console.log("Insights:", res.data);
+      console.log("Insights:", res.data.data);
       setInsights(res.data.data || {});
     } catch (err) {
       console.error(err);
@@ -116,7 +135,7 @@ export default function InvoicesDashboard() {
   const fetchFilterOptions = async () => {
     try {
       const res = await getFilterOptions();
-      console.log("Filter Options:", res.data);
+      console.log("Filter Options:", res.data.data);
       setFilterOptions(res.data.data || {});
     } catch (err) {
       console.error(err);
@@ -131,26 +150,70 @@ export default function InvoicesDashboard() {
     {label: "Total Invoice Value (INR)", value: `₹${((dashboard.totalInvoiceValue || 0) / 10000000).toFixed(2)} Cr`, change: "", icon: BarChart3, color: "text-teal-600", bg: "bg-teal-50", border: "border-teal-100"},
     {label: "Avg. Invoice Value (INR)", value: `₹${((dashboard.averageInvoiceValue || 0) / 10000000).toFixed(2)} Cr`, change: "", icon: Wallet, color: "text-indigo-600", bg: "bg-indigo-50", border: "border-indigo-100"}
   ];
-  const [filters,setFilters] = useState({search:"",type:"",country:"",partyType:"",status:""});
-  const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
-  const points = valueTrend.map((item, index) => {
-  const x = (index * 300) / (valueTrend.length - 1 || 1);
-  const y = 80 - (item.value / maxValue) * 60;
-  return { x, y };});
-  
+
+  useEffect(() => {
+  fetchInvoices();
+}, [
+  filters.search,
+  filters.type,
+  filters.country,
+  filters.status,
+]);
   useEffect(() => {
     fetchDashboard();
-    fetchInvoices();
     fetchStatusSummary();
-    fetchValueTrend();
+   // fetchValueTrend();
     fetchRecentInvoices();
     fetchTopParties();
     fetchOverdueInvoices();
     fetchInsights();
     fetchFilterOptions();
   }, []);
+const valueTrend = useMemo(() => {
+  const monthlyData = {};
 
+  invoices.forEach((invoice) => {
+    if (!invoice.invoiceDate) return;
 
+    const month = new Date(invoice.invoiceDate).getMonth() + 1;
+
+    if (!monthlyData[month]) {
+      monthlyData[month] = 0;
+    }
+
+    monthlyData[month] += Number(invoice.invoiceValue) || 0;
+  });
+
+  return Object.entries(monthlyData)
+    .map(([month, value]) => ({
+      _id: {
+        month: Number(month),
+      },
+      value,
+    }))
+    .sort((a, b) => a._id.month - b._id.month);
+}, [invoices]);
+const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
+  const points = valueTrend.map((item, index) => {
+  const x = (index * 300) / (valueTrend.length - 1 || 1);
+  const y = 80 - (item.value / maxValue) * 60;
+  return { x, y };});
+  
+  const filteredStatusSummary = useMemo(() => {
+  const summary = {};
+
+  invoices.forEach((invoice) => {
+    if (!invoice.status) return;
+
+    summary[invoice.status] =
+      (summary[invoice.status] || 0) + 1;
+  });
+
+  return Object.entries(summary).map(([status, count]) => ({
+    _id: status,
+    count,
+  }));
+}, [invoices]);
   // --- TOP 6 METRIC CARDS DATA ---
   /*const metrics = [
     { label: "Total Invoice", value: "3,145", change: "▲ 14.8% vs last month", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
@@ -301,7 +364,14 @@ export default function InvoicesDashboard() {
           <button className="flex-1 flex items-center justify-center gap-1 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
             <SlidersHorizontal size={12} /> More Filters
           </button>
-          <button className="text-[11px] font-semibold text-slate-400 hover:text-slate-600 px-1">Reset</button>
+          <button onClick={() =>
+    setFilters({
+      search: "",
+      type: "",
+      country: "",
+      status: "",
+    })
+  } className="text-[11px] font-semibold text-slate-400 hover:text-slate-600 px-1">Reset</button>
         </div>
       </div>
 
@@ -448,24 +518,69 @@ export default function InvoicesDashboard() {
             <div className="flex items-center gap-6 my-2">
               {/* Exact High-Fidelity SVG Donut Arc Layout */}
               <div className="relative w-28 h-28 shrink-0 flex items-center justify-center">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                  {/* Paid Section (Green) - ~55% */}
-                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="#10b981" strokeWidth="3.5" strokeDasharray="55 100" strokeDashoffset="0" />
-                  {/* Pending Section (Yellow) - ~30% */}
-                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f59e0b" strokeWidth="3.5" strokeDasharray="30 100" strokeDashoffset="-55" />
-                  {/* Overdue Section (Red) - ~15% */}
-                  <circle cx="18" cy="18" r="15.915" fill="none" stroke="#ef4444" strokeWidth="3.5" strokeDasharray="15 100" strokeDashoffset="-85" />
-                </svg>
-                <div className="absolute text-center">
-                  <span className="text-base font-black text-slate-800 block leading-none">{statusSummary.reduce((sum, item) => sum + item.count, 0)}</span>
-                  <span className="text-[9px] uppercase font-bold text-slate-400 mt-0.5 block tracking-wider">Total</span>
-                </div>
-              </div>
+                 <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={filteredStatusSummary}
+            dataKey="count"
+            nameKey="_id"
+            cx="50%"
+            cy="50%"
+            innerRadius={42}
+            outerRadius={56}
+            paddingAngle={0}
+            stroke="none"
+          >
+            {filteredStatusSummary.map((item, index) => (
+              <Cell
+                key={`cell-${index}`}
+                fill={
+                  item._id === "Paid"
+                    ? "#10b981"
+                    : item._id === "Pending"
+                    ? "#f59e0b"
+                    : item._id === "Overdue"
+                    ? "#ef4444"
+                    : item._id === "Cancelled"
+                    ? "#94a3b8"
+                    : "#6366f1"
+                }
+              />
+            ))}
+          </Pie>
 
+          <Tooltip
+            formatter={(value, name) => [`${value}`, name]}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+ {/* Center Total */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <span className="text-base font-black text-slate-800 leading-none">
+          {filteredStatusSummary.reduce(
+            (sum, item) => sum + Number(item.count || 0),
+            0
+          )}
+        </span>
+
+        <span className="text-[9px] uppercase font-bold text-slate-400 mt-0.5 tracking-wider">
+          Total
+        </span>
+      </div>
+
+    </div>
               {/* Chart Legend Metrics */}
               <div className="flex-1 space-y-2 text-[11px]">
-                {statusSummary.map((item, index) => {
-                  const percentage = totalInvoices > 0 ? ((item.count / totalInvoices) * 100).toFixed(1) : 0;
+                {filteredStatusSummary.map((item, index) => {
+                  const filteredTotal = filteredStatusSummary.reduce(
+    (sum, item) => sum + Number(item.count || 0),
+    0
+  );
+
+  const percentage =
+    filteredTotal > 0
+      ? ((item.count / filteredTotal) * 100).toFixed(1)
+      : 0;
                 return (
                 <div key={index} className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5 text-slate-500 font-medium">

@@ -245,7 +245,7 @@ export default function ExportIntelligenceDashboard() {
 
     const matchPort =
       appliedFilters.port === "All Ports" ||
-      ship.route?.warehouse === appliedFilters.port;
+      ship.route?.originCity === appliedFilters.port;
 
     const matchCountry =
       appliedFilters.country === "All Countries" ||
@@ -581,7 +581,7 @@ export default function ExportIntelligenceDashboard() {
                         <td className="py-3.5 truncate text-slate-500">{ship.exporter?.companyName}</td>
                         <td className="py-3.5 truncate text-slate-500">{ship.buyer?.companyName}</td>
                         <td className="py-3.5 text-slate-700">{ship.route?.destinationCountry}</td>
-                        <td className="py-3.5 text-slate-500">{ship.route?.warehouse || "-"}</td>
+                        <td className="py-3.5 text-slate-500">{ship.route?.originCity || "-"}</td>
                         <td className="py-3.5 text-slate-400 whitespace-nowrap">{new Date(ship.shipmentDate).toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric",})}</td>
                         <td className="py-3.5 font-bold text-slate-800">₹ {ship.cargo?.value?.toFixed(2)}</td>
                         <td className="py-3.5 text-center">
