@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { AlertTriangle, Search, X } from "lucide-react";
-
-const alerts = [
+import { getRecentAlerts } from "../../api/ShipmentApi";
+/*const alerts = [
   { title: "New sanctions imposed on Russia. US adds 120+ entities to sanction list.", region: "Russia", date: "22 Apr 2025", risk: "High", status: "Active" },
   { title: "Red Sea shipping disruptions. Multiple attacks reported near Bab-el-Mandeb.", region: "Red Sea", date: "22 Apr 2025", risk: "High", status: "Active" },
   { title: "Export restrictions on rare earth materials. China tightens export controls.", region: "China", date: "22 Apr 2025", risk: "High", status: "Active" },
@@ -9,15 +9,43 @@ const alerts = [
   { title: "Port congestion in Rotterdam causing shipment delays.", region: "Iran", date: "22 Apr 2025", risk: "High", status: "Monitoring" },
   { title: "New customs inspection rules implemented in UAE.", region: "Netherlands", date: "22 Apr 2025", risk: "High", status: "Monitoring" },
   { title: "Strike announced at Hamburg Port affecting cargo movement.", region: "UAE", date: "22 Apr 2025", risk: "High", status: "Monitoring" },
-];
+];*/
 
 export default function RecentHighRiskAlertsModal({ onClose }) {
   const [search, setSearch] = useState("");
-  const filtered = alerts.filter(
-    (a) =>
-      a.title.toLowerCase().includes(search.toLowerCase()) ||
-      a.region.toLowerCase().includes(search.toLowerCase())
-  );
+  const [alerts, setAlerts] = useState([]);
+const [loading, setLoading] = useState(true);
+ 
+useEffect(() => {
+  const fetchAlerts = async () => {
+    try {
+      const res = await getRecentAlerts();
+
+      setAlerts(res.data?.data || []);
+    } catch (error) {
+      console.error("Failed to fetch alerts:", error);
+      setAlerts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchAlerts();
+}, []);
+
+const filtered = alerts.filter((a) => {
+  const title = a.title || "";
+  const message = a.message || "";
+  const shipmentId = a.shipment?.sbNumber || "";
+
+  const searchText = `
+    ${title}
+    ${message}
+    ${shipmentId}
+  `.toLowerCase();
+
+  return searchText.includes(search.toLowerCase());
+});
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
@@ -56,27 +84,28 @@ export default function RecentHighRiskAlertsModal({ onClose }) {
           <div className="min-w-[700px]">
             <div className="grid grid-cols-4 bg-gray-50 px-4 py-3 text-sm font-bold text-gray-700">
               <span>Alert Title</span>
-              <span>Region/Country</span>
+              <span>Shipment</span>
               <span>Date</span>
               <span>Risk Level</span>
             </div>
-            {filtered.map((a, i) => (
+            {filtered.map((a, i) => { 
+              const riskLevel =
+  a.type === "Critical"
+    ? "High"
+    : a.type === "Warning"
+    ? "Medium"
+    : "Low";
+    return (
               <div key={i} className="grid grid-cols-4 items-center px-4 py-3 border-t border-gray-50">
                 <span className="text-sm text-gray-800 pr-2">{a.title}</span>
-                <span className="text-sm text-gray-500">{a.region}</span>
-                <span className="text-sm text-gray-500">{a.date}</span>
+                <span className="text-sm text-gray-500"> {a.shipment?.sbNumber || "-"}</span>
+                <span className="text-sm text-gray-500">{a.createdAt ? new Date(a.createdAt).toLocaleDateString("en-GB", {day: "2-digit",month: "short",year: "numeric",}) : "-"}</span>
                 <div className="flex flex-col gap-1">
-                  <span className="text-sm text-red-500 font-medium">{a.risk}</span>
-                  <span
-                    className={`text-xs font-medium ${
-                      a.status === "Active" ? "text-green-600" : "text-yellow-600"
-                    }`}
-                  >
-                    {a.status}
-                  </span>
+                  <span className={`text-sm font-medium ${riskLevel === "High" ? "text-red-500" : riskLevel === "Medium" ? "text-yellow-600" : "text-blue-500"}`}>{a.riskLevel}</span>
+                  <span className="text-xs font-medium text-slate-500">{a.type || "-"}</span>
                 </div>
               </div>
-            ))}
+            );})}
           </div>
         </div>
 

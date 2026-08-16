@@ -210,10 +210,22 @@ const fetchRecentShipments = async () => {
   };
 
   const handleResetFilters = () => {
-    setSearchQuery(""); setSelectedPort("All Ports"); setSelectedCountry("All Countries");
-    setSelectedExporter("All Exporters"); setSelectedBuyer("All Buyers");
-    setAppliedFilters({ search: "", port: "All Ports", country: "All Countries", exporter: "All Exporters", buyer: "All Buyers" });
-  };
+  setSearchQuery("");
+  setSelectedHsCode("All");
+  setSelectedPort("All Ports");
+  setSelectedCountry("All Countries");
+  setSelectedExporter("All Exporters");
+  setSelectedBuyer("All Buyers");
+
+  setAppliedFilters({
+    search: "",
+    hsCode: "All",
+    port: "All Ports",
+    country: "All Countries",
+    exporter: "All Exporters",
+    buyer: "All Buyers"
+  });
+};
 
   useEffect(() => {
   fetchDashboard();
@@ -283,6 +295,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
     const search =
       `${ship.sbNumber}
        ${ship.cargo?.productName}
+       ${hsCode}
        ${exporter}
        ${buyer}
        ${country}
@@ -296,8 +309,8 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
       (appliedFilters.hsCode === "All" ||
         hsCode === appliedFilters.hsCode) &&
 
-      //(appliedFilters.port === "All Ports" ||
-       // port === appliedFilters.port) &&
+      (appliedFilters.port === "All Ports" ||
+       port === appliedFilters.port) &&
 
       (appliedFilters.country === "All Countries" ||
         country === appliedFilters.country) &&
@@ -575,7 +588,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
                       <td className="py-3.5 truncate text-slate-500">{ship.exporter?.companyName || "-"}</td>
                       <td className="py-3.5 truncate text-slate-500">{ship.buyer?.companyName || "-"}</td>
                       <td className="py-3.5 text-slate-700">{ship.route?.destinationCountry || "-"}</td>
-                      <td className="py-3.5 text-slate-500">{ship.route?.destinationCity || "-"}</td>
+                      <td className="py-3.5 text-slate-500">{ship.route?.originCity || "-"}</td>
                       <td className="py-3.5 text-slate-400 whitespace-nowrap">{new Date(ship.shipmentDate).toLocaleDateString("en-GB", {day: "2-digit", month: "short", year: "numeric",})}</td>
                       <td className="py-3.5 font-bold text-slate-800">₹ {(ship.cargo?.value / 10000000).toFixed(2)} Cr</td>
                       <td className="py-3.5 text-center">

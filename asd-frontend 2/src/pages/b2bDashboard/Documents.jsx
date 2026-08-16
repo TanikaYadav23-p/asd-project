@@ -191,6 +191,22 @@ export default function DocumentsDashboard() {
     const [uploadShipment, setUploadShipment] = useState(false)
    const [recentUpload, setRecentUpload] = useState(false)
 
+   const [selectedDocSearch, setSelectedDocSearch] = useState("");
+const [selectedDocStatus, setSelectedDocStatus] = useState("");
+const [selectedDocCountry, setSelectedDocCountry] = useState("");
+const [selectedDocType, setSelectedDocType] = useState("");
+const [selectedDocShipment, setSelectedDocShipment] = useState("");
+
+const [appliedDocFilters, setAppliedDocFilters] = useState({
+  search: "",
+  status: "",
+  country: "",
+  documentType: "",
+  shipmentId: "",
+  startDate: null,
+  endDate: null,
+});
+
   const fetchDashboard = async () => {
     try {
      const res = await getDocumentDashboard();
@@ -272,6 +288,38 @@ export default function DocumentsDashboard() {
       console.error(error);
     }
   };
+  const handleApplyDocumentFilters = () => {
+  setAppliedDocFilters({
+    search: selectedDocSearch,
+    status: selectedDocStatus,
+    country: selectedDocCountry,
+    documentType: selectedDocType,
+    shipmentId: selectedDocShipment,
+    startDate: startDate,
+    endDate: endDate,
+  });
+};
+
+const handleResetDocumentFilters = () => {
+  setSelectedDocSearch("");
+  setSelectedDocStatus("");
+  setSelectedDocCountry("");
+  setSelectedDocType("");
+  setSelectedDocShipment("");
+
+  setStartDate(null);
+  setEndDate(null);
+
+  setAppliedDocFilters({
+    search: "",
+    status: "",
+    country: "",
+    documentType: "",
+    shipmentId: "",
+    startDate: null,
+    endDate: null,
+  });
+};
   const KPI_STATS = [
     {title: "Total Documents", value: dashboard.totalDocuments || 0, change: "", icon: FileText, bg: "bg-blue-50", color: "text-blue-500", up: true,},
     {title: "Uploaded This Month", value: dashboard.uploadedThisMonth || 0, change: "", icon: Upload, bg: "bg-emerald-50", color: "text-emerald-500", up: true,},
@@ -314,6 +362,68 @@ export default function DocumentsDashboard() {
     fetchFilterOptions();
     fetchStorage();
   }, []);
+
+  const filteredDocuments = documents.filter((d) => {
+  const search = appliedDocFilters.search.toLowerCase().trim();
+
+  const documentName =
+    d.documentName ||
+    d.fileName ||
+    d.fileUrl?.split("/").pop() ||
+    "";
+
+  const shipmentNumber = d.shipmentId?.sbNumber || "";
+
+  const matchesSearch =
+    !search ||
+    documentName.toLowerCase().includes(search) ||
+    d.documentType?.toLowerCase().includes(search) ||
+    shipmentNumber.toLowerCase().includes(search);
+
+  const matchesStatus =
+    !appliedDocFilters.status ||
+    d.status === appliedDocFilters.status;
+
+  const matchesCountry =
+    !appliedDocFilters.country ||
+    d.country === appliedDocFilters.country;
+
+  const matchesDocumentType =
+    !appliedDocFilters.documentType ||
+    d.documentType === appliedDocFilters.documentType;
+
+  const matchesShipment =
+    !appliedDocFilters.shipmentId ||
+    d.shipmentId?._id === appliedDocFilters.shipmentId;
+
+  const documentDate = d.createdAt
+    ? new Date(d.createdAt)
+    : null;
+
+  const matchesStartDate =
+    !appliedDocFilters.startDate ||
+    (documentDate &&
+      documentDate >= new Date(
+        new Date(appliedDocFilters.startDate).setHours(0, 0, 0, 0)
+      ));
+
+  const matchesEndDate =
+    !appliedDocFilters.endDate ||
+    (documentDate &&
+      documentDate <= new Date(
+        new Date(appliedDocFilters.endDate).setHours(23, 59, 59, 999)
+      ));
+
+  return (
+    matchesSearch &&
+    matchesStatus &&
+    matchesCountry &&
+    matchesDocumentType &&
+    matchesShipment &&
+    matchesStartDate &&
+    matchesEndDate
+  );
+});
 
   return (
     <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600 font-sans antialiased py-5">
@@ -399,7 +509,7 @@ export default function DocumentsDashboard() {
             <div>
               <label className="text-[10px] text-[##06145F] #06145F font-bold block mb-1.5 uppercase">Search Document</label>
               <div className="relative">
-                <input
+                <input value={selectedDocSearch} onChange={(e) => setSelectedDocSearch(e.target.value)}
                   placeholder="Search by document name, type"
                   className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs focus:outline-none placeholder-slate-400"
                 />
@@ -409,19 +519,30 @@ export default function DocumentsDashboard() {
             <div>
               <label className="text-[10px] text-[##06145F] font-bold block mb-1.5 uppercase">Date Range</label>
               <div className="relative">
-                <input
-                  defaultValue="01 Apr 2025 - 24 Apr 2025"
-                  className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs focus:outline-none"
-                />
+                 <DatePicker
+          selected={startDate}
+          onChange={(dates) => {
+            const [start, end] = dates;
+            setStartDate(start);
+            setEndDate(end);
+          }}
+          startDate={startDate}
+          endDate={endDate}
+          selectsRange
+          dateFormat="dd MMM yyyy"
+          placeholderText="Select Date Range"
+          className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-9 text-xs focus:outline-none focus:ring-2 focus:ring-blue-100"
+        />
+
                 <CalendarDays size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
               </div>
             </div>
             <div>
               <label className="text-[10px] text-[##06145F] font-bold block mb-1.5 uppercase">Status</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <select value={selectedDocStatus} onChange={(e) => setSelectedDocStatus(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
                   <option value="">All Status</option>
-                  { filterOptions.statuses?.map((status) => (
+                  { filterOptions.status?.map((status) => (
                     <option key={status} value={status}>{status}</option>
                   )) }
                 </select>
@@ -431,7 +552,7 @@ export default function DocumentsDashboard() {
             <div>
               <label className="text-[10px] text-[##06145F] font-bold block mb-1.5 uppercase">Country</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <select  value={selectedDocCountry} onChange={(e) => setSelectedDocCountry(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
                   <option value="">All Countries</option>
                   { filterOptions.countries?.map((country) => (
                     <option key={country} value={country}>{country}</option>
@@ -443,7 +564,7 @@ export default function DocumentsDashboard() {
             <div>
               <label className="text-[10px] text-[##06145F] font-bold block mb-1.5 uppercase">Document Type</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <select value={selectedDocType} onChange={(e) => setSelectedDocType(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
                   <option value="">All Types</option>
                   { filterOptions.documentTypes?.map((type) => (
                     <option key={type} value={type}>{type}</option>
@@ -455,7 +576,7 @@ export default function DocumentsDashboard() {
             <div>
               <label className="text-[10px] text-[##06145F] font-bold block mb-1.5 uppercase">Shipment / Ref No.</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <select  value={selectedDocShipment} onChange={(e) => setSelectedDocShipment(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
                   <option value="">All Shipments</option>
                   { filterOptions.shipments?.map((shipment) => (
                     <option key={shipment._id} value={shipment._id}>{shipment.sbNumber}</option>
@@ -465,10 +586,10 @@ export default function DocumentsDashboard() {
               </div>
             </div>
              <div className="flex justify-end gap-2 mt-3">
-            <button className="flex-1 bg-slate-50/80 border border-slate-200 text-slate-600 rounded-xl py-2 px-4 text-xs font-semibold hover:bg-slate-100 transition">
-              More Filters
+            <button onClick={handleApplyDocumentFilters} className="flex-1 bg-slate-50/80 border border-slate-200 text-slate-600 rounded-xl py-2 px-4 text-xs font-semibold hover:bg-slate-100 transition">
+              Apply Filters
             </button>
-            <button className="flex-1 text-slate-400 hover:text-slate-600 text-xs font-medium px-1">Reset</button>
+            <button onClick={handleResetDocumentFilters} className="flex-1 text-slate-400 hover:text-slate-600 text-xs font-medium px-1">Reset</button>
           </div>
           </div>
           {/* <div>
@@ -478,7 +599,7 @@ export default function DocumentsDashboard() {
         </SectionCard>
 
         <SectionCard className="mb-5">
-          <h3 className={`font-bold text-base mb-4 ${HEADING}`}>Document List ({documents.length})</h3>
+          <h3 className={`font-bold text-base mb-4 ${HEADING}`}>Document List ({filteredDocuments.length})</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-[11px] min-w-[920px]">
               <thead>
@@ -496,7 +617,7 @@ export default function DocumentsDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {documents.map((d, i) => (
+                {filteredDocuments.map((d, i) => (
                   <tr key={i}>
                     <td className="py-3 pr-2"><input type="checkbox" className="accent-blue-600" /></td>
                     <td className="py-3 whitespace-nowrap">
@@ -527,7 +648,7 @@ export default function DocumentsDashboard() {
             </table>
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 pt-3 border-t border-slate-100">
-            <span className="text-[11px] text-blue-500 font-medium">Showing 1 to {documents.length} of {documents.length} documents</span>
+            <span className="text-[11px] text-blue-500 font-medium">Showing 1 to {filteredDocuments.length} of {filteredDocuments.length} documents</span>
             <div className="flex items-center gap-1.5">
               <button className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400">
                 <ChevronLeft size={14} />

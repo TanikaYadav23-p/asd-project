@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect,useMemo } from "react";
 import ReactCountryFlag from "react-country-flag";
 import axios from "axios";
 import DatePicker from "react-datepicker";
@@ -172,6 +172,21 @@ export default function Shipment({setActiveTab:setParentTab, activeTab:parentTab
    const [dateRange, setDateRange] = useState(false)
    const [exportReport, setExportReport] = useState(false)
 
+   const [searchQuery, setSearchQuery] = useState("");
+const [selectedStatus, setSelectedStatus] = useState("");
+const [selectedOrigin, setSelectedOrigin] = useState("");
+const [selectedDestination, setSelectedDestination] = useState("");
+const [selectedMode, setSelectedMode] = useState("");
+
+const [appliedFilters, setAppliedFilters] = useState({
+  search: "",
+  status: "",
+  origin: "",
+  destination: "",
+  mode: "",
+  startDate: null,
+  endDate: null,
+});
   const fetchShipments = async () => {
   try {
     setLoading(true);
@@ -264,6 +279,151 @@ const fetchFilterOptions = async () => {
   }
 };
 
+const handleApplyFilters = () => {
+  setAppliedFilters({
+    search: searchQuery,
+    status: selectedStatus,
+    origin: selectedOrigin,
+    destination: selectedDestination,
+    mode: selectedMode,
+    startDate: startDate,
+    endDate: endDate,
+  });
+};
+const handleResetFilters = () => {
+  setSearchQuery("");
+  setSelectedStatus("");
+  setSelectedOrigin("");
+  setSelectedDestination("");
+  setSelectedMode("");
+  setStartDate(null);
+  setEndDate(null);
+
+  setAppliedFilters({
+    search: "",
+    status: "",
+    origin: "",
+    destination: "",
+    mode: "",
+    startDate: null,
+    endDate: null,
+  });
+};
+const filteredShipments = useMemo(() => {
+  return shipments.filter((s) => {
+    const shipmentId =
+      s.referenceNumber ||
+      s.sbNumber ||
+      "";
+
+    const awbNumber =
+      s.additionalInformation?.awbNumber ||
+      "";
+
+    const product =
+      s.cargo?.productName ||
+      "";
+
+    const hsCode =
+      s.cargo?.hsCode?.hsCode ||
+      "";
+
+    const status =
+      s.status ||
+      s.shipmentStatus ||
+      "";
+
+    const origin =
+      s.route?.origin ||
+      s.route?.originCountry ||
+      "";
+
+    const destination =
+      s.route?.destination ||
+      s.route?.destinationCountry ||
+      "";
+
+    const mode =
+      s.route?.mode ||
+      "";
+
+    const shipmentDate = s.shipmentDate
+      ? new Date(s.shipmentDate)
+      : null;
+
+    const searchText = `
+      ${shipmentId}
+      ${awbNumber}
+      ${product}
+      ${hsCode}
+      ${origin}
+      ${destination}
+    `.toLowerCase();
+
+    // Search
+    if (
+      appliedFilters.search &&
+      !searchText.includes(
+        appliedFilters.search.toLowerCase()
+      )
+    ) {
+      return false;
+    }
+
+    // Status
+    if (
+      appliedFilters.status &&
+      status !== appliedFilters.status
+    ) {
+      return false;
+    }
+
+    // Origin
+    if (
+      appliedFilters.origin &&
+      origin !== appliedFilters.origin
+    ) {
+      return false;
+    }
+
+    // Destination
+    if (
+      appliedFilters.destination &&
+      destination !== appliedFilters.destination
+    ) {
+      return false;
+    }
+
+    // Mode
+    if (
+      appliedFilters.mode &&
+      mode !== appliedFilters.mode
+    ) {
+      return false;
+    }
+
+    // Date range
+    if (
+      appliedFilters.startDate &&
+      shipmentDate < new Date(
+        new Date(appliedFilters.startDate).setHours(0, 0, 0, 0)
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      appliedFilters.endDate &&
+      shipmentDate > new Date(
+        new Date(appliedFilters.endDate).setHours(23, 59, 59, 999)
+      )
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+}, [shipments, appliedFilters]);
 const KPI_STATS = [
   { title: "Total Shipments", value: dashboard.totalShipments || 0, change: "▲ 16.8% vs last month", icon: Square, bg: "bg-blue-50", color: "text-blue-500", up: true },
   { title: "In Transit", value: dashboard.inTransit || 0, change: "▲ 5.4% vs last month", icon: RectangleHorizontal, bg: "bg-blue-50", color: "text-blue-500", up: true },
@@ -334,7 +494,7 @@ const TOP_ORIGINS = originCountries.map((item) => ({
       ? `${(item.shipments / dashboard.totalShipments) * 100}%`
       : "0%",
 }));
-const RECENT_ALERTS = recentAlerts.map((item) => ({
+/*const RECENT_ALERTS = recentAlerts.map((item) => ({
   icon: AlertTriangle,
    color:
     item.type === "Critical"
@@ -351,7 +511,7 @@ const RECENT_ALERTS = recentAlerts.map((item) => ({
    text: item.title,
    sub: item.message,
    time: new Date(item.createdAt).toLocaleTimeString(),
-}));
+}));*/
 
 const TRACKER_STEPS = shipmentTracker?.statusHistory?.map((item) => ({label: item.status, date: item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : "-", done: true,})) || [];
 
@@ -466,7 +626,7 @@ useEffect(() => {
             <div>
               <label className="text-[10px] text-[#081B6B] font-bold block mb-1.5 uppercase">Search Shipment</label>
               <div className="relative">
-                <input
+                <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by B/L, Container, Ref. No."
                   className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs focus:outline-none placeholder-slate-400"
                 />
@@ -502,9 +662,9 @@ useEffect(() => {
             <div>
               <label className="text-[10px] text-[#081B6B] font-bold block mb-1.5 uppercase">Shipment Status</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
                   <option value="">All Status</option>
-                  {filters.status.map((status) => (
+                  {filters.status?.map((status) => (
                     <option key={status} value={status}>{status}</option>
                   ))}
                 </select>
@@ -514,9 +674,9 @@ useEffect(() => {
             <div>
               <label className="text-[10px] text-[#081B6B] font-bold block mb-1.5 uppercase">Origin Country</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <select  value={selectedOrigin} onChange={(e) => setSelectedOrigin(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
                   <option value="">All Countries</option>
-                  {filters.origins.map((country) => (
+                  {filters.origins?.map((country) => (
                     <option key={country} value={country}>{country}</option>
                   ))}
                 </select>
@@ -526,9 +686,9 @@ useEffect(() => {
             <div>
               <label className="text-[10px] text-[#081B6B] font-bold block mb-1.5 uppercase">Destination Country</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <select value={selectedDestination} onChange={(e) => setSelectedDestination(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
                   <option value="">All Countries</option>
-                  {filters.destinations.map((country) => (
+                  {filters.destinations?.map((country) => (
                     <option key={country} value={country}>{country}</option>
                   ))}
                 </select>
@@ -538,9 +698,9 @@ useEffect(() => {
             <div>
               <label className="text-[10px] text-[#081B6B] font-bold block mb-1.5 uppercase">Transport Mode</label>
               <div className="relative">
-                <select className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
+                <select  value={selectedMode} onChange={(e) => setSelectedMode(e.target.value)} className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none">
                   <option value="">All Modes</option>
-                  {filters.modes.map((mode) => (
+                  {filters.modes?.map((mode) => (
                     <option key={mode} value={mode}>{mode}</option>
                   ))}
                 </select>
@@ -549,10 +709,10 @@ useEffect(() => {
             </div>
 
             <div className="flex items-center justify-end gap-2 mt-3">
-            <button className=" flex bg-slate-50/80 border border-slate-200 text-slate-600 rounded-xl py-2 px-4 text-xs font-semibold hover:bg-slate-100 transition">
-              More Filters
+            <button onClick={handleApplyFilters} className=" flex bg-blue-100 border border-slate-200 text-slate-600 rounded-xl py-2 px-4 text-xs font-semibold hover:bg-slate-100 transition">
+              Apply Filters
             </button>
-            <button className="  flex-1 text-slate-400 hover:text-slate-600 text-xs font-medium px-1">Reset</button>
+            <button onClick={handleResetFilters} className="  flex-1 text-slate-400 hover:text-slate-600 text-xs font-medium px-1">Reset</button>
           </div>
           </div>
           
@@ -577,7 +737,7 @@ useEffect(() => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {shipments.map((s, i) => (
+                  {filteredShipments.map((s, i) => (
                     <tr key={i}>
                       <td className="py-3 pr-2"><input type="checkbox" className="accent-blue-600" /></td>
                       <td className="py-3 whitespace-nowrap">
@@ -698,18 +858,20 @@ useEffect(() => {
               <button className="text-blue-600 text-[11px] font-bold" onClick={() => setHighRisk(true)}>View All →</button>
             </div>
             <div className="space-y-2.5">
-              {RECENT_ALERTS.map((a, i) => {
-                const Icon = a.icon;
+              {recentAlerts.map((a, i) => {
+                const Icon = AlertTriangle;
+                const color = a.type === "Critical" ? "text-red-500" : alert.type === "Warning" ? "text-orange-500" : "text-blue-500";
+                const bg = a.type === "Critical" ? "bg-red-50" : alert.type === "Warning" ? "bg-orange-50" : "bg-blue-50";
                 return (
-                  <div key={i} className="flex items-start gap-2.5">
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${a.bg} ${a.color}`}>
+                  <div key={a._id || i} className="flex items-start gap-2.5">
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${bg} ${color}`}>
                       <Icon size={13} />
                     </div>
                     <div className="flex-1">
-                      <p className={`text-[11px] font-semibold leading-snug ${HEADING}`}>{a.text}</p>
-                      <p className="text-[10px] text-slate-400">{a.sub}</p>
+                      <p className={`text-[11px] font-semibold leading-snug ${HEADING}`}>{a.title || "-"}</p>
+                      <p className="text-[10px] text-slate-400">{a.message || "-"}</p>
                     </div>
-                    <span className="text-[9px] text-slate-400 font-medium whitespace-nowrap">{a.time}</span>
+                    <span className="text-[9px] text-slate-400 font-medium whitespace-nowrap"> {a.createdAt ? new Date(a.createdAt).toLocaleTimeString() : "-"}</span>
                   </div>
                 );
               })}
