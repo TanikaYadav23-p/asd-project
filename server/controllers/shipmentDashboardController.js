@@ -7,19 +7,23 @@ exports.getDashboard=async(req,res)=>{
     const totalShipments=await Shipment.countDocuments();
     
     const inTransit=await Shipment.countDocuments({
-    status:"In Transit"
+    shipmentStatus:"In Transit"
     });
     
     const delivered=await Shipment.countDocuments({
-    status:"Delivered"
+    shipmentStatus:"Delivered"
     });
     
+    const pending = await Shipment.countDocuments({
+      approvalStatus: "Pending"
+    });
+
     const delayed=await Shipment.countDocuments({
-    status:"Delayed"
+    exceptionStatus:"Delayed"
     });
     
     const exception=await Shipment.countDocuments({
-    status:"Exception"
+    exceptionStatus:{ $ne: "None" }
     });
     
     const shipmentValue=await Shipment.aggregate([
@@ -39,6 +43,7 @@ exports.getDashboard=async(req,res)=>{
     totalShipments,
     inTransit,
     delivered,
+    pending,
     delayed,
     exception,
     shipmentValue:shipmentValue[0]?.total||0

@@ -10,6 +10,8 @@ import {
   getTopExportDestinations,
   getRecentShipments
 } from '../../api/B2BDashboardApi';
+import { getDashboard } from "../../api/ShipmentApi";
+import { getAccountSummary } from "../../api/SettingsApi";
 import {
   FiMenu,
   FiSearch,
@@ -195,7 +197,7 @@ import Reports from "./Reports";
 import AlertNotification from "./AlertNotification";
 import Settings from "./Settings";
 
-import AuditsLogs from "./AuditsLogs";
+
 import SelectRangeModal from "../../components/b2bComponent/SelectDateRange";
 import MarketIntelligencePopup from "../../components/b2bComponent/MarketIntelligence";
 
@@ -347,7 +349,6 @@ const sidebarSections = [
         badge: "Pro Plan",
         badgeColor: "bg-[#00BBA7]",
       },
-      { icon: FiSettings, label: "Audit Logs" },
     ],
   },
 ];
@@ -401,13 +402,29 @@ export default function B2BDashboard() {
   const [activeSubTab, setActiveSubTab] = useState('Import Intelligence');
   const [openMenu, setOpenMenu] = useState("Import Intelligence"); // null
   const [shipment, setShipment] = useState("")
-
+const [accountSummary, setAccountSummary] = useState({});
   const [chatInput, setChatInput] = useState("");
   const riskColor = {
     Low: "bg-teal-100 text-teal-600",
     Medium: "bg-orange-100 text-orange-500",
     High: "bg-red-100 text-red-500",
   };
+
+  useEffect(() => {
+  const fetchAccountSummary = async () => {
+    try {
+      const res = await getAccountSummary();
+
+      console.log("Logged in user:", res.data);
+
+      setAccountSummary(res.data.data || {});
+    } catch (error) {
+      console.error("Failed to fetch account summary:", error);
+    }
+  };
+
+  fetchAccountSummary();
+}, []);
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden font-sans ">
@@ -460,14 +477,18 @@ export default function B2BDashboard() {
                <div className="flex items-center gap-2 ml-1 pl-2 py-2 border-l border-gray-200">
                  <div className="hidden sm:block leading-tight">
                    <p className="text-xs sm:text-sm font-semibold text-gray-800">
-                     Arjun Soni
+                     {accountSummary?.user?.name}
                    </p>
                    <p className="text-gray-400 text-xs sm:text-sm">
-                     Exporter go plan
+                     {accountSummary?.user?.roleId?.name}
                    </p>
                  </div>
                  <div className=" h-8 w-8 sm:w-10 sm:h-10 bg-teal-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                   A
+                    {accountSummary?.user?.name
+        ?.split(" ")
+        .map(word => word[0])
+        .join("")
+        .toUpperCase()}
                  </div>
                </div>
              </div>
@@ -614,9 +635,6 @@ export default function B2BDashboard() {
               {activeTab === "Settings" && (
               <Settings />
             )}   
-                {activeTab === "Audit Logs" && (
-              <AuditsLogs />
-            )}  
 
 
         </main>   
@@ -847,13 +865,15 @@ const regionMarkers = {
     const [selectedTrend] = useState('This Month');
 
     const [dashboardMetrics, setDashboardMetrics] = useState({});
-    const [operationalInsights, setOperationalInsights] = useState({});
+    
+      const [dashboard, setDashboard] = useState({});
     const [globalTradeOverview, setGlobalTradeOverview] = useState([]);
     const [tradeValueTrend, setTradeValueTrend] = useState([]);
     const [topTradingPartners, setTopTradingPartners] = useState([]);
     const [topImportedProducts, setTopImportedProducts] = useState([]);
     const [topExportDestinations, setTopExportDestinations] = useState([]);
     const [recentShipments, setRecentShipments] = useState([]);
+    const [accountSummary, setAccountSummary] = useState({});
 const fetchDashboardMetrics = async () => {
   try {
     const res = await getDashboardMetrics();
@@ -864,17 +884,17 @@ const fetchDashboardMetrics = async () => {
   }
 };
 
-
-const fetchOperationalInsights = async () => {
+const fetchDashboard = async () => {
   try {
-    const res = await getOperationalInsights();
-    console.log("Operational Insights:", res.data);
-    setOperationalInsights(res.data.data || {});
+    const res = await getDashboard();
+
+    console.log("Dashboard Response", res.data);
+
+    setDashboard(res.data.data);
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 };
-
 
 const fetchGlobalTradeOverview = async () => {
   try {
@@ -942,7 +962,7 @@ const fetchRecentShipments = async () => {
 };
 useEffect(() => {
   fetchDashboardMetrics();
-  fetchOperationalInsights();
+  fetchDashboard();
   fetchGlobalTradeOverview();
   fetchTradeValueTrend();
   fetchTopTradingPartners();
@@ -950,7 +970,21 @@ useEffect(() => {
   fetchTopExportDestinations();
   fetchRecentShipments();
 }, []);
+ useEffect(() => {
+  const fetchAccountSummary = async () => {
+    try {
+      const res = await getAccountSummary();
 
+      console.log("Logged in user:", res.data);
+
+      setAccountSummary(res.data.data || {});
+    } catch (error) {
+      console.error("Failed to fetch account summary:", error);
+    }
+  };
+
+  fetchAccountSummary();
+}, []);
  const topMetrics= [
         { id: 1, title: 'Total Shipments', value: dashboardMetrics.totalShipments?.toLocaleString() || "0", growth: '', isPositive: true, color: '#3B82F6', bgColor: '#F0F6FF', icon: 'shipment' },
         { id: 2, title: 'Total Trade Value (INR)', value: dashboardMetrics.totalTradeValue ? `₹${(dashboardMetrics.totalTradeValue / 10000000).toFixed(2)} Cr` : '₹0.00 Cr', growth: '', isPositive: true, color: '#10B981', bgColor: '#ECFDF5', icon: 'trade' },
@@ -960,11 +994,11 @@ useEffect(() => {
         { id: 6, title: 'Avg. Lead Time (Days)', value: dashboardMetrics.averageLeadTime?.toFixed(1) || "0.0", growth: '', isPositive: false, color: '#EF4444', bgColor: '#FEF2F2', icon: 'leadTime' },
     ];
   const operationalInsightPills=[
-        { title: 'On-Time Shipments', value: `${operationalInsights.onTimeShipmentRate || 0}%`, growth: '', color: '#0D9488', bgColor: '#F0FDFA', icon: 'ontime' },
-        { title: 'Shipment Accuracy', value: `${operationalInsights.shipmentAccuracy || 0}%` , growth: '', color: '#EF4444', bgColor: '#FEF2F2', icon: 'accuracy' },
-        { title: 'Document Compliance', value: `${operationalInsights.documentCompliance || 0}%`, growth: '', color: '#2563EB', bgColor: '#EFF6FF', icon: 'compliance' },
-        { title: 'Repeat Business Rate', value: `${operationalInsights.repeatBusinessRate || 0}%`, growth: '', color: '#059669', bgColor: '#ECFDF5', icon: 'repeat' },
-        { title: 'Verified Buyer Rate', value: `${operationalInsights.verifiedBuyerRate || 0}%`, growth: '', color: '#F43F5E', bgColor: '#FFF1F2', icon: 'satisfaction' },
+        { title: 'In Transit', value: dashboard.inTransit || 0, growth: '', color: '#0D9488', bgColor: '#F0FDFA', icon: 'ontime' },
+        { title: 'Delivered', value: dashboard.delivered || 0 , growth: '', color: '#EF4444', bgColor: '#FEF2F2', icon: 'accuracy' },
+        { title: 'Delayed', value: dashboard.delayed || 0, growth: '', color: '#2563EB', bgColor: '#EFF6FF', icon: 'compliance' },
+        { title: 'Exception', value: dashboard.exception || 0, growth: '', color: '#059669', bgColor: '#ECFDF5', icon: 'repeat' },
+        { title: 'Pending', value: dashboard.pending || 0, growth: '', color: '#F43F5E', bgColor: '#FFF1F2', icon: 'satisfaction' },
     ];
     const geoUrl =
   "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
@@ -1080,7 +1114,7 @@ const regionMarkers = {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <div>
                     <h1 className="text-[22px] font-bold text-[#0F172A] flex items-center gap-2 tracking-tight">
-                        Welcome back ! <span className="text-xl">👋</span>
+                        Welcome back, {accountSummary?.user?.name} ! <span className="text-xl">👋</span>
                     </h1>
                     <p className="text-xs text-[#64748B] mt-1 font-medium">Here's your B2B trade overview and key business insights.</p>
                 </div>
