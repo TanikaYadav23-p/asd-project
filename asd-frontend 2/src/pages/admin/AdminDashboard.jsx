@@ -129,7 +129,7 @@ import document from '../../assets/icon/document.png'
 import order from '../../assets/icon/orders.png'
 
 import logo from "../../assets/Images/logo.png";
-import AIModulesBackendScope from "./AiModules";
+import CreateNewInvoice from "./CreateNewInvoice";
 
 
 const fabActions = [
@@ -533,7 +533,7 @@ export default function AdminDashboard() {
 
         {/* Page Content */}
 
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6 sm:p-10 lg:p-12">
+        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
           {activeNav === "Admin Dashboard" && (
             <div className="">
               <div
@@ -878,8 +878,8 @@ export default function AdminDashboard() {
             {showBot && <WhatsappBot showBot={showBot} setShowBot={setShowBot} fabOpen={fabOpen} setFabOpen={setFabOpen}/>  }
 
 
-           <AIModulesBackendScope />
-          
+        
+           {/* <CreateNewInvoice /> */}
         </main>
       </div>
 

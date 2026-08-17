@@ -19,6 +19,19 @@ const initialRequests = [
     riskScore: "Low (18/100)",
     compliance: "Eligible (2.5%)",
   },
+    {
+    id: "REQ-2505-0012",
+    company: "international Exports Pvt. Ltd.",
+    email: "info@internationalexport.com",
+    phone: "+91 98765 43210",
+    route: "India ---- USA",
+    submittedOn: "16 May 2025, 10:30 AM",
+    shipmentType: "Export",
+    status: "Pending Review",
+    documentsUploaded: 7,
+    riskScore: "Low (18/100)",
+    compliance: "Eligible (2.5%)",
+  },
 ];
 
 const stats = [
@@ -30,19 +43,33 @@ const stats = [
 
 export default function PendingReviews({setPendingReview,}) {
   const [requests, setRequests] = useState(
-    Array.from({ length: 8 }, (_, i) => ({ ...initialRequests[0], key: i }))
+    Array.from({ length: 8 }, (_, i) => ({ ...initialRequests[i % initialRequests.length], key: i }))
   );
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
   const [selected, setSelected] = useState(requests[0]);
-  const [reviews, setReviews] = useState(false)
+  const [reviews, setReviews] = useState(false);
+
   const filtered = requests.filter((r) => {
-    const term = search.toLowerCase();
+    const term = search.trim().toLowerCase();
+    if (!term) return true;
     return (
-      r.id.toLowerCase().includes(term) ||
-      r.company.toLowerCase().includes(term) ||
-      r.email.toLowerCase().includes(term)
+      r.id?.toLowerCase().includes(term) ||
+      r.company?.toLowerCase().includes(term) ||
+      r.email?.toLowerCase().includes(term) ||
+      r.route?.toLowerCase().includes(term) ||
+      r.shipmentType?.toLowerCase().includes(term) ||
+      r.status?.toLowerCase().includes(term) ||
+      r.phone?.toLowerCase().includes(term)
     );
   });
+
+  const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+  const paginatedRequests = filtered.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   const handleDecision = async (decision) => {
     try {
@@ -51,8 +78,9 @@ export default function PendingReviews({setPendingReview,}) {
   };
 
   return (
-   <><div className="w-full  mx-auto grid lg:grid-cols-3 gap-4">
-      <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+   <>
+   <div className="w-full  grid grid-cols-1 lg:grid-cols-[70%_30%]  gap-2 ">
+      <div className=" bg-white rounded-2xl shadow-xl p-4 sm:p-6 mb-3">
         <div className="flex  justify-between items-start"> 
         <div className="flex items-center gap-3 mb-6">
           <div className="w-11 h-11 rounded-full bg-yellow-50 flex items-center justify-center shrink-0">
@@ -87,7 +115,10 @@ export default function PendingReviews({setPendingReview,}) {
             <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setCurrentPage(1);
+              }}
               placeholder="Search by Request ID, Company, Email..."
               className="w-full border border-gray-300 rounded-lg pl-9 pr-3 py-2.5 text-sm"
             />
@@ -108,35 +139,78 @@ export default function PendingReviews({setPendingReview,}) {
               <span className="text-center"> Status</span>
               <span className="text-right">Actions</span>
             </div>
-            {filtered.map((r) => (
-              <div
-                key={r.key}
-                onClick={() => setSelected(r)}
-                className="grid grid-cols-7 items-center px-4 py-3 border-t border-gray-100 cursor-pointer hover:bg-gray-50"
-              >
-                <span className="text-xs text-blue-600 font-medium">{r.id}</span>
-                <div>
-                  <p className="text-xs text-gray-800">{r.company}</p>
-                  <p className="text-xs text-gray-400">{r.email}</p>
+            {paginatedRequests.length > 0 ? (
+              paginatedRequests.map((r) => (
+                <div
+                  key={r.key}
+                  onClick={() => setSelected(r)}
+                  className="grid grid-cols-7 items-center px-4 py-3 border-t border-gray-100 cursor-pointer hover:bg-gray-50"
+                >
+                  <span className="text-xs text-blue-600 font-medium">{r.id}</span>
+                  <div>
+                    <p className="text-xs text-gray-800">{r.company}</p>
+                    <p className="text-xs text-gray-400">{r.email}</p>
+                  </div>
+                  <span className="text-xs text-gray-500 text-center">{r.route}</span>
+                  <span className="text-xs text-gray-500">{r.submittedOn}</span>
+                  <span className="text-xs text-center text-gray-500">{r.shipmentType}</span>
+                  <span className="text-xs text-left text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full w-fit">
+                    {r.status}
+                  </span>
+                  <button onClick={() => {  
+                    setReviews(true)}} className="text-xs border border-gray-300 rounded-lg px-3 py-1.5">
+                    Review
+                  </button>
                 </div>
-                <span className="text-xs text-gray-500 text-center">{r.route}</span>
-                <span className="text-xs text-gray-500">{r.submittedOn}</span>
-                <span className="text-xs text-center text-gray-500">{r.shipmentType}</span>
-                <span className="text-xs text-left text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full w-fit">
-                  {r.status}
-                </span>
-                <button onClick={() => {  
-                  setReviews(true)}} className="text-xs border border-gray-300 rounded-lg px-3 py-1.5">
-                  Review
-                </button>
+              ))
+            ) : (
+              <div className="px-4 py-8 text-center text-sm text-gray-500 border-t border-gray-100">
+                No requests found matching your search.
               </div>
+            )}
+          </div>
+        </div>
+
+        {/* Pagination Controls */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
+          <div>
+            Showing {filtered.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} to{" "}
+            {Math.min(currentPage * itemsPerPage, filtered.length)} of {filtered.length} entries
+          </div>
+          <div className="flex items-center gap-1">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 font-medium"
+            >
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1.5 border rounded-lg font-medium ${
+                  currentPage === page
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "border-gray-300 text-gray-700 hover:bg-gray-50"
+                }`}
+              >
+                {page}
+              </button>
             ))}
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              className="px-3 py-1.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 font-medium"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
 
       {selected && (
-        <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 h-fit">
+        <div className="bg-white rounded-2xl w-full shadow-xl p-4 sm:p-6 h-fit">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-900">Request Details</h3>
             <span className="text-xs text-yellow-600 bg-yellow-50 px-3 py-1 rounded-full">
@@ -200,9 +274,8 @@ export default function PendingReviews({setPendingReview,}) {
         </div>
       )}
 
-      
-      
     </div>
+
      {reviews && 
        <ReviewShipment onClose={() => setReviews(false)} />
        }

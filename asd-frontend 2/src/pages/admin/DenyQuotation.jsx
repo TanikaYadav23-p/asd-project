@@ -29,6 +29,7 @@ export default function DenyQuotation({ onClose, onSubmit, setDeny }) {
       if (!response.ok) throw new Error("Request failed");
       const data = await response.json();
       if (onSubmit) onSubmit(data);
+      
     } catch (err) {
       console.log(err);
     } finally {
@@ -39,7 +40,7 @@ export default function DenyQuotation({ onClose, onSubmit, setDeny }) {
   if (!open) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 flex items-center justify-center">
+    <div className="bg-gray-50 flex items-center justify-center rounded-lg">
       <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white rounded-2xl border border-gray-200 p-5 sm:p-8">
         <div className="flex items-start justify-between mb-5">
           <div className="flex items-start gap-3">

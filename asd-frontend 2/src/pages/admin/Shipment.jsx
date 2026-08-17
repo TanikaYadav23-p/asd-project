@@ -8,6 +8,7 @@ import {
 import { useEffect } from "react";
 import API from "../../api/axios";
 import PendingReview  from "./PendingReview"
+import AIModulesBackendScope from "./AiModules";
 
 const Toggle = ({ checked, onChange }) => (
   <div onClick={() => onChange(!checked)}
@@ -539,8 +540,9 @@ export default function Shipment() {
       {showBooking ? (
         <NewBookingPage onCancel={() => setShowBooking(false)} />
       ) : (
-        <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
-           {!pendingReview && ( <div className="max-w-7xl mx-auto">
+        <div className="min-h-screen bg-gray-50  ">
+           {!pendingReview && (
+             <div className="max-w-7xl mx-auto mb-4 ">
 
               <div className="flex items-start justify-between mb-5 gap-3">
                 <div>
@@ -652,7 +654,14 @@ export default function Shipment() {
                   </div>
                 </div>
               </div>
-            </div> )}
+            </div> 
+          
+          )}
+
+
+        {!pendingReview && (
+          <AIModulesBackendScope />
+        )} 
 
       {pendingReview && (
         <PendingReview setPendingReview={setPendingReview}  />

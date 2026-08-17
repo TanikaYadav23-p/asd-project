@@ -17,11 +17,12 @@ import CargoDetails from "./CargoDetails"
 import Documents from "./Documents"
 import Charges from "./Charges"
 import ShipmentDetails from "./ShipmentDetails"
-
+import Quotation from "./Quotation"
+import CreateNewInvoice from "./CreateNewInvoice";
 const actions = [
   { icon: Pencil, bg: "bg-purple-50", color: "text-purple-600", title: "Edit Shipment", desc: "Make changes to shipment details." },
   { icon: FileText, bg: "bg-green-50", color: "text-green-600", title: "Create Invoice", desc: "Create invoice for this shipment." },
-  { icon: FileSignature, bg: "bg-blue-50", color: "text-blue-600", title: "Create quotation", desc: "Generate and share quotation" },
+  { icon: FileSignature, bg: "bg-blue-50", color: "text-blue-600", title: "Create quotation", desc: "Generate and share quotation",},
   { icon: Share2, bg: "bg-orange-50", color: "text-orange-500", title: "Share Quotation", desc: "Share quotation with client." },
   { icon: RefreshCcw, bg: "bg-blue-50", color: "text-blue-500", title: "Change Status", desc: "Change Shipment status." },
 ];
@@ -29,15 +30,195 @@ const actions = [
 export default function ReviewShipment({onClose}) {
   const [activeTab, setActiveTab] = useState("Shipment Details");
   const [viewShipmentDetail, setViewShipmentDetail] = useState(false)
+  const [showQuotationModal, setShowQuotationModal] = useState(false);
+  const [editBasicInfo, setEditBasicInfo] = useState(false);
+  const [newInvoice, setNewInvoice] = useState(false)
+  const [basicInfo, setBasicInfo] = useState({
+  shipmentType: "Export",
+  transportMode: "Sea",
+  incoterm: "FOB",
+  priority: "Medium",
+  referenceNo: "REF-2025-789",
+  bookingNo: "BK-4587",
+  etd: "25 May, 2025",
+  eta: "05 June, 2025",
+});
 
+const initialRoute = {
+  origin: "Nhava Sheva Port,India",
+  destination: "Rotterdam Port, Netherlands",
+  placeOfReceipt: "Indore, Madhya Pradesh",
+  finalDelivery: "Rotterdam Warehouse,NL",
+};
+const [route, setRoute] = useState(initialRoute);
+const [originalRoute, setOriginalRoute] = useState(initialRoute);
+const [editRoute, setEditRoute] = useState(false);
+
+const handleBasicInfoChange = (key) => (e) => {
+  setBasicInfo((prev) => ({
+    ...prev,
+    [key]: e.target.value,
+  }));
+};
+
+const saveBaseInfo = () => {
+
+            try {
+              // API call yaha kar sakte ho
+              // await fetch("/api/shipment/basic-info", {
+              //   method: "PUT",
+              //   headers: {
+              //     "Content-Type": "application/json",
+              //   },
+              //   body: JSON.stringify(basicInfo),
+              // });
+
+              setEditBasicInfo(false);
+            } catch (error) {
+              console.error("Failed to save basic information", error);
+            }
+          
+}
   const handleProceed = async () => {
     try {
       await fetch("/api/shipments/SHP-250520-0001/proceed", { method: "POST" });
     } catch (err) {}
   };
 
+  const handleRouteChange = (key) => (e) => {
+  setRoute((prev) => ({
+    ...prev,
+    [key]: e.target.value,
+  }));
+};
+
+const handleRouteEdit = () => {
+  setOriginalRoute(route);
+  setEditRoute(true);
+};
+
+const handleRouteCancel = () => {
+  setRoute(originalRoute);
+  setEditRoute(false);
+};
+
+const handleRouteSave = async () => {
+  try {
+    // API call yaha kar sakte ho
+    // await fetch("/api/shipment/route", {
+    //   method: "PUT",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(route),
+    // });
+
+    setOriginalRoute(route);
+    setEditRoute(false);
+  } catch (error) {
+    console.error("Failed to save route", error);
+  }
+};
+
+const initialCargo = {
+  productName: "Allnonds (Blached)",
+  hsCode: "0802.12.00",
+  packagingType: "Cartons",
+  totalPackages: "120",
+  netWeight: "1500.00 KG",
+  grossWeight: "1650.00 KG",
+  volume: "3.250 CBM",
+  cargoDescription: "Food Products",
+};
+
+const [cargo, setCargo] = useState(initialCargo);
+const [originalCargo, setOriginalCargo] = useState(initialCargo);
+const [editCargo, setEditCargo] = useState(false);
+
+const handleCargoChange = (key) => (e) => {
+  setCargo((prev) => ({
+    ...prev,
+    [key]: e.target.value,
+  }));
+};
+
+const handleCargoEdit = () => {
+  setOriginalCargo(cargo);
+  setEditCargo(true);
+};
+
+const handleCargoCancel = () => {
+  setCargo(originalCargo);
+  setEditCargo(false);
+};
+
+const handleCargoSave = async () => {
+  try {
+    // API call yaha kar sakte ho
+    // await fetch("/api/shipment/cargo-information", {
+    //   method: "PUT",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(cargo),
+    // });
+
+    setOriginalCargo(cargo);
+    setEditCargo(false);
+  } catch (error) {
+    console.error("Failed to save cargo information", error);
+  }
+};
+
+const initialAdditionalInfo = {
+  specialInstructions: "Handle with care, keep away from moisture",
+  insuranceRequired: "Yes",
+  inspectionRequired: "Yes",
+  remarks: "Please ensure time delivery",
+};
+
+const [additionalInfo, setAdditionalInfo] = useState(initialAdditionalInfo);
+const [originalAdditionalInfo, setOriginalAdditionalInfo] =
+  useState(initialAdditionalInfo);
+const [editAdditionalInfo, setEditAdditionalInfo] = useState(false);
+
+const handleAdditionalInfoChange = (key) => (e) => {
+  setAdditionalInfo((prev) => ({
+    ...prev,
+    [key]: e.target.value,
+  }));
+};
+
+const handleAdditionalInfoEdit = () => {
+  setOriginalAdditionalInfo(additionalInfo);
+  setEditAdditionalInfo(true);
+};
+
+const handleAdditionalInfoCancel = () => {
+  setAdditionalInfo(originalAdditionalInfo);
+  setEditAdditionalInfo(false);
+};
+
+const handleAdditionalInfoSave = async () => {
+  try {
+    // API call yaha kar sakte ho
+    // await fetch("/api/shipment/additional-information", {
+    //   method: "PUT",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify(additionalInfo),
+    // });
+
+    setOriginalAdditionalInfo(additionalInfo);
+    setEditAdditionalInfo(false);
+  } catch (error) {
+    console.error("Failed to save additional information", error);
+  }
+};
+
   return (
-  <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 p-4">
+  <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 ">
    {!viewShipmentDetail && (  
     <div className="w-full max-w-7xl max-h-[90vh] overflow-y-auto hide-scrollbar">
     
@@ -97,145 +278,592 @@ export default function ReviewShipment({onClose}) {
 
         {activeTab === "Shipment Details" && (
           <div className="space-y-4">
-            <div className="border border-gray-100 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="font-semibold text-gray-900 text-sm">Basic Information</p>
-                <button className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5">
+            <div className="border border-gray-300 rounded-lg   ">
+             <div className="border border-gray-100 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-semibold text-gray-900 text-sm">
+                Basic Information
+              </p>
+
+              {!editBasicInfo ? (
+                <button
+                  type="button"
+                  onClick={() => setEditBasicInfo(true)}
+                  className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5"
+                >
                   Edit Section
                 </button>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                <div>
-                  <p className="text-xs text-gray-400">Shipment Type</p>
-                  <p className="font-medium text-gray-900">Export</p>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditBasicInfo(false)}
+                    className="text-xs text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={saveBaseInfo}
+                    className="text-xs text-white bg-blue-600 rounded-lg px-3 py-1.5"
+                  >
+                    Save
+                  </button>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-400">Mode of Transport</p>
-                  <p className="font-medium text-gray-900">Sea</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Incoterm</p>
-                  <p className="font-medium text-gray-900">FOB</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Priority</p>
-                  <p className="font-medium text-orange-500">Medium</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Reference No.</p>
-                  <p className="font-medium text-gray-900">REF-2025-789</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Booking No.</p>
-                  <p className="font-medium text-gray-900">BK-4587</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">ETD(expected)</p>
-                  <p className="font-medium text-gray-900">25 May,2025</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">ETA(expected)</p>
-                  <p className="font-medium text-gray-900">05 June,2025</p>
-                </div>
-              </div>
+              )}
             </div>
 
-            <div className="border border-gray-100 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="font-semibold text-gray-900 text-sm">Route</p>
-                <button className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5">
-                  Edit Section
-                </button>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+
+              {/* Shipment Type */}
+              <div>
+                <p className="text-xs text-gray-400">Shipment Type</p>
+
+                {editBasicInfo ? (
+                  <input
+                    value={basicInfo.shipmentType}
+                    onChange={handleBasicInfoChange("shipmentType")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {basicInfo.shipmentType}
+                  </p>
+                )}
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                <div>
-                  <p className="text-xs text-gray-400">From (Origin)</p>
-                  <p className="font-medium text-gray-900">Nhava Sheva Port,India</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">To (Destination)</p>
-                  <p className="font-medium text-gray-900">Rotterdam Port, Netherlands</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Place of receipt</p>
-                  <p className="font-medium text-gray-900">Indore, Madhya Pradesh</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Final Delivery</p>
-                  <p className="font-medium text-gray-900">Rotterdam Warehouse,NL</p>
-                </div>
+
+              {/* Mode of Transport */}
+              <div>
+                <p className="text-xs text-gray-400">Mode of Transport</p>
+
+                {editBasicInfo ? (
+                  <input
+                    value={basicInfo.transportMode}
+                    onChange={handleBasicInfoChange("transportMode")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {basicInfo.transportMode}
+                  </p>
+                )}
               </div>
+
+              {/* Incoterm */}
+              <div>
+                <p className="text-xs text-gray-400">Incoterm</p>
+
+                {editBasicInfo ? (
+                  <input
+                    value={basicInfo.incoterm}
+                    onChange={handleBasicInfoChange("incoterm")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {basicInfo.incoterm}
+                  </p>
+                )}
+              </div>
+
+              {/* Priority */}
+              <div>
+                <p className="text-xs text-gray-400">Priority</p>
+
+                {editBasicInfo ? (
+                  <select
+                    value={basicInfo.priority}
+                    onChange={handleBasicInfoChange("priority")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  >
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                  </select>
+                ) : (
+                  <p className="font-medium text-orange-500">
+                    {basicInfo.priority}
+                  </p>
+                )}
+              </div>
+
+              {/* Reference No */}
+              <div>
+                <p className="text-xs text-gray-400">Reference No.</p>
+
+                {editBasicInfo ? (
+                  <input
+                    value={basicInfo.referenceNo}
+                    onChange={handleBasicInfoChange("referenceNo")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {basicInfo.referenceNo}
+                  </p>
+                )}
+              </div>
+
+              {/* Booking No */}
+              <div>
+                <p className="text-xs text-gray-400">Booking No.</p>
+
+                {editBasicInfo ? (
+                  <input
+                    value={basicInfo.bookingNo}
+                    onChange={handleBasicInfoChange("bookingNo")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {basicInfo.bookingNo}
+                  </p>
+                )}
+              </div>
+
+              {/* ETD */}
+              <div>
+                <p className="text-xs text-gray-400">ETD (expected)</p>
+
+                {editBasicInfo ? (
+                  <input
+                    value={basicInfo.etd}
+                    onChange={handleBasicInfoChange("etd")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {basicInfo.etd}
+                  </p>
+                )}
+              </div>
+
+              {/* ETA */}
+              <div>
+                <p className="text-xs text-gray-400">ETA (expected)</p>
+
+                {editBasicInfo ? (
+                  <input
+                    value={basicInfo.eta}
+                    onChange={handleBasicInfoChange("eta")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {basicInfo.eta}
+                  </p>
+                )}
+              </div>
+
+            </div>
+          </div>
             </div>
 
-            <div className="border border-gray-100 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="font-semibold text-gray-900 text-sm">Cargo Information</p>
-                <button className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5">
+          <div className="border border-gray-300 rounded-lg p-4">
+  <div className="flex items-center justify-between mb-3">
+    <p className="font-semibold text-gray-900 text-sm">Route</p>
+
+    {!editRoute ? (
+      <button
+        type="button"
+        onClick={handleRouteEdit}
+        className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5"
+      >
+        Edit Section
+      </button>
+    ) : (
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={handleRouteCancel}
+          className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          onClick={handleRouteSave}
+          className="text-xs text-white bg-blue-600 border border-blue-600 rounded-lg px-3 py-1.5"
+        >
+          Save
+        </button>
+      </div>
+    )}
+  </div>
+
+  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+
+    {/* From */}
+    <div>
+      <p className="text-xs text-gray-400">From (Origin)</p>
+
+      {editRoute ? (
+        <input
+          value={route.origin}
+          onChange={handleRouteChange("origin")}
+          className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+        />
+      ) : (
+        <p className="font-medium text-gray-900">
+          {route.origin}
+        </p>
+      )}
+    </div>
+
+    {/* To */}
+    <div>
+      <p className="text-xs text-gray-400">To (Destination)</p>
+
+      {editRoute ? (
+        <input
+          value={route.destination}
+          onChange={handleRouteChange("destination")}
+          className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+        />
+      ) : (
+        <p className="font-medium text-gray-900">
+          {route.destination}
+        </p>
+      )}
+    </div>
+
+    {/* Place of receipt */}
+    <div>
+      <p className="text-xs text-gray-400">Place of receipt</p>
+
+      {editRoute ? (
+        <input
+          value={route.placeOfReceipt}
+          onChange={handleRouteChange("placeOfReceipt")}
+          className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+        />
+      ) : (
+        <p className="font-medium text-gray-900">
+          {route.placeOfReceipt}
+        </p>
+      )}
+    </div>
+
+    {/* Final Delivery */}
+    <div>
+      <p className="text-xs text-gray-400">Final Delivery</p>
+
+      {editRoute ? (
+        <input
+          value={route.finalDelivery}
+          onChange={handleRouteChange("finalDelivery")}
+          className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+        />
+      ) : (
+        <p className="font-medium text-gray-900">
+          {route.finalDelivery}
+        </p>
+      )}
+    </div>
+
+  </div>
+          </div>
+
+            <div className="border border-gray-300 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-semibold text-gray-900 text-sm">
+                Cargo Information
+              </p>
+
+              {!editCargo ? (
+                <button
+                  type="button"
+                  onClick={handleCargoEdit}
+                  className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5"
+                >
                   Edit Section
                 </button>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                <div>
-                  <p className="text-xs text-gray-400">Product Name</p>
-                  <p className="font-medium text-gray-900">Allnonds (Blached)</p>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCargoCancel}
+                    className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleCargoSave}
+                    className="text-xs text-white bg-blue-600 border border-blue-600 rounded-lg px-3 py-1.5"
+                  >
+                    Save
+                  </button>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-400">HS Code</p>
-                  <p className="font-medium text-gray-900">0802.12.00</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Packaging Type</p>
-                  <p className="font-medium text-gray-900">Cartons</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Total Packages</p>
-                  <p className="font-medium text-gray-900">120</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Net weight</p>
-                  <p className="font-medium text-gray-900">1500.00 KG</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Gross Weight</p>
-                  <p className="font-medium text-gray-900">1650.00 KG</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Volume (CBM)</p>
-                  <p className="font-medium text-gray-900">3.250 CBM</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Cargo Description</p>
-                  <p className="font-medium text-gray-900">Food Products</p>
-                </div>
-              </div>
+              )}
             </div>
 
-            <div className="border border-gray-100 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-3">
-                <p className="font-semibold text-gray-900 text-sm">Additional Information</p>
-                <button className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5">
-                  Edit Section
-                </button>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+
+              {/* Product Name */}
+              <div>
+                <p className="text-xs text-gray-400">Product Name</p>
+
+                {editCargo ? (
+                  <input
+                    value={cargo.productName}
+                    onChange={handleCargoChange("productName")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {cargo.productName}
+                  </p>
+                )}
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
-                <div>
-                  <p className="text-xs text-gray-400">Special Instructions</p>
-                  <p className="font-medium text-gray-900">Handle with care, keep away from moisture</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Insurance Required</p>
-                  <p className="font-medium text-gray-900">Yes</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Inspection required</p>
-                  <p className="font-medium text-gray-900">Yes</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Remarks</p>
-                  <p className="font-medium text-gray-900">Please ensure time delivery</p>
-                </div>
+
+              {/* HS Code */}
+              <div>
+                <p className="text-xs text-gray-400">HS Code</p>
+
+                {editCargo ? (
+                  <input
+                    value={cargo.hsCode}
+                    onChange={handleCargoChange("hsCode")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {cargo.hsCode}
+                  </p>
+                )}
               </div>
+
+              {/* Packaging Type */}
+              <div>
+                <p className="text-xs text-gray-400">Packaging Type</p>
+
+                {editCargo ? (
+                  <input
+                    value={cargo.packagingType}
+                    onChange={handleCargoChange("packagingType")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {cargo.packagingType}
+                  </p>
+                )}
+              </div>
+
+              {/* Total Packages */}
+              <div>
+                <p className="text-xs text-gray-400">Total Packages</p>
+
+                {editCargo ? (
+                  <input
+                    value={cargo.totalPackages}
+                    onChange={handleCargoChange("totalPackages")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {cargo.totalPackages}
+                  </p>
+                )}
+              </div>
+
+              {/* Net Weight */}
+              <div>
+                <p className="text-xs text-gray-400">Net weight</p>
+
+                {editCargo ? (
+                  <input
+                    value={cargo.netWeight}
+                    onChange={handleCargoChange("netWeight")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {cargo.netWeight}
+                  </p>
+                )}
+              </div>
+
+              {/* Gross Weight */}
+              <div>
+                <p className="text-xs text-gray-400">Gross Weight</p>
+
+                {editCargo ? (
+                  <input
+                    value={cargo.grossWeight}
+                    onChange={handleCargoChange("grossWeight")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {cargo.grossWeight}
+                  </p>
+                )}
+              </div>
+
+              {/* Volume */}
+              <div>
+                <p className="text-xs text-gray-400">Volume (CBM)</p>
+
+                {editCargo ? (
+                  <input
+                    value={cargo.volume}
+                    onChange={handleCargoChange("volume")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {cargo.volume}
+                  </p>
+                )}
+              </div>
+
+              {/* Cargo Description */}
+              <div>
+                <p className="text-xs text-gray-400">Cargo Description</p>
+
+                {editCargo ? (
+                  <input
+                    value={cargo.cargoDescription}
+                    onChange={handleCargoChange("cargoDescription")}
+                    className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                  />
+                ) : (
+                  <p className="font-medium text-gray-900">
+                    {cargo.cargoDescription}
+                  </p>
+                )}
+              </div>
+
             </div>
+          </div>
+
+
+          <div className="border border-gray-300 rounded-lg p-4">
+        <div className="flex items-center justify-between mb-3">
+          <p className="font-semibold text-gray-900 text-sm">
+            Additional Information
+          </p>
+
+          {!editAdditionalInfo ? (
+            <button
+              type="button"
+              onClick={handleAdditionalInfoEdit}
+              className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5"
+            >
+              Edit Section
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleAdditionalInfoCancel}
+                className="text-xs text-blue-600 border border-blue-200 rounded-lg px-3 py-1.5"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleAdditionalInfoSave}
+                className="text-xs text-white bg-blue-600 border border-blue-600 rounded-lg px-3 py-1.5"
+              >
+                Save
+              </button>
+            </div>
+          )}
+        </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+
+            {/* Special Instructions */}
+            <div>
+              <p className="text-xs text-gray-400">
+                Special Instructions
+              </p>
+
+              {editAdditionalInfo ? (
+                <input
+                  value={additionalInfo.specialInstructions}
+                  onChange={handleAdditionalInfoChange("specialInstructions")}
+                  className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                />
+              ) : (
+                <p className="font-medium text-gray-900">
+                  {additionalInfo.specialInstructions}
+                </p>
+              )}
+            </div>
+
+            {/* Insurance Required */}
+            <div>
+              <p className="text-xs text-gray-400">
+                Insurance Required
+              </p>
+
+              {editAdditionalInfo ? (
+                <select
+                  value={additionalInfo.insuranceRequired}
+                  onChange={handleAdditionalInfoChange("insuranceRequired")}
+                  className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                >
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              ) : (
+                <p className="font-medium text-gray-900">
+                  {additionalInfo.insuranceRequired}
+                </p>
+              )}
+            </div>
+
+            {/* Inspection Required */}
+            <div>
+              <p className="text-xs text-gray-400">
+                Inspection required
+              </p>
+
+              {editAdditionalInfo ? (
+                <select
+                  value={additionalInfo.inspectionRequired}
+                  onChange={handleAdditionalInfoChange("inspectionRequired")}
+                  className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                >
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              ) : (
+                <p className="font-medium text-gray-900">
+                  {additionalInfo.inspectionRequired}
+                </p>
+              )}
+            </div>
+
+            {/* Remarks */}
+            <div>
+              <p className="text-xs text-gray-400">
+                Remarks
+              </p>
+
+              {editAdditionalInfo ? (
+                <input
+                  value={additionalInfo.remarks}
+                  onChange={handleAdditionalInfoChange("remarks")}
+                  className="w-full mt-1 border border-gray-200 rounded-lg px-2 py-1.5 text-sm"
+                />
+              ) : (
+                <p className="font-medium text-gray-900">
+                  {additionalInfo.remarks}
+                </p>
+              )}
+            </div>
+
+          </div>
+        </div>
 
             <div className="bg-purple-50 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
@@ -276,10 +904,18 @@ export default function ReviewShipment({onClose}) {
         <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6">
           <p className="font-bold text-gray-900 mb-4">Actions</p>
           <div className="space-y-3">
-            {actions.map((a) => {
+            {actions.map((a,i) => {
               const Icon = a.icon;
               return (
                 <button
+               onClick={() => {
+                      if (a.title === "Create quotation") {
+                        //  setViewShipmentDetail(false)
+                         setShowQuotationModal(true);
+                      }else if (a.title === "Create Invoice") {
+                        setNewInvoice(true)
+                      }
+                    }}
                   key={a.title}
                   className={`w-full flex items-center gap-3 rounded-lg p-3 text-left ${a.bg}`}
                 >
@@ -339,13 +975,20 @@ export default function ReviewShipment({onClose}) {
         </div>
       </div>
     </div>
-    </div> )}
+    </div>
+  
+  )}
 
     {
       viewShipmentDetail && (
           <ShipmentDetails  onClose={() => setViewShipmentDetail(false)}/>
       )
     }
+
+      { showQuotationModal && <Quotation  onClose={() => setShowQuotationModal(false)} />}
+
+      {newInvoice && <CreateNewInvoice onClose={() => setNewInvoice(false)} />}
+        
     </div>
   );
 }

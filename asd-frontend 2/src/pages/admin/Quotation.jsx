@@ -19,15 +19,16 @@ const timeline = [
   { title: "Form Submitted", sub: "on 24 April 2025 by xyz traders", color: "bg-blue-400" },
 ];
 
-export default function Quotation() {
+export default function Quotation({onClose}) {
   const navigate = useNavigate()
   const [deny, setDeny] = useState(false)
   const denyQuotation = () => {
       setDeny(true)
   }
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 flex justify-center">
-    { !deny && (  <div className="w-full max-w-5xl bg-white rounded-2xl border border-gray-200 p-5 sm:p-8">
+    <div className=" fixed inset-0 z-[20] bg-black/50 backdrop-blur-sm p-4 sm:p-6 flex items-center  transparent justify-center">
+    { !deny && ( 
+       <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-200 p-5 sm:p-8 shadow-2xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <LuFileText className="text-blue-500" size={20} />
@@ -210,7 +211,7 @@ export default function Quotation() {
 
           <div className="flex justify-between items-center">
              <div>
-             <button onClick={() => navigate(-1)} className="w-full sm:w-auto px-5 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 flex items-center justify-center gap-2">
+             <button onClick={onClose} className="w-full sm:w-auto px-5 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 flex items-center justify-center gap-2">
             <LuMapPin size={14} /> Back to Shipment
           </button>
           </div>
@@ -224,9 +225,11 @@ export default function Quotation() {
           </button>
         </div> </div>
          
-      </div> )}
+      </div>
+     )}
 
         { deny && (<DenyQuotation setDeny={setDeny} />)}
+       {}
     </div>
   );
 }

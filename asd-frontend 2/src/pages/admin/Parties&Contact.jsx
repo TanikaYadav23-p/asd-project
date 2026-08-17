@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Users } from "lucide-react";
 
 export default function PartiesContact() {
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({
+  const initialFormData = {
     shipperCompanyName: "ABC Exports Pvt. Ltd.",
     shipperContactPerson: "Aarav sharma",
     shipperEmail: "aarav.sharma@gmail.com",
@@ -12,23 +11,51 @@ export default function PartiesContact() {
     consigneeContactPerson: "John Williams",
     consigneeEmail: "john.williams@gmail.com",
     consigneePhone: "+1 202 555 0147",
-  });
+  };
+
+  const [editMode, setEditMode] = useState(false);
+
+  const [formData, setFormData] = useState(initialFormData);
+
+  const [savedData, setSavedData] = useState(initialFormData);
 
   const handleChange = (field) => (e) => {
-    setFormData({ ...formData, [field]: e.target.value });
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+  };
+
+  const handleEdit = () => {
+    setSavedData(formData);
+    setEditMode(true);
+  };
+
+  const handleCancel = () => {
+    setFormData(savedData);
+    setEditMode(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await fetch("/api/shipment/parties-contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-      const data = await res.json();
+      // API remains same - uncomment when backend integration is needed
+
+      // const res = await fetch("/api/shipment/parties-contact", {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(formData),
+      // });
+
+      // const data = await res.json();
+
+      // Frontend save
+      setSavedData(formData);
       setEditMode(false);
-    } catch (err) {}
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const inputClass =
@@ -45,15 +72,18 @@ export default function PartiesContact() {
             <Users className="w-6 h-6 text-blue-500" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Parties & Contact</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
+              Parties & Contact
+            </h2>
             <p className="text-sm text-gray-500 truncate">
               Manage shipper, consignee & contact details.
             </p>
           </div>
         </div>
+
         <button
           type="button"
-          onClick={() => setEditMode((v) => !v)}
+          onClick={editMode ? handleCancel : handleEdit}
           className="px-4 py-1.5 rounded-full border border-blue-300 text-blue-600 text-sm shrink-0"
         >
           {editMode ? "Cancel" : "Edit Details"}
@@ -62,9 +92,12 @@ export default function PartiesContact() {
 
       <div className="space-y-4">
         <h3 className="font-semibold text-gray-900 text-sm">Shipper</h3>
+
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Company Name</label>
+            <label className="block text-sm text-gray-700 mb-1">
+              Company Name
+            </label>
             <input
               disabled={!editMode}
               value={formData.shipperCompanyName}
@@ -72,8 +105,11 @@ export default function PartiesContact() {
               className={inputClass}
             />
           </div>
+
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Contact Person</label>
+            <label className="block text-sm text-gray-700 mb-1">
+              Contact Person
+            </label>
             <input
               disabled={!editMode}
               value={formData.shipperContactPerson}
@@ -81,8 +117,11 @@ export default function PartiesContact() {
               className={inputClass}
             />
           </div>
+
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Category Name</label>
+            <label className="block text-sm text-gray-700 mb-1">
+              Category Name
+            </label>
             <input
               disabled={!editMode}
               value={formData.shipperEmail}
@@ -90,8 +129,11 @@ export default function PartiesContact() {
               className={inputClass}
             />
           </div>
+
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Category Name</label>
+            <label className="block text-sm text-gray-700 mb-1">
+              Category Name
+            </label>
             <input
               disabled={!editMode}
               value={formData.shipperPhone}
@@ -102,9 +144,12 @@ export default function PartiesContact() {
         </div>
 
         <h3 className="font-semibold text-gray-900 text-sm">Consignee</h3>
+
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Company Name</label>
+            <label className="block text-sm text-gray-700 mb-1">
+              Company Name
+            </label>
             <input
               disabled={!editMode}
               value={formData.consigneeCompanyName}
@@ -112,8 +157,11 @@ export default function PartiesContact() {
               className={inputClass}
             />
           </div>
+
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Contact Person</label>
+            <label className="block text-sm text-gray-700 mb-1">
+              Contact Person
+            </label>
             <input
               disabled={!editMode}
               value={formData.consigneeContactPerson}
@@ -121,8 +169,11 @@ export default function PartiesContact() {
               className={inputClass}
             />
           </div>
+
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Email</label>
+            <label className="block text-sm text-gray-700 mb-1">
+              Email
+            </label>
             <input
               disabled={!editMode}
               value={formData.consigneeEmail}
@@ -130,8 +181,11 @@ export default function PartiesContact() {
               className={inputClass}
             />
           </div>
+
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Contact Person</label>
+            <label className="block text-sm text-gray-700 mb-1">
+              Contact Person
+            </label>
             <input
               disabled={!editMode}
               value={formData.consigneePhone}

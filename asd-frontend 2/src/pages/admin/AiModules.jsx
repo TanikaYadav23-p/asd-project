@@ -53,7 +53,7 @@ export default function AIModulesBackendScope() {
     const [hsCodeSearch, setHsCodeSearch] = useState(false)
    const [activeModal, setActiveModal] = useState(null);
   return (
-    <div className="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6">
+    <div className="w-full mx-auto bg-white rounded-2xl shadow-md p-4 sm:p-6">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center shrink-0">
           <Cloud className="w-6 h-6 text-purple-500" />

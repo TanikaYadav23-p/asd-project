@@ -1,9 +1,12 @@
 import { useState, useRef } from "react";
 import { FileText, UploadCloud, Pencil, Trash2, DollarSign } from "lucide-react";
-
+import {
+  FaPlus, FaMagnifyingGlass, FaXmark, FaChevronDown,
+  FaStar, FaTruck, FaBoxOpen, FaWarehouse, FaFileContract
+} from "react-icons/fa6";
 const emptyItem = { description: "", hsCode: "", qty: "", unit: "", unitPrice: "" };
 
-export default function CreateNewInvoice() {
+export default function CreateNewInvoice({onClose}) {
   const [form, setForm] = useState({
     invoiceNumber: "PMW-2025-0202",
     invoiceDate: "24 Apr 2025",
@@ -76,8 +79,10 @@ export default function CreateNewInvoice() {
   const inputClass = "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-600";
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-6 gap-3">
+    <form onSubmit={handleSubmit} className=" fixed inset-0 z-[20] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 sm:p-6 ">
+      <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl p-4 sm:p-6">
+        <div className="flex w-full  "> 
+      <div className="w-full flex items-center justify-between mb-6 gap-3">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-full bg-purple-50 flex items-center justify-center shrink-0">
             <FileText className="w-5 h-5 text-purple-600" />
@@ -87,7 +92,15 @@ export default function CreateNewInvoice() {
             <p className="text-sm text-gray-500">Create and manage invoice for this shipment</p>
           </div>
         </div>
-        <span className="text-xs text-yellow-600 font-medium">Pending Review</span>
+         <div className="flex flex-col
+         "> 
+          <div className="flex justify-end gap-5"> 
+          <button onClick={onClose}> <FaXmark className="text-lg"/></button></div>
+          <span className="text-xs text-yellow-600 font-medium">Pending Review</span>
+         </div>
+       
+      </div>
+          
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4">
@@ -299,6 +312,7 @@ export default function CreateNewInvoice() {
           </button>
         </div>
       </div>
+       </div>
     </form>
   );
 }
