@@ -526,14 +526,15 @@ const [accountSummary, setAccountSummary] = useState({});
                              ? "bg-teal-500 text-white rounded-r-lg "
                              : "text-[#8aa0bc] hover:bg-teal-500 hover:text-white rounded-r-lg"
                          }`}
-                     >
-                       <div className=" flex gap-3 px-4 py-2">
-                         <Icon className="text-base  flex-shrink-0" />
-                         <span
                            onClick={() => {
                              setActiveTab(label);
                              setSidebarOpen(false);
                            }}
+                     >
+                       <div className=" flex gap-3 px-4 py-2">
+                         <Icon className="text-base  flex-shrink-0" />
+                         <span
+                         
                            className="flex-1 font-normal text-xs  truncate  "
                          >
                            {label}
