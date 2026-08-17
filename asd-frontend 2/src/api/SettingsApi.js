@@ -24,6 +24,7 @@ export const updateBilling = async (data) => {
     return API.put("/settings/billing", data);
 };
 
+
 export const updateTheme = async (data) => {
     return API.put("/settings/theme", data);
 };

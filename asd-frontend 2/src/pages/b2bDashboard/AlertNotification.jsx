@@ -11,6 +11,7 @@ import {
   markAllNotificationsRead,
   deleteNotification
 } from '../../api/AlertNotificationApi';
+import { getRecentAlerts } from '../../api/ShipmentApi';
 import { 
   Settings, Check, Search, ChevronDown, MoreVertical, ChevronLeft, 
   ChevronRight, AlertTriangle, Clock, ShieldAlert, Mail, FileText, 
@@ -36,6 +37,8 @@ export default function AlertsNotificationsDashboard() {
   const [notificationSearch, setNotificationSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedUrgency, setSelectedUrgency] = useState("");
+
+  const [recentAlerts, setRecentAlerts] = useState([]);
   
   const fetchDashboard = async () => {
     try {
@@ -82,6 +85,14 @@ export default function AlertsNotificationsDashboard() {
         console.error(err);
       }
   };
+  const fetchRecentAlerts = async () => {
+    try {
+      const res = await getRecentAlerts();
+      setRecentAlerts(res.data.data || []);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     fetchDashboard();
@@ -89,6 +100,7 @@ export default function AlertsNotificationsDashboard() {
     fetchAlertFilters();
     fetchNotifications();
     fetchNotificationFilters();
+    fetchRecentAlerts();
   }, []);
 
   const notificationIcons = {
@@ -99,111 +111,14 @@ export default function AlertsNotificationsDashboard() {
   };
 
   return (
-    <div className="  overflow-y-auto bg-[#f8fafc] p-6 text-slate-700 font-sans text-xs antialiased selection:bg-blue-100">
+   <div className="w-full min-h-screen bg-[#f8fafc] p-6 text-slate-700 font-sans text-xs antialiased selection:bg-blue-100">
       
-      {/* TWO MAIN COLUMNS SPLIT */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start mt-10">
+     <div className="w-full mt-10">
         
-        {/* ================= LEFT COLUMN: ALERTS ================= */}
-        <div>
-          {/* Section Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-lg font-bold text-slate-900 tracking-tight">Alerts</h1>
-              <p className="text-[11px] text-slate-400 mt-0.5">Monitor critical events and take action before it impacts your business.</p>
-            </div>
-            <button className="flex items-center gap-1.5 text-blue-600 font-semibold hover:underline">
-              <Settings size={13} />
-              <span>Alert Settings</span>
-            </button>
-          </div>
-
-          {/* Pill Filters */}
-          <div className="flex items-center gap-2 mb-4">
-            <button className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-lg font-semibold shadow-sm">
-              All Alerts <span className="px-1.5 py-0.2 bg-blue-600 text-white text-[10px] rounded-full font-bold">{dashboard.alerts?.totalAlerts || 0}</span>
-            </button>
-            <button className="flex items-center gap-2 px-3 py-1.5 bg-white text-slate-600 border border-slate-200 rounded-lg font-medium hover:bg-slate-50">
-              Critical <span className="px-1.5 py-0.2 bg-rose-50 text-rose-600 text-[10px] rounded-full font-bold">{dashboard.alerts?.critical || 0}</span>
-            </button>
-            <button className="flex items-center gap-2 px-3 py-1.5 bg-white text-slate-600 border border-slate-200 rounded-lg font-medium hover:bg-slate-50">
-              Warning <span className="px-1.5 py-0.2 bg-amber-50 text-amber-600 text-[10px] rounded-full font-bold">{dashboard.alerts?.warning || 0}</span>
-            </button>
-            <button className="flex items-center gap-2 px-3 py-1.5 bg-white text-slate-600 border border-slate-200 rounded-lg font-medium hover:bg-slate-50">
-              Info <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-600 text-[10px] rounded-full font-bold">{dashboard.alerts?.info || 0}</span>
-            </button>
-          </div>
-
-          {/* Filter Controls Bar */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-            <div className="relative">
-              <Search size={13} className="absolute right-2.5 top-2.5 text-slate-400" />
-              <input type="text" placeholder="Search alerts..." value={search} onChange={(e) => setSearch(e.target.value)} className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none placeholder:text-slate-400 focus:border-blue-500"/>
-            </div>
-           <select value={selectedCategories} onChange={(e) => setSelectedCategories(e.target.value)} className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none">
-              <option value="">All Categories</option>{alertFilters.categories.map((item) => (
-                <option key={item} value={item}>{item}</option>))}
-           </select>
-           <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)} className="w-full bg-white px-3 py-1.5 rounded-lg border border-slate-200 focus:outline-none">
-             <option value="">All Status</option>{alertFilters.status.map((item) => (
-              <option key={item} value={item}>{item}</option>))}
-           </select>
-          </div>
-
-          {/* Alerts White Main Container Box */}
-          <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
-            <div className="divide-y divide-slate-100">
-              {alerts.map((alert) => (
-                <div key={alert._id} className="p-4 flex items-start gap-3 hover:bg-slate-50/40 transition-colors">
-                 <div  className={`p-1.5 rounded-lg border shrink-0 ${alert.severity === "Critical" ? "text-rose-500 bg-rose-50 border-rose-100"
-                  : alert.severity === "Warning" ? "text-amber-500 bg-amber-50 border-amber-100"
-                  : "text-emerald-500 bg-emerald-50 border-emerald-100"}`}>{alert.severity === "Critical" ? (<ShieldAlert size={15} />) : alert.severity === "Warning" ? ( <AlertTriangle size={15} />) : (<Clock size={15} />)}
-                 </div> 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h4 className="font-bold text-slate-900 text-xs">{alert.title}</h4>
-                        <p className="text-[11px] text-slate-500 mt-1 leading-normal font-medium">{alert.description}</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="text-[10px] text-slate-400 font-medium block">{new Date(alert.createdAt).toLocaleString()}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between mt-3">
-                      <div className="flex items-center gap-1.5">
-                        <span className="px-2 py-0.5 border border-blue-100 bg-blue-50/40 rounded text-blue-600 text-[10px] font-semibold tracking-wide">{alert.category}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold tracking-wider uppercase ${alert.severity === "Critical" ? "text-rose-600 bg-rose-50" : alert.severity === "Warning" ? "text-amber-600 bg-amber-50" : "text-emerald-600 bg-emerald-50"}`}>
-                          {alert.severity}
-                        </span>
-                        <MoreVertical size={13} className="text-slate-400 cursor-pointer hover:text-slate-600" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Pagination Segment */}
-            <div className="p-3 border-t border-slate-100 bg-[#f8fafc]/40 flex items-center justify-between text-[11px] text-slate-400 font-medium">
-              <span>Showing 1 to {alerts.length} of {alerts.length} alerts</span>
-              <div className="flex items-center gap-1">
-                <button className="p-1 rounded border border-slate-200 bg-white text-slate-400 cursor-not-allowed opacity-50"><ChevronLeft size={13} /></button>
-                <button className="px-2 py-0.5 rounded font-bold bg-blue-600 text-white shadow-sm">1</button>
-                <button className="px-2 py-0.5 rounded font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">2</button>
-                <button className="px-2 py-0.5 rounded font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">3</button>
-                <span className="px-0.5 text-slate-300">...</span>
-                <button className="p-1 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"><ChevronRight size={13} /></button>
-              </div>
-            </div>
-          </div>
-        </div>
-
+        
 
         {/* ================= RIGHT COLUMN: NOTIFICATIONS ================= */}
-        <div>
+        <div className="w-full">
           {/* Section Header */}
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -246,7 +161,7 @@ export default function AlertsNotificationsDashboard() {
           {/* Notifications White Main Container Box */}
           <div className="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
             <div className="divide-y divide-slate-100">
-              {notifications.map((notif) => {
+              {recentAlerts.map((notif) => {
                 const Icon = notificationIcons[notif.category]?.icon || Mail;
                 const iconBg = notificationIcons[notif.category]?.bg || "bg-blue-50 text-blue-500";
                 return (

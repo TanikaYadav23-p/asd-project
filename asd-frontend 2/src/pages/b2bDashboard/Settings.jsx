@@ -1,287 +1,1269 @@
-import React, { useState,useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+
 import {
   getAccountSummary,
   getActivity,
   getSettings,
-  updatePreferences,
-  updateGeneral,
   updateNotifications,
   updateSecurity,
-  updateTheme,
-  updateBilling,
-  changePassword
-} from '../../api/SettingsApi'; 
-import { 
-  Globe, Calendar, DollarSign, Sun, LayoutGrid, Ruler, 
-  MapPin, Sliders, ChevronRight, Key, Eye, Download, 
-  LogOut, ShieldAlert, Bell, ChevronDown, Check, HelpCircle
-} from 'lucide-react';
+} from "../../api/SettingsApi";
+
+import {
+  Globe,
+  Calendar,
+  LayoutGrid,
+  MapPin,
+  Sliders,
+  ChevronRight,
+  Key,
+  LogOut,
+  ShieldAlert,
+  Bell,
+  HelpCircle,
+  Building2,
+  Mail,
+  Phone,
+  CreditCard,
+  ToggleLeft,
+  ToggleRight,
+  FileText,
+} from "lucide-react";
+
 
 export default function SettingsDashboard() {
-  const [activeTab, setActiveTab] = useState('General');
+
+  const [activeTab, setActiveTab] = useState("General");
+
   const [settings, setSettings] = useState({});
   const [activity, setActivity] = useState([]);
   const [accountSummary, setAccountSummary] = useState({});
 
+
+  // =========================
+  // FETCH SETTINGS
+  // =========================
+
   const fetchSettings = async () => {
+
     try {
+
       const res = await getSettings();
-     console.log("Settings:", res.data);
-     setSettings(res.data.data || {});
+
+      console.log("Settings:", res.data);
+
+      setSettings(res.data.data || {});
+
     } catch (err) {
-        console.error(err);
-      }
+
+      console.error("Settings Error:", err);
+
+    }
+
   };
+
+
+  // =========================
+  // FETCH ACTIVITY
+  // =========================
+
   const fetchActivity = async () => {
+
     try {
+
       const res = await getActivity();
+
       console.log("Activity:", res.data);
+
       setActivity(res.data.data || []);
+
     } catch (err) {
-        console.error(err);
-      }
+
+      console.error("Activity Error:", err);
+
+    }
+
   };
+
+
+  // =========================
+  // FETCH ACCOUNT SUMMARY
+  // =========================
+
   const fetchAccountSummary = async () => {
+
     try {
+
       const res = await getAccountSummary();
+
       console.log("Account Summary:", res.data);
+
       setAccountSummary(res.data.data || {});
+
     } catch (err) {
-        console.error(err);
-      }
+
+      console.error("Account Summary Error:", err);
+
+    }
+
   };
-  
+
+
+  // =========================
+  // INITIAL API CALL
+  // =========================
+
   useEffect(() => {
+
     fetchSettings();
     fetchActivity();
     fetchAccountSummary();
+
   }, []);
-  
-  const getActivityIcon = (type) => {
-    switch (type) {
-      case "SHIPMENT_CREATED":
-        return "📦";
-      
-      case "SHIPMENT_UPDATED":
-        return "✏️";
 
-      case "SHIPMENT_SUBMITTED":
-        return "📤";
 
-      case "SHIPMENT_APPROVED":
-        return "✅";
+  // =========================
+  // TABS
+  // =========================
 
-      case "SHIPMENT_REJECTED":
-        return "❌";
+  const tabs = [
+    "General",
+    "Company Profile",
+    "Security",
+    "Billing",
+    "Notifications"
+  ];
 
-      case "SHIPMENT_ON_HOLD":
-        return "⏸️";
-
-      case "SHIPMENT_STATUS_CHANGED":
-        return "🚚";
-
-      case "DOCUMENT_UPLOADED":
-        return "📄";
-
-      case "DOCUMENT_VERIFIED":
-        return "✔️";
-
-      case "DOCUMENT_REJECTED":
-        return "⚠️";
-
-      case "TRACKING_UPDATED":
-        return "📍";
-
-      case "PAYMENT_RECEIVED":
-        return "💰";
-
-      case "PAYMENT_FAILED":
-        return "💸";
-
-      case "AI_QUERY":
-        return "🤖";
-
-      case "INCENTIVE_CHECKED":
-        return "🎯";
-
-      case "FREIGHT_CALCULATED":
-        return "🚛";
-
-      default:
-        return "ℹ️";
-    }
-  };
-  const tabs = ['General', 'Company Profile', 'Preferences', 'Notifications', 'Security', 'Integrations', 'Data & Privacy', 'Billing'];
 
   return (
-    <div className="overflow-y-auto bg-slate-50 text-slate-800 font-sans p-6">
-      
-      {/* HEADER */}
+
+    <div className="min-h-screen overflow-y-auto bg-slate-50 text-slate-800 font-sans p-6">
+
+
+      {/* =====================================
+          HEADER
+      ===================================== */}
+
       <div className="mb-6 mt-10">
-        <h1 className="text-2xl font-bold text-slate-900">Settings</h1>
-        <p className="text-sm text-slate-500 mt-1">Manage your account, preferences and system configuration.</p>
+
+        <h1 className="text-2xl font-bold text-slate-900">
+          Settings
+        </h1>
+
+        <p className="text-sm text-slate-500 mt-1">
+          Manage your account, preferences and system configuration.
+        </p>
+
       </div>
 
-      {/* NAVIGATION TABS */}
-      <div className="border-b border-slate-200 mb-6 overflow-x-auto flex whitespace-nowrap scrollbar-none">
-        {tabs.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`pb-3 px-4 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === tab 
-                ? 'border-blue-600 text-blue-600 font-semibold' 
-                : 'border-transparent text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
+
+      {/* =====================================
+          TABS
+      ===================================== */}
+
+      <div className="border-b border-slate-200 mb-6 overflow-x-auto">
+
+        <div className="flex whitespace-nowrap">
+
+          {tabs.map((tab) => (
+
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`
+                pb-3 px-5 text-sm font-medium
+                border-b-2 transition-colors
+                ${
+                  activeTab === tab
+                    ? "border-blue-600 text-blue-600 font-semibold"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
+                }
+              `}
+            >
+              {tab}
+            </button>
+
+          ))}
+
+        </div>
+
       </div>
 
-      {/* TWO COLUMN GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-          
+      {/* =====================================
+          GENERAL
+      ===================================== */}
+
+      {activeTab === "General" && (
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+
           {/* ACCOUNT SUMMARY */}
+
           <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-            <h3 className="font-bold text-sm text-slate-900 mb-5">Account Summary</h3>
+
+            <h3 className="font-bold text-sm text-slate-900 mb-5">
+              Account Summary
+            </h3>
+
+
             <div className="flex items-center gap-4 border-b border-slate-100 pb-5 mb-5">
+
               <div className="w-14 h-14 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                {accountSummary?.user?.name ?.split(" ").map(word => word[0]).join("").toUpperCase()}
+
+                {accountSummary?.user?.name
+                  ?.split(" ")
+                  .map(word => word[0])
+                  .join("")
+                  .toUpperCase()
+                }
+
               </div>
+
+
               <div>
-                <h4 className="font-bold text-base text-slate-900">{accountSummary?.user?.name}</h4>
-                <p className="text-xs text-slate-400 font-medium">{accountSummary?.user?.roleId?.name}</p>
-                <p className="text-xs text-blue-600 mt-0.5 font-medium hover:underline cursor-pointer">{accountSummary?.user?.email}</p>
+
+                <h4 className="font-bold text-base text-slate-900">
+                  {accountSummary?.user?.name || "-"}
+                </h4>
+
+                <p className="text-xs text-slate-400 font-medium">
+                  {accountSummary?.user?.roleId?.name || "-"}
+                </p>
+
+                <p className="text-xs text-blue-600 mt-0.5 font-medium">
+                  {accountSummary?.user?.email || "-"}
+                </p>
+
               </div>
+
             </div>
+
 
             <div className="space-y-3.5 text-xs">
+
+
               <div className="flex justify-between items-center">
-                <span className="text-slate-400 font-medium flex items-center gap-1.5"><Sliders size={14}/> User ID</span>
-                <span className="font-bold text-slate-800">{accountSummary?.user?._id?.slice(-6)}</span>
+
+                <span className="text-slate-400 font-medium flex items-center gap-1.5">
+                  <Sliders size={14} />
+                  User ID
+                </span>
+
+                <span className="font-bold text-slate-800">
+                  {accountSummary?.user?._id?.slice(-6) || "-"}
+                </span>
+
               </div>
+
+
               <div className="flex justify-between items-center">
-                <span className="text-slate-400 font-medium flex items-center gap-1.5"><ShieldAlert size={14}/> Role</span>
-                <span className="font-bold text-slate-800">{accountSummary?.user?.roleId?.name}</span>
+
+                <span className="text-slate-400 font-medium flex items-center gap-1.5">
+                  <ShieldAlert size={14} />
+                  Role
+                </span>
+
+                <span className="font-bold text-slate-800">
+                  {accountSummary?.user?.roleId?.name || "-"}
+                </span>
+
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-slate-400 font-medium flex items-center gap-1.5"><Calendar size={14}/> Last Login</span>
-                <span className="font-bold text-slate-800">{accountSummary?.user?.lastLogin ? new Date(accountSummary.user.lastLogin).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short",}) : "Never Logged In"}</span>
-              </div>
+
+
               <div className="flex justify-between items-center pt-2 border-t border-slate-50">
-                <span className="text-slate-400 font-medium flex items-center gap-1.5"><Key size={14}/> Password</span>
+
+                <span className="text-slate-400 font-medium flex items-center gap-1.5">
+                  <Key size={14} />
+                  Password
+                </span>
+
+
                 <div className="flex items-center gap-3">
-                  <span className="font-bold text-slate-800 tracking-widest">••••••••</span>
-                  <button className="text-blue-600 font-bold hover:underline">Change</button>
+
+                  <span className="font-bold text-slate-800 tracking-widest">
+                    ••••••••
+                  </span>
+
+                  <button
+                    onClick={() => setActiveTab("Security")}
+                    className="text-blue-600 font-bold hover:underline"
+                  >
+                    Change
+                  </button>
+
                 </div>
+
               </div>
+
             </div>
+
           </div>
 
-          {/* RECENT ACTIVITY */}
-          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-sm text-slate-900">Recent Activity</h3>
-              <button className="text-xs font-bold text-blue-600 hover:underline">View All</button>
-            </div>
-            
-            <div className="space-y-4">
-              {activity.length > 0 ? ( activity.map((item) => (
-                <ActivityItem key={item._id} icon={getActivityIcon(item.type)} title={item.message} 
-                time={new Date(item.createdAt).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",})}/>
-              ))
-            ) : (<p className="text-center text-slate-400 text-sm py-4">No recent activity found.</p>)}
-            </div>
-          </div>
 
           {/* QUICK ACTIONS */}
+
           <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
-            <h3 className="font-bold text-sm text-slate-900 mb-4">Quick Actions</h3>
+
+            <h3 className="font-bold text-sm text-slate-900 mb-4">
+              Quick Actions
+            </h3>
+
+
             <div className="space-y-1">
-              <QuickActionRow icon={<Key size={16} className="text-slate-500" />} label="Change Password" />
-              <QuickActionRow icon={<LayoutGrid size={16} className="text-slate-500" />} label="Manage API Keys" />
-              <QuickActionRow icon={<Download size={16} className="text-slate-500" />} label="Download Data" />
-              <QuickActionRow icon={<LogOut size={16} className="text-rose-500" />} label="Log Out" isDanger={true} />
+
+
+              <QuickActionRow
+                icon={<Key size={16} className="text-slate-500" />}
+                label="Change Password"
+                onClick={() => setActiveTab("Security")}
+              />
+
+
+              <QuickActionRow
+                icon={<LayoutGrid size={16} className="text-slate-500" />}
+                label="Manage API Keys"
+              />
+
+
+              <QuickActionRow
+                icon={<LogOut size={16} className="text-rose-500" />}
+                label="Log Out"
+                isDanger
+              />
+
             </div>
+
           </div>
 
         </div>
 
-      {/* FOOTER TIMESTAMPS */}
+      )}
+
+
+      {/* =====================================
+          COMPANY PROFILE
+      ===================================== */}
+
+      {activeTab === "Company Profile" && (
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+
+          {/* COMPANY DETAILS */}
+
+          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+            <h3 className="font-bold text-sm text-slate-900 mb-5">
+              Company Details
+            </h3>
+
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+
+              <ProfileItem
+                icon={<Building2 size={15} />}
+                label="Company Name"
+                value={accountSummary?.user?.companyName}
+              />
+
+
+              <ProfileItem
+                icon={<Building2 size={15} />}
+                label="Company Type"
+                value={accountSummary?.user?.businessType}
+              />
+
+
+              <ProfileItem
+                icon={<FileText size={15} />}
+                label="GST Number"
+                value={
+                  accountSummary?.user?.gstNumber ||
+                  accountSummary?.user?.gstin
+                }
+              />
+
+
+              <ProfileItem
+                icon={<FileText size={15} />}
+                label="Import Export ID"
+                value={accountSummary?.user?.importExportId}
+              />
+
+
+              <ProfileItem
+                icon={<MapPin size={15} />}
+                label="Country"
+                value={accountSummary?.user?.country}
+              />
+
+
+              <ProfileItem
+                icon={<MapPin size={15} />}
+                label="City"
+                value={accountSummary?.user?.city}
+              />
+
+
+              <ProfileItem
+                icon={<MapPin size={15} />}
+                label="Address"
+                value={accountSummary?.user?.address}
+              />
+
+
+              <ProfileItem
+                icon={<Globe size={15} />}
+                label="Account Type"
+                value={accountSummary?.user?.accountType}
+              />
+
+            </div>
+
+          </div>
+
+
+          {/* RIGHT SIDE */}
+
+          <div className="space-y-6">
+
+
+            {/* BUSINESS SUMMARY */}
+
+            <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+              <h3 className="font-bold text-sm text-slate-900 mb-4">
+                Business Summary
+              </h3>
+
+
+              <div className="space-y-3">
+
+                <SummaryRow
+                  label="Plan"
+                  value={accountSummary?.user?.plan}
+                />
+
+                <SummaryRow
+                  label="Status"
+                  value={accountSummary?.user?.accountStatus}
+                />
+
+                <SummaryRow
+                  label="Profile Completion"
+                  value={
+                    accountSummary?.user?.profileCompletion != null
+                      ? `${accountSummary.user.profileCompletion}%`
+                      : "-"
+                  }
+                />
+
+              </div>
+
+            </div>
+
+
+            {/* VERIFICATION */}
+
+            <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+              <h3 className="font-bold text-sm text-slate-900 mb-4">
+                Verification Status
+              </h3>
+
+
+              <div className="space-y-3">
+
+                <VerificationRow
+                  label="Email"
+                  verified={accountSummary?.user?.emailVerified}
+                />
+
+                <VerificationRow
+                  label="Phone"
+                  verified={accountSummary?.user?.phoneVerified}
+                />
+
+                <VerificationRow
+                  label="GST"
+                  verified={accountSummary?.user?.gstVerified}
+                />
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =====================================
+          SECURITY
+      ===================================== */}
+
+      {activeTab === "Security" && (
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+
+          {/* SECURITY INFORMATION */}
+
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+            <h3 className="font-bold text-sm text-slate-900 mb-5">
+              Security
+            </h3>
+
+
+            <div>
+
+
+              <SettingRow
+                icon={<Mail size={16} className="text-slate-500" />}
+                title="Email Address"
+                desc={accountSummary?.user?.email || "Not available"}
+                control={
+                  <button className="text-blue-600 font-bold text-xs">
+                    Change
+                  </button>
+                }
+              />
+
+
+              <div className="border-t border-slate-100" />
+
+
+              <SettingRow
+                icon={<Phone size={16} className="text-slate-500" />}
+                title="Mobile Number"
+                desc={accountSummary?.user?.phone || "Not available"}
+                control={
+                  <button className="text-blue-600 font-bold text-xs">
+                    Change
+                  </button>
+                }
+              />
+
+
+              <div className="border-t border-slate-100" />
+
+
+              <SettingRow
+                icon={<Key size={16} className="text-slate-500" />}
+                title="Password"
+                desc="Your password is securely protected."
+                control={
+                  <button className="text-blue-600 font-bold text-xs">
+                    Change
+                  </button>
+                }
+              />
+
+            </div>
+
+          </div>
+
+
+          {/* SECURITY SETTINGS */}
+
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+            <h3 className="font-bold text-sm text-slate-900 mb-5">
+              Security Settings
+            </h3>
+
+
+            <SettingRow
+              icon={<ShieldAlert size={16} className="text-slate-500" />}
+              title="Two-Factor Authentication"
+              desc="Add an additional layer of security."
+              control={
+
+                <button
+                  onClick={async () => {
+
+                    try {
+
+                      const newValue =
+                        !settings?.twoFactorAuth;
+
+                      const res =
+                        await updateSecurity({
+                          twoFactorAuth: newValue,
+                          sessionTimeout:
+                            settings?.sessionTimeout || 30
+                        });
+
+                      setSettings(
+                        res.data.data || {}
+                      );
+
+                    } catch (err) {
+
+                      console.error(err);
+
+                    }
+
+                  }}
+                >
+
+                  {settings?.twoFactorAuth ? (
+
+                    <ToggleRight
+                      size={30}
+                      className="text-blue-600"
+                    />
+
+                  ) : (
+
+                    <ToggleLeft
+                      size={30}
+                      className="text-slate-300"
+                    />
+
+                  )}
+
+                </button>
+
+              }
+            />
+
+
+            <div className="border-t border-slate-100" />
+
+
+            <SettingRow
+              icon={<Calendar size={16} className="text-slate-500" />}
+              title="Session Timeout"
+              desc="Automatically sign out after inactivity."
+              control={
+                <span className="text-xs font-bold text-slate-700">
+                  {settings?.sessionTimeout || 30} min
+                </span>
+              }
+            />
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =====================================
+          BILLING
+      ===================================== */}
+
+      {activeTab === "Billing" && (
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+
+          {/* BILLING DETAILS */}
+
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+            <h3 className="font-bold text-sm text-slate-900 mb-5">
+              Billing Details
+            </h3>
+
+
+            <div className="space-y-4">
+
+
+              <SummaryRow
+                label="Company Name"
+                value={
+                  settings?.companyName ||
+                  accountSummary?.user?.companyName
+                }
+              />
+
+
+              <SummaryRow
+                label="Billing Email"
+                value={
+                  settings?.billingEmail ||
+                  accountSummary?.user?.email
+                }
+              />
+
+
+              <SummaryRow
+                label="GST Number"
+                value={
+                  settings?.gstNumber ||
+                  accountSummary?.user?.gstNumber ||
+                  accountSummary?.user?.gstin
+                }
+              />
+
+
+              <SummaryRow
+                label="Currency"
+                value={settings?.currency}
+              />
+
+            </div>
+
+          </div>
+
+
+          {/* CURRENT PLAN */}
+
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+            <h3 className="font-bold text-sm text-slate-900 mb-5">
+              Current Plan
+            </h3>
+
+
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
+
+              <div className="flex justify-between items-center">
+
+                <div>
+
+                  <p className="text-[11px] text-slate-400">
+                    Current Plan
+                  </p>
+
+                  <h3 className="text-base font-bold text-slate-900 mt-1">
+                    {accountSummary?.user?.plan || "Free"}
+                  </h3>
+
+                </div>
+
+
+                <CreditCard
+                  size={24}
+                  className="text-blue-600"
+                />
+
+              </div>
+
+
+              <div className="mt-5">
+
+                <p className="text-[11px] text-slate-400">
+                  Plan Expiry
+                </p>
+
+                <p className="text-xs font-bold text-slate-700 mt-1">
+
+                  {accountSummary?.user?.planExpiry
+                    ? new Date(
+                        accountSummary.user.planExpiry
+                      ).toLocaleDateString()
+                    : "Not available"}
+
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =====================================
+          NOTIFICATIONS
+      ===================================== */}
+
+      {activeTab === "Notifications" && (
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+
+          {/* NOTIFICATION SETTINGS */}
+
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+            <h3 className="font-bold text-sm text-slate-900 mb-5">
+              Notification Preferences
+            </h3>
+
+
+            <NotificationRow
+              title="Email Notifications"
+              desc="Receive important updates through email."
+              value={settings?.emailNotification}
+              onChange={async () => {
+
+                try {
+
+                  const res =
+                    await updateNotifications({
+
+                      emailNotification:
+                        !settings?.emailNotification,
+
+                      pushNotification:
+                        settings?.pushNotification,
+
+                      smsNotification:
+                        settings?.smsNotification
+
+                    });
+
+                  setSettings(
+                    res.data.data || {}
+                  );
+
+                } catch (err) {
+
+                  console.error(err);
+
+                }
+
+              }}
+            />
+
+
+            <div className="border-t border-slate-100" />
+
+
+            <NotificationRow
+              title="Push Notifications"
+              desc="Receive notifications inside the application."
+              value={settings?.pushNotification}
+              onChange={async () => {
+
+                try {
+
+                  const res =
+                    await updateNotifications({
+
+                      emailNotification:
+                        settings?.emailNotification,
+
+                      pushNotification:
+                        !settings?.pushNotification,
+
+                      smsNotification:
+                        settings?.smsNotification
+
+                    });
+
+                  setSettings(
+                    res.data.data || {}
+                  );
+
+                } catch (err) {
+
+                  console.error(err);
+
+                }
+
+              }}
+            />
+
+
+            <div className="border-t border-slate-100" />
+
+
+            <NotificationRow
+              title="SMS Notifications"
+              desc="Receive important updates through SMS."
+              value={settings?.smsNotification}
+              onChange={async () => {
+
+                try {
+
+                  const res =
+                    await updateNotifications({
+
+                      emailNotification:
+                        settings?.emailNotification,
+
+                      pushNotification:
+                        settings?.pushNotification,
+
+                      smsNotification:
+                        !settings?.smsNotification
+
+                    });
+
+                  setSettings(
+                    res.data.data || {}
+                  );
+
+                } catch (err) {
+
+                  console.error(err);
+
+                }
+
+              }}
+            />
+
+          </div>
+
+
+          {/* NOTIFICATION SUMMARY */}
+
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+            <h3 className="font-bold text-sm text-slate-900 mb-5">
+              Notification Summary
+            </h3>
+
+
+            <div className="space-y-4">
+
+              <SummaryRow
+                label="Email"
+                value={
+                  settings?.emailNotification
+                    ? "Enabled"
+                    : "Disabled"
+                }
+              />
+
+              <SummaryRow
+                label="Push"
+                value={
+                  settings?.pushNotification
+                    ? "Enabled"
+                    : "Disabled"
+                }
+              />
+
+              <SummaryRow
+                label="SMS"
+                value={
+                  settings?.smsNotification
+                    ? "Enabled"
+                    : "Disabled"
+                }
+              />
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =====================================
+          FOOTER
+      ===================================== */}
+
       <div className="flex justify-between items-center text-[11px] text-slate-400 font-medium mt-8 pt-4 border-t border-slate-200">
+
         <span className="flex items-center gap-1">
+
           <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+
           All changes are automatically saved.
+
         </span>
+
+
         <button className="flex items-center gap-1 hover:text-slate-600 font-semibold">
-          <HelpCircle size={14} /> Help Center
+
+          <HelpCircle size={14} />
+
+          Help Center
+
         </button>
+
       </div>
 
     </div>
+
   );
+
 }
 
-{/* --- HELPER COMPONENTS FOR PERFECT DESIGN --- */}
 
-function SettingRow({ icon, title, desc, control }) {
+/* =====================================================
+   SETTING ROW
+===================================================== */
+
+function SettingRow({
+  icon,
+  title,
+  desc,
+  control
+}) {
+
   return (
-    <div className="flex items-center justify-between py-4 first:pt-0 last:pb-0 gap-4">
-      <div className="flex items-start gap-3.5 min-w-0">
-        <div className="p-2 bg-slate-50 rounded-xl border border-slate-100 flex-shrink-0 mt-0.5">
+
+    <div className="flex items-center justify-between py-4 gap-4">
+
+      <div className="flex items-start gap-3 min-w-0">
+
+        <div className="p-2 bg-slate-50 rounded-lg border border-slate-100 shrink-0">
+
           {icon}
+
         </div>
+
+
         <div className="min-w-0">
-          <h4 className="text-sm font-bold text-slate-900">{title}</h4>
-          <p className="text-xs text-slate-400 mt-0.5 font-medium truncate max-w-[250px] sm:max-w-md">{desc}</p>
+
+          <h4 className="text-xs font-bold text-slate-900">
+            {title}
+          </h4>
+
+          <p className="text-[11px] text-slate-400 mt-0.5">
+            {desc}
+          </p>
+
         </div>
+
       </div>
-      <div className="flex-shrink-0">
+
+
+      <div className="shrink-0">
         {control}
       </div>
+
     </div>
+
   );
+
 }
 
-function ActivityItem({ icon, title, time }) {
+
+/* =====================================================
+   PROFILE ITEM
+===================================================== */
+
+function ProfileItem({
+  icon,
+  label,
+  value
+}) {
+
   return (
-    <div className="flex items-center justify-between text-xs group cursor-pointer">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="w-8 h-8 bg-slate-50 border border-slate-100 rounded-lg flex items-center justify-center text-sm flex-shrink-0">
-          {icon}
-        </div>
-        <div className="min-w-0">
-          <h4 className="font-bold text-slate-800 truncate group-hover:text-blue-600 transition-colors">{title}</h4>
-          <p className="text-[11px] text-slate-400 mt-0.5 font-medium">{time}</p>
-        </div>
+
+    <div className="flex items-start gap-3">
+
+      <div className="p-2 bg-slate-50 border border-slate-100 rounded-lg text-slate-500">
+
+        {icon}
+
       </div>
-      <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 transition-colors flex-shrink-0 ml-1" />
+
+
+      <div>
+
+        <p className="text-[10px] text-slate-400 font-semibold">
+          {label}
+        </p>
+
+        <p className="text-xs text-slate-800 font-bold mt-1">
+          {value || "-"}
+        </p>
+
+      </div>
+
     </div>
+
   );
+
 }
 
-function QuickActionRow({ icon, label, isDanger = false }) {
+
+/* =====================================================
+   SUMMARY ROW
+===================================================== */
+
+function SummaryRow({
+  label,
+  value
+}) {
+
   return (
-    <div className="flex items-center justify-between py-2.5 px-2 rounded-lg hover:bg-slate-50 cursor-pointer group transition-colors">
+
+    <div className="flex justify-between items-center gap-4 text-xs">
+
+      <span className="text-slate-400 font-medium">
+        {label}
+      </span>
+
+      <span className="text-slate-800 font-bold text-right">
+        {value || "-"}
+      </span>
+
+    </div>
+
+  );
+
+}
+
+
+/* =====================================================
+   VERIFICATION ROW
+===================================================== */
+
+function VerificationRow({
+  label,
+  verified
+}) {
+
+  return (
+
+    <div className="flex justify-between items-center">
+
+      <span className="text-xs font-medium text-slate-600">
+        {label}
+      </span>
+
+      <span
+        className={`text-xs font-bold ${
+          verified
+            ? "text-emerald-600"
+            : "text-slate-400"
+        }`}
+      >
+        {verified
+          ? "✓ Verified"
+          : "Not Verified"}
+      </span>
+
+    </div>
+
+  );
+
+}
+
+
+/* =====================================================
+   NOTIFICATION ROW
+===================================================== */
+
+function NotificationRow({
+  title,
+  desc,
+  value,
+  onChange
+}) {
+
+  return (
+
+    <div className="flex items-center justify-between py-4 gap-4">
+
+      <div className="flex items-start gap-3">
+
+        <div className="p-2 bg-slate-50 border border-slate-100 rounded-lg">
+
+          <Bell
+            size={16}
+            className="text-slate-500"
+          />
+
+        </div>
+
+
+        <div>
+
+          <h4 className="text-xs font-bold text-slate-900">
+            {title}
+          </h4>
+
+          <p className="text-[11px] text-slate-400 mt-0.5">
+            {desc}
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <button onClick={onChange}>
+
+        {value ? (
+
+          <ToggleRight
+            size={30}
+            className="text-blue-600"
+          />
+
+        ) : (
+
+          <ToggleLeft
+            size={30}
+            className="text-slate-300"
+          />
+
+        )}
+
+      </button>
+
+    </div>
+
+  );
+
+}
+
+
+/* =====================================================
+   QUICK ACTION
+===================================================== */
+
+function QuickActionRow({
+  icon,
+  label,
+  isDanger = false,
+  onClick
+}) {
+
+  return (
+
+    <div
+      onClick={onClick}
+      className="flex items-center justify-between py-2.5 px-2 rounded-lg hover:bg-slate-50 cursor-pointer group transition-colors"
+    >
+
       <div className="flex items-center gap-3">
-        <div className={`p-1.5 rounded-md ${isDanger ? 'bg-rose-50' : 'bg-slate-50 border border-slate-100'}`}>
-          {icon}
-        </div>
-        <span className={`text-xs font-bold ${isDanger ? 'text-rose-600' : 'text-slate-700'}`}>{label}</span>
-      </div>
-      <ChevronRight size={14} className="text-slate-300 group-hover:text-slate-500 transition-colors" />
-    </div>
-  );
-}
 
-// Custom simple icon for items per page
-function FileTextIcon({ className }) {
-  return (
-    <div className={`w-4 h-4 border border-current rounded-sm relative ${className}`}>
-      <span className="absolute top-1 left-0.5 right-0.5 h-0.5 bg-current" />
-      <span className="absolute top-2 left-0.5 right-1 h-0.5 bg-current" />
+        <div
+          className={`p-1.5 rounded-md ${
+            isDanger
+              ? "bg-rose-50"
+              : "bg-slate-50 border border-slate-100"
+          }`}
+        >
+
+          {icon}
+
+        </div>
+
+
+        <span
+          className={`text-xs font-bold ${
+            isDanger
+              ? "text-rose-600"
+              : "text-slate-700"
+          }`}
+        >
+          {label}
+        </span>
+
+      </div>
+
+
+      <ChevronRight
+        size={14}
+        className="text-slate-300 group-hover:text-slate-500"
+      />
+
     </div>
+
   );
+
 }

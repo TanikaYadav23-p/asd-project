@@ -53,6 +53,20 @@ const settingSchema = new mongoose.Schema({
         type:Boolean,
         default:true
     },
+    billingEmail: {
+  type: String,
+  default: ""
+},
+
+billingCompanyName: {
+  type: String,
+  default: ""
+},
+
+billingGstNumber: {
+  type: String,
+  default: ""
+},
 
     pushNotification:{
         type:Boolean,

@@ -173,42 +173,38 @@ exports.getSettings = async (req, res) => {
   };
 
   exports.updateBilling = async (req, res) => {
-    try {
-  
-      const settings = await Setting.findOneAndUpdate(
-  
-        {
-          userId: req.user._id
-        },
-  
-        {
-          billingEmail: req.body.billingEmail,
-          gstNumber: req.body.gstNumber,
-          companyName: req.body.companyName
-        },
-  
-        {
-          new: true
-        }
-  
-      );
-  
-      res.json({
-        status:1,
-        message:"Billing updated successfully",
-        data:settings
-      });
-  
-    } catch (error) {
-  
-      res.status(500).json({
-        status:0,
-        message:error.message
-      });
-  
-    }
-  };
+  try {
 
+    const settings = await Setting.findOneAndUpdate(
+      {
+        userId: req.user._id
+      },
+      {
+        billingEmail: req.body.billingEmail,
+        billingCompanyName: req.body.billingCompanyName,
+        billingGstNumber: req.body.billingGstNumber
+      },
+      {
+        new: true,
+        upsert: true
+      }
+    );
+
+    res.json({
+      status: 1,
+      message: "Billing updated successfully",
+      data: settings
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      status: 0,
+      message: error.message
+    });
+
+  }
+};
   exports.updateTheme = async(req,res)=>{
 
     try{
@@ -253,68 +249,50 @@ exports.getSettings = async (req, res) => {
     
     };
 
-    const bcrypt=require("bcryptjs");
+   const bcrypt = require("bcryptjs");
 
-exports.changePassword=async(req,res)=>{
+exports.changePassword = async (req, res) => {
+  try {
 
-try{
+    const {
+      oldPassword,
+      newPassword
+    } = req.body;
 
-const{
+    const user = await User.findById(req.user._id)
+      .select("+password");
 
-oldPassword,
+    const match = await bcrypt.compare(
+      oldPassword,
+      user.password
+    );
 
-newPassword
+    if (!match) {
+      return res.status(400).json({
+        status: 0,
+        message: "Old password is incorrect"
+      });
+    }
 
-}=req.body;
+    const hash = await bcrypt.hash(newPassword, 10);
 
-const user=await User.findById(req.user._id);
+    user.password = hash;
 
-const match=await bcrypt.compare(
+    await user.save();
 
-oldPassword,
+    res.json({
+      status: 1,
+      message: "Password changed successfully"
+    });
 
-user.password
+  } catch (error) {
 
-);
+    res.status(500).json({
+      status: 0,
+      message: error.message
+    });
 
-if(!match){
-
-return res.status(400).json({
-
-status:0,
-
-message:"Old password is incorrect"
-
-});
-
-}
-
-const hash=await bcrypt.hash(newPassword,10);
-
-user.password=hash;
-
-await user.save();
-
-res.json({
-
-status:1,
-
-message:"Password changed successfully"
-
-});
-
-}catch(error){
-
-res.status(500).json({
-
-status:0,
-
-message:error.message
-
-});
-
-}
-
+  }
 };
 
 exports.getActivity=async(req,res)=>{
@@ -357,56 +335,38 @@ exports.getActivity=async(req,res)=>{
     
     };
 
-    exports.getAccountSummary=async(req,res)=>{
+    exports.getAccountSummary = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+      .select(
+        "name email phone companyName gstNumber importExportId businessType " +
+        "country city address accountType plan accountStatus profileCompletion " +
+        "emailVerified phoneVerified gstVerified twoFactorEnabled profileImage " +
+        "designation createdAt lastLogin planExpiry"
+      )
+      .populate("roleId", "name")
+      .populate("planId");
 
-        try{
-        
-        const user=await User.findById(req.user._id)
-        
-        .select(
-        
-        "name email role createdAt lastLogin"
-        
-        ).populate("roleId", "name");
-        
-        const settings=await Setting.findOne({
-        
-        userId:req.user._id
-        
-        });
-        
-        res.json({
-        
-        status:1,
-        
-        data:{
-        
+    const settings = await Setting.findOne({
+      userId: req.user._id
+    });
+
+    res.json({
+      status: 1,
+      data: {
         user,
-        
-        theme:settings?.theme,
-        
-        language:settings?.language,
-        
-        currency:settings?.currency,
-        
-        timezone:settings?.timezone
-        
-        }
-        
-        });
-        
-        }catch(error){
-        
-        res.status(500).json({
-        
-        status:0,
-        
-        message:error.message
-        
-        });
-        
-        }
-        
-        };
+        theme: settings?.theme,
+        language: settings?.language,
+        currency: settings?.currency,
+        timezone: settings?.timezone
+      }
+    });
 
+  } catch (error) {
+    res.status(500).json({
+      status: 0,
+      message: error.message
+    });
+  }
+};
         

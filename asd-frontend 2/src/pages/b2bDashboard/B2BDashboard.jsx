@@ -10,6 +10,7 @@ import {
   getTopExportDestinations,
   getRecentShipments
 } from '../../api/B2BDashboardApi';
+import { getDashboard } from "../../api/ShipmentApi";
 import {
   FiMenu,
   FiSearch,
@@ -195,7 +196,7 @@ import Reports from "./Reports";
 import AlertNotification from "./AlertNotification";
 import Settings from "./Settings";
 
-import AuditsLogs from "./AuditsLogs";
+
 import SelectRangeModal from "../../components/b2bComponent/SelectDateRange";
 import MarketIntelligencePopup from "../../components/b2bComponent/MarketIntelligence";
 
@@ -347,7 +348,6 @@ const sidebarSections = [
         badge: "Pro Plan",
         badgeColor: "bg-[#00BBA7]",
       },
-      { icon: FiSettings, label: "Audit Logs" },
     ],
   },
 ];
@@ -614,9 +614,6 @@ export default function B2BDashboard() {
               {activeTab === "Settings" && (
               <Settings />
             )}   
-                {activeTab === "Audit Logs" && (
-              <AuditsLogs />
-            )}  
 
 
         </main>   
@@ -847,7 +844,8 @@ const regionMarkers = {
     const [selectedTrend] = useState('This Month');
 
     const [dashboardMetrics, setDashboardMetrics] = useState({});
-    const [operationalInsights, setOperationalInsights] = useState({});
+    
+      const [dashboard, setDashboard] = useState({});
     const [globalTradeOverview, setGlobalTradeOverview] = useState([]);
     const [tradeValueTrend, setTradeValueTrend] = useState([]);
     const [topTradingPartners, setTopTradingPartners] = useState([]);
@@ -864,17 +862,17 @@ const fetchDashboardMetrics = async () => {
   }
 };
 
-
-const fetchOperationalInsights = async () => {
+const fetchDashboard = async () => {
   try {
-    const res = await getOperationalInsights();
-    console.log("Operational Insights:", res.data);
-    setOperationalInsights(res.data.data || {});
+    const res = await getDashboard();
+
+    console.log("Dashboard Response", res.data);
+
+    setDashboard(res.data.data);
   } catch (err) {
-    console.error(err);
+    console.log(err);
   }
 };
-
 
 const fetchGlobalTradeOverview = async () => {
   try {
@@ -942,7 +940,7 @@ const fetchRecentShipments = async () => {
 };
 useEffect(() => {
   fetchDashboardMetrics();
-  fetchOperationalInsights();
+  fetchDashboard();
   fetchGlobalTradeOverview();
   fetchTradeValueTrend();
   fetchTopTradingPartners();
@@ -960,11 +958,11 @@ useEffect(() => {
         { id: 6, title: 'Avg. Lead Time (Days)', value: dashboardMetrics.averageLeadTime?.toFixed(1) || "0.0", growth: '', isPositive: false, color: '#EF4444', bgColor: '#FEF2F2', icon: 'leadTime' },
     ];
   const operationalInsightPills=[
-        { title: 'On-Time Shipments', value: `${operationalInsights.onTimeShipmentRate || 0}%`, growth: '', color: '#0D9488', bgColor: '#F0FDFA', icon: 'ontime' },
-        { title: 'Shipment Accuracy', value: `${operationalInsights.shipmentAccuracy || 0}%` , growth: '', color: '#EF4444', bgColor: '#FEF2F2', icon: 'accuracy' },
-        { title: 'Document Compliance', value: `${operationalInsights.documentCompliance || 0}%`, growth: '', color: '#2563EB', bgColor: '#EFF6FF', icon: 'compliance' },
-        { title: 'Repeat Business Rate', value: `${operationalInsights.repeatBusinessRate || 0}%`, growth: '', color: '#059669', bgColor: '#ECFDF5', icon: 'repeat' },
-        { title: 'Verified Buyer Rate', value: `${operationalInsights.verifiedBuyerRate || 0}%`, growth: '', color: '#F43F5E', bgColor: '#FFF1F2', icon: 'satisfaction' },
+        { title: 'In Transit', value: dashboard.inTransit || 0, growth: '', color: '#0D9488', bgColor: '#F0FDFA', icon: 'ontime' },
+        { title: 'Delivered', value: dashboard.delivered || 0 , growth: '', color: '#EF4444', bgColor: '#FEF2F2', icon: 'accuracy' },
+        { title: 'Delayed', value: dashboard.delayed || 0, growth: '', color: '#2563EB', bgColor: '#EFF6FF', icon: 'compliance' },
+        { title: 'Exception', value: dashboard.exception || 0, growth: '', color: '#059669', bgColor: '#ECFDF5', icon: 'repeat' },
+        { title: 'Pending', value: dashboard.pending || 0, growth: '', color: '#F43F5E', bgColor: '#FFF1F2', icon: 'satisfaction' },
     ];
     const geoUrl =
   "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";

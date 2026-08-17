@@ -162,7 +162,7 @@ export default function ReportsDashboard() {
           </button>
           <button className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded-md text-xs font-medium shadow-sm hover:bg-blue-700 transition-colors">
             <Plus size={14} />
-            Create Invoice
+            Create Reports
           </button>
         </div>
       </div>
