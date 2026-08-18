@@ -135,9 +135,8 @@ import crown from "../../assets/Images/webp/crown.webp"
                 </div>
 
                 {/* Usage */}
-                <div className="bg-white rounded-2xl p-6  shadow-sm border-b-gray-800" >
+                {/* <div className="bg-white rounded-2xl p-6  shadow-sm border-b-gray-800" >
                     <h3 className="font-bold font-sm text-black-800 mb-6 gap-5">Usage Summary</h3>
-
                     {[
                         {
                             icon: <Package size={18} className="text-black-500" />,
@@ -160,7 +159,7 @@ import crown from "../../assets/Images/webp/crown.webp"
                     ].map((item, i) => (
                         <div key={i} className="mb-12 last:mb-0 " >
                             <div className="flex items-center justify-between gap-3">
-                                {/* Left */}
+                               
                                 <div className="flex items-center gap-2 min-w-[110px]">
                                     {item.icon}
                                     <span className="text-[12px] text-black-700">
@@ -168,7 +167,7 @@ import crown from "../../assets/Images/webp/crown.webp"
                                     </span>
                                 </div>
 
-                                {/* Progress + count */}
+                               
                                 <div className="flex items-center gap-3 flex-1">
                                     <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
                                         <div
@@ -182,7 +181,6 @@ import crown from "../../assets/Images/webp/crown.webp"
                                     </span>
                                 </div>
 
-                                {/* Percentage */}
                                 <span className="text-xs font-bold text-black-700 w-8 text-right">
                                     {item.progress}%
                                 </span>
@@ -196,7 +194,7 @@ import crown from "../../assets/Images/webp/crown.webp"
                             <ChevronRight size={15} />
                         </button>
                     </div>
-                </div>
+                </div> */}
 
                 {/* Billing */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border-b-gray-800 ">
@@ -296,24 +294,24 @@ import crown from "../../assets/Images/webp/crown.webp"
                 </div>
 
 
-                {/* Side cards */}
+              
                 <div className="space-y-5">
-                    {/* Payment Method */}
-                    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                 
+                    {/* <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                         <h3 className=" font-semibold text-gray-800 mb-6">
                             Payment Method
                         </h3>
 
                         <div className="border border-gray-200 rounded-2xl px-5 py-6 flex items-center justify-between">
                             <div className="flex items-center gap-4">
-                                {/* VISA Badge */}
+                              
                                 <div className="bg-gray-100 px-3 py-2 rounded-lg">
                                     <span className="text-blue-700 font-bold text-lg">
                                         VISA
                                     </span>
                                 </div>
 
-                                {/* Card Info */}
+                               
                                 <div>
                                     <p className="text-l font-bold text-sm text-gray-800">
                                         Visa ending in 4242
@@ -324,14 +322,14 @@ import crown from "../../assets/Images/webp/crown.webp"
                                 </div>
                             </div>
 
-                            {/* Default Badge */}
+                            
                             <span className="bg-green-100 text-green-600 px-4 py-2 rounded-md text-xs font-semibold">
                                 DEFAULT
                             </span>
                         </div>
-                    </div>
+                    </div> */}
 
-                    {/* Subscription Actions */}
+ 
                     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                         <h3 className=" font-semibold text-gray-800 mb-6">
                             Subscription Actions

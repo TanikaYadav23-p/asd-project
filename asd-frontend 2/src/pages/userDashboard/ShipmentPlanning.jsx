@@ -10,6 +10,7 @@ import { BsAirplane } from "react-icons/bs";
 import { MdOutlineRocketLaunch } from "react-icons/md";
 import plane from "../../assets/Images/webp/aeroplane.webp"
 import girl from "../../assets/Images/webp/girll.webp"
+
 const tabs = [
   { id: 1, label: "Shipment Details" },
   { id: 2, label: "Route & Schedule" },
@@ -73,10 +74,13 @@ const whatsNext = [
   { icon: FiRadio, title: "Track Shipment", sub: "Track status in real-time", btn: "Go to Tracking" },
   { icon: FiShare2, title: "Share Plan", sub: "Share plan with team or partner", btn: "Share Plan" },
 ];
+import PlanSummary from "../../components/userComponent/PlanSummary";
 
-export default function ShipmentPlanning() {
+
+
+export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
   const [activeTab, setActiveTab] = useState(1);
-
+  const [savePlan, setSavePlan] = useState(false)
   return (
     <div className="h-auto bg-gray-50 font-sans flex-1 overflow-y-auto pt-14">
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
@@ -92,7 +96,7 @@ export default function ShipmentPlanning() {
             <FiArrowLeft size={15} /> Back to Dashboard
           </button>
 
-          <button className="flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold px-3 py-1.5 rounded-lg hover:bg-gray-50">
+          <button onClick={() => setMainTab && setMainTab("Saved")} className="flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold px-3 py-1.5 rounded-lg hover:bg-gray-50">
             <FiSave size={15} /> Save Plan
           </button>
 
@@ -153,6 +157,8 @@ export default function ShipmentPlanning() {
           </div>
         </div>
 
+        
+      
         <div className="grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-4  ">
           <div className="flex flex-col gap-4 min-w-0 ">
             <div className="bg-white border border-gray-200 rounded-xl overflow-hidden ">
@@ -484,6 +490,7 @@ export default function ShipmentPlanning() {
       </div>
 
       
+     
 
     </div>
   );

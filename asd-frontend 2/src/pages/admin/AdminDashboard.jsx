@@ -180,11 +180,11 @@ const navItems = [
   { icon: MdLocalShipping, label: "Shipment", color: "text-cyan-400" },
   { icon: MdPeople, label: "Vendors/ Partners", color: "text-green-400" },
   { icon: MdSmartToy, label: "AI Assistant", color: "text-blue-500" },
-  { icon: MdInsights, label: "Trade Intelligence", color: "text-rose-400" },
+  // { icon: MdInsights, label: "Trade Intelligence", color: "text-rose-400" },
   { icon: MdApi, label: "API Integrations", color: "text-emerald-400" },
   { icon: MdCampaign, label: "Ad Managment", color: "text-yellow-500" },
   { icon: MdSupportAgent, label: "Support", color: "text-orange-500" },
-  { icon: MdWidgets, label: "Modules", color: "text-indigo-500" },
+  // { icon: MdWidgets, label: "Modules", color: "text-indigo-500" },
   { icon: MdSettings, label: "Settings", color: "text-gray-400" },
 ];
 

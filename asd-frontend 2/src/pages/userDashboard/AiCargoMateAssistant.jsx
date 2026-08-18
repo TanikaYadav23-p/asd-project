@@ -1,4 +1,4 @@
-import React, { useState, useTransition } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import {
   FiArrowLeft,
   FiSave,
@@ -286,7 +286,10 @@ const AiCargoMateAssistant = () => {
   const [saveReport, setSaveReport] = useState(false)
   const [shareReport, setShareReport] = useState(false)
   const [dataSource, setDataSource] = useState(false)
-
+  
+  useEffect(() => {
+  setNewQuery(true)
+  },[]) 
   return (
     <div className="flex-1 flex flex-col min-w-0 overflow-hidden pt-14">
       {activeTab === "AI CargoMate Assistant" && (<div>
