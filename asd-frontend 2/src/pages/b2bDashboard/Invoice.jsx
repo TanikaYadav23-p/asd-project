@@ -305,10 +305,10 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
             <Download size={13} className="text-slate-500" />
             Export Report
           </button>
-          <button onClick={() => setCreateInvoice(true)} className="flex items-center gap-1 bg-blue-600 text-white rounded-lg px-3 py-1.5 font-semibold shadow-sm hover:bg-blue-700 transition-colors">
+          {/*<button onClick={() => setCreateInvoice(true)} className="flex items-center gap-1 bg-blue-600 text-white rounded-lg px-3 py-1.5 font-semibold shadow-sm hover:bg-blue-700 transition-colors">
             <Plus size={14} />
             Create Invoice
-          </button>
+          </button>*/}
         </div>
       </div>
 
@@ -388,7 +388,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
         ))}
         <div className="flex gap-2 h-8">
           <button className="flex-1 flex items-center justify-center gap-1 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
-            <SlidersHorizontal size={12} /> More Filters
+            <SlidersHorizontal size={12} /> Apply Filters
           </button>
           <button onClick={() =>
     setFilters({
@@ -424,7 +424,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
                     <th className="p-3 font-semibold">Invoice No.</th>
                     <th className="p-3 font-semibold">Invoice Date</th>
                     <th className="p-3 font-semibold">Party</th>
-                    <th className="p-3 font-semibold">Type</th>
+                    {/*<th className="p-3 font-semibold">Type</th>*/}
                     <th className="p-3 font-semibold">Country</th>
                     <th className="p-3 font-semibold">Due Date</th>
                     <th className="p-3 font-semibold text-right">Invoice Value (INR)</th>
@@ -439,7 +439,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
                       <td className="p-3 font-semibold text-blue-600 hover:underline cursor-pointer whitespace-nowrap">{row.invoiceNumber}</td>
                       <td className="p-3 text-slate-400 whitespace-nowrap">{new Date(row.createdAt).toLocaleDateString("en-GB")}</td>
                       <td className="p-3 font-medium text-slate-800 max-w-[140px] truncate">{row.party}</td>
-                      <td className="p-3 text-slate-400 whitespace-nowrap">{row.type}</td>
+                      {/*<td className="p-3 text-slate-400 whitespace-nowrap">{row.type}</td>*/}
                       <td className="p-3 text-slate-600 whitespace-nowrap"> <ReactCountryFlag countryCode={row.countryCode} svg style={{ width: "18px", height: "13px" }}/>{row.country}</td>
                       <td className="p-3 text-slate-400 whitespace-nowrap">{new Date(row.dueDate).toLocaleDateString("en-GB")}</td>
                       <td className="p-3 font-bold text-slate-800 text-right whitespace-nowrap">₹ {row.amount?.toLocaleString("en-IN")}</td>
@@ -529,6 +529,56 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
                 </div>
               </div>
             </div>
+
+             <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-sm font-bold text-slate-900">Recent Invoices</h3>
+              <span className="text-xs font-semibold text-blue-600 cursor-pointer hover:underline">View All</span>
+            </div>
+            
+            <div className="space-y-3">
+              {recentInvoices.map((act, i) => (
+                <div key={i} className="flex items-center justify-between py-1 border-b border-slate-50 last:border-0">
+                  <div>
+                    <span className="text-xs font-bold text-blue-600 hover:underline cursor-pointer block">{act.invoiceNumber}</span>
+                    <span className="text-[11px] font-medium text-slate-700 block mt-0.5">{act.party}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-bold text-slate-900 block">₹ {act.amount?.toLocaleString("en-IN")}</span>
+                    <div className="flex items-center justify-end gap-1.5 mt-0.5">
+                      <span className="text-[10px] text-slate-400 font-medium">{new Date(act.createdAt).toLocaleDateString("en-GB")}</span>
+                      <span className={`text-[8px] px-1 rounded font-bold ${act.status === 'Paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-500'}`}>{act.status}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* WIDGET 4: INVOICE INSIGHTS PANEL */}
+          <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 mb-3">Invoice Insights</h3>
+              <div className="space-y-3">
+                {[
+                   {text: `${insights.paidInvoices || 0} invoices are paid.`, icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-50",},
+                   {text: `₹ ${((insights.pendingAmount || 0) / 10000000).toFixed(2)} Cr in pending payments.`, icon: Wallet, color: "text-indigo-500", bg: "bg-indigo-50",},
+                   {text: `${insights.overdueInvoices || 0} invoices are overdue.`, icon: AlertCircle, color: "text-rose-500", bg: "bg-rose-50",},
+                ].map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 p-2 bg-[#f8fafc]/60 rounded-xl border border-slate-50">
+                    <div className={`p-1 ${item.bg} ${item.color} rounded-lg shrink-0 mt-0.5`}>
+                      <item.icon size={13} />
+                    </div>
+                    <p className="text-[11px] font-semibold text-slate-600 leading-normal">{item.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+           {/*} <button onClick={() => setInvoiceInsight(true)} className="w-full mt-4 text-left text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 pt-3 border-t border-slate-50">
+              View Detailed Insights <ArrowUpRight size={14} />
+            </button> */}
+          </div>
+
 
           </div>
 
@@ -624,9 +674,9 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
               </div>
             </div>
 
-            <button className="w-full mt-4 text-center text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center justify-center gap-1 pt-3 border-t border-slate-50">
+           {/*} <button className="w-full mt-4 text-center text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center justify-center gap-1 pt-3 border-t border-slate-50">
               View All Status <ArrowRight size={13} />
-            </button>
+            </button>*/}
           </div>
 
           {/* WIDGET 2: INVOICE VALUE OVERVIEW LINE SPLINE CHART */}
@@ -668,61 +718,13 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
               </div>
             </div>
 
-            <button onClick={() => setInvoiceInsight(true)} className="w-full mt-4 text-center text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center justify-center gap-1 pt-3 border-t border-slate-50">
+           {/*<button onClick={() => setInvoiceInsight(true)} className="w-full mt-4 text-center text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center justify-center gap-1 pt-3 border-t border-slate-50">
               View Detailed Analytics <ArrowRight size={13} />
-            </button>
+            </button>*/}
           </div>
 
           {/* WIDGET 3: RECENT INVOICES */}
-          <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-sm font-bold text-slate-900">Recent Invoices</h3>
-              <span className="text-xs font-semibold text-blue-600 cursor-pointer hover:underline">View All</span>
-            </div>
-            
-            <div className="space-y-3">
-              {recentInvoices.map((act, i) => (
-                <div key={i} className="flex items-center justify-between py-1 border-b border-slate-50 last:border-0">
-                  <div>
-                    <span className="text-xs font-bold text-blue-600 hover:underline cursor-pointer block">{act.invoiceNumber}</span>
-                    <span className="text-[11px] font-medium text-slate-700 block mt-0.5">{act.party}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs font-bold text-slate-900 block">₹ {act.amount?.toLocaleString("en-IN")}</span>
-                    <div className="flex items-center justify-end gap-1.5 mt-0.5">
-                      <span className="text-[10px] text-slate-400 font-medium">{new Date(act.createdAt).toLocaleDateString("en-GB")}</span>
-                      <span className={`text-[8px] px-1 rounded font-bold ${act.status === 'Paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-500'}`}>{act.status}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* WIDGET 4: INVOICE INSIGHTS PANEL */}
-          <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
-            <div>
-              <h3 className="text-sm font-bold text-slate-900 mb-3">Invoice Insights</h3>
-              <div className="space-y-3">
-                {[
-                   {text: `${insights.paidInvoices || 0} invoices are paid.`, icon: CheckCircle2, color: "text-emerald-500", bg: "bg-emerald-50",},
-                   {text: `₹ ${((insights.pendingAmount || 0) / 10000000).toFixed(2)} Cr in pending payments.`, icon: Wallet, color: "text-indigo-500", bg: "bg-indigo-50",},
-                   {text: `${insights.overdueInvoices || 0} invoices are overdue.`, icon: AlertCircle, color: "text-rose-500", bg: "bg-rose-50",},
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-2 bg-[#f8fafc]/60 rounded-xl border border-slate-50">
-                    <div className={`p-1 ${item.bg} ${item.color} rounded-lg shrink-0 mt-0.5`}>
-                      <item.icon size={13} />
-                    </div>
-                    <p className="text-[11px] font-semibold text-slate-600 leading-normal">{item.text}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <button onClick={() => setInvoiceInsight(true)} className="w-full mt-4 text-left text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 pt-3 border-t border-slate-50">
-              View Detailed Insights <ArrowUpRight size={14} />
-            </button>
-          </div>
-
+         
         </div>
       </div>
 

@@ -992,7 +992,7 @@ useEffect(() => {
         { id: 3, title: 'Active Business Partners', value: dashboardMetrics.activeBusinessPartners?.toLocaleString() || "0", growth: '', isPositive: true, color: '#4F46E5', bgColor: '#EEF2FF', icon: 'partner' },
         { id: 4, title: 'New Business Inquiries', value:  dashboardMetrics.pendingBuyers?.toLocaleString() || "0", growth: '', isPositive: true, color: '#06B6D4', bgColor: '#ECFEFF', icon: 'inquiry' },
         { id: 5, title: 'Avg. Shipment Value (INR)', value:  dashboardMetrics.averageShipmentValue ? `₹${(dashboardMetrics.averageShipmentValue / 100000).toFixed(2)} L` : '₹0.00 L', growth: '', isPositive: true, color: '#F59E0B', bgColor: '#FFFBEB', icon: 'avgVal' },
-        { id: 6, title: 'Avg. Lead Time (Days)', value: dashboardMetrics.averageLeadTime?.toFixed(1) || "0.0", growth: '', isPositive: false, color: '#EF4444', bgColor: '#FEF2F2', icon: 'leadTime' },
+        /*{ id: 6, title: 'Avg. Lead Time (Days)', value: dashboardMetrics.averageLeadTime?.toFixed(1) || "0.0", growth: '', isPositive: false, color: '#EF4444', bgColor: '#FEF2F2', icon: 'leadTime' },*/
     ];
   const operationalInsightPills=[
         { title: 'In Transit', value: dashboard.inTransit || 0, growth: '', color: '#0D9488', bgColor: '#F0FDFA', icon: 'ontime' },
@@ -1124,10 +1124,10 @@ const regionMarkers = {
                         <DynamicIcon type="calendar" color="#64748B" size="4" />
                         <span>01 Apr 2025 - 24 Apr 2025</span>
                     </div>
-                    <button className="bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-xs font-bold text-[#334155] px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition">
+                    {/*<button className="bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-xs font-bold text-[#334155] px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition">
                         <DynamicIcon type="bulb" color="#64748B" size="4" />
                         Customize Dashboard
-                    </button>
+                    </button>*/}
                 </div>
             </div>
 
@@ -1152,7 +1152,7 @@ const regionMarkers = {
                     </div>
                 ))}
             </div> */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             {topMetrics.map((m) => {
               const Icon = iconMap[m.icon];
 
@@ -1214,100 +1214,116 @@ const regionMarkers = {
             {/* --- DATA PANELS ROW 2 (Imported, Exported, & Recent Shipments Tables) --- */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                {/* Top Imported Products */}
-                <div className="bg-white border border-[#E5E7EB] rounded-2xl p-4 shadow-sm flex flex-col justify-between">
-                    <div>
-                        {/* <h4 className="text-[15px] font-bold text-[#0F172A] mb-3 text-[#0F172A] mb-4 tracking-tight"> */}
-                        <h4 className="text-[15px] font-bold text-[#0F172A] mb-4 tracking-tight">
-                            Top Imported Products</h4>
-                        <div className="overflow-x-auto w-full">
-                            <table className="w-full text-left text-xs">
-                                {/* <thead>
-                                    <tr className="text-[#94A3B8] border-b border-[#F1F5F9] font-bold">
-                                        <th className="pb-2 font-medium">HS Code</th>
-                                        <th className="pb-2 font-medium">Product Description</th>
-                                        <th className="pb-2 text-right font-medium">Shipments</th>
-                                        <th className="pb-2 text-right font-medium">Value (INR)</th>
-                                    </tr>
-                                </thead> */}
-                                <thead>
-                                    <tr className="border-b border-[#E5E7EB]">
-                                        <th className="pb-2 text-[11px] font-medium text-[#94A3B8]">
-                                            HS Code
-                                        </th>
+                {/* TOP IMPORTED PRODUCTS */}
+<div className="bg-white border border-[#E5E7EB] rounded-2xl p-5 shadow-sm flex flex-col">
 
-                                        <th className="pb-2 text-[11px] font-medium text-[#94A3B8]">
-                                            Product Description
-                                        </th>
+  {/* HEADER */}
+  <div className="flex items-center justify-between mb-5">
+    <h4 className="text-[15px] font-bold text-[#0F172A] tracking-tight">
+      Top Imported Products
+    </h4>
 
-                                        <th className="pb-2 text-[11px] text-center font-medium text-[#94A3B8]">
-                                            Shipments
-                                        </th>
+  </div>
 
-                                        <th className="pb-2 text-[11px] text-right font-medium text-[#94A3B8]">
-                                            Value (INR)
-                                        </th>
+  {/* PRODUCTS LIST */}
+  <div className="flex flex-col">
 
-                                        <th className="pb-2 text-[11px] text-left font-medium text-[#94A3B8]">
-                                            Share
-                                        </th>
-                                    </tr>
-                                </thead>
-                                {/* <tbody className="divide-y divide-[#F8FAFC] font-bold text-[#334155]">
-                                    {mockData.importedProducts.map(p => (
-                                        <tr key={p.hs} className="hover:bg-[#F8FAFC]/50 transition-colors">
-                                            <td className="py-2.5 font-extrabold text-[#0F172A]">{p.hs}</td>
-                                            <td className="py-2.5 text-[#64748B] font-semibold max-w-[130px] truncate">{p.name}</td>
-                                            <td className="py-2.5 text-right font-medium text-[#475569]">{p.shipments}</td>
-                                            <td className="py-2.5 text-right font-black text-[#334155]">{p.value}</td>
-                                        </tr>
-                                    ))}
-                                </tbody> */}
-                                <tbody>
-                                    {topImportedProducts.map((p) => (
-                                        <tr
-                                            key={p._id}
-                                            className="border-b border-[#F1F5F9] last:border-0"
-                                        >
-                                            <td className="py-2 text-[11px] font-bold text-[#0F172A]">
-                                               {p.hsCode || "-"}
-                                            </td>
+    {topImportedProducts.map((p, index) => {
 
-                                            <td className="py-2 text-[11px] text-[#64748B] truncate max-w-[140px]">
-                                                {p._id || "-"}
-                                            </td>
+      const totalTradeValue = topImportedProducts.reduce(
+        (sum, item) => sum + (item.tradeValue || 0),
+        0
+      );
 
-                                            <td className="py-2 text-[11px] text-center text-[#475569]">
-                                                {p.shipments?.toLocaleString() || "0"}
-                                            </td>
+      const share =
+        totalTradeValue > 0
+          ? ((p.tradeValue || 0) / totalTradeValue) * 100
+          : 0;
 
-                                            <td className="py-2 text-[11px] text-right font-semibold text-[#334155]">
-                                                ₹{((p.tradeValue || 0) / 10000000).toFixed(2)} Cr
-                                            </td>
+      return (
+        <div
+          key={p._id || index}
+          className="py-3.5 border-b border-[#F1F5F9] last:border-0"
+        >
 
-                                            <td className="py-2">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-[10px] text-[#64748B] min-w-[35px]">
-                                                        {topImportedProducts.length > 0 ? (((p.tradeValue || 0) / topImportedProducts.reduce((sum, item) => sum + (item.tradeValue || 0), 0)) * 100).toFixed(1) + "%" : "0%"}
-                                                    </span>
+          {/* TOP ROW */}
+          <div className="flex items-center justify-between gap-4">
 
-                                                    <div className="w-14 h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
-                                                        <div
-                                                            className="h-full bg-[#14B8A6] rounded-full"
-                                                            style={{ width: `${topImportedProducts.length > 0 ? (((p.tradeValue || 0) / topImportedProducts.reduce((sum, item) => sum + (item.tradeValue || 0), 0)) * 100).toFixed(1) : 0}%`, }}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <button className="text-xs font-bold text-[#2563EB] text-center mt-3 pt-3 border-t border-[#F1F5F9]">View All Products</button>
-                </div>
+            {/* LEFT SIDE */}
+            <div className="flex items-center gap-2 min-w-0 flex-1">
 
+              {/* HS CODE */}
+              <span
+                className="text-[11px] text-[#94A3B8] font-medium truncate max-w-[150px]"
+                title={p.hsCode || "-"}
+              >
+                {p.hsCode || "-"}
+              </span>
+
+              {/* PRODUCT NAME */}
+              <span
+                className="text-[11px] text-[#334155] font-medium truncate"
+                title={p.productDescription || p.description || p._id || "-"}
+              >
+                {p.productDescription ||
+                  p.description ||
+                  p._id ||
+                  "-"}
+              </span>
+
+            </div>
+
+            {/* VALUE */}
+            <span className="text-[11px] font-semibold text-[#0F172A] whitespace-nowrap">
+              ₹{((p.tradeValue || 0) / 10000000).toFixed(2)} Cr
+            </span>
+
+          </div>
+
+
+          {/* PROGRESS + SHARE */}
+          <div className="flex items-center gap-3 mt-2">
+
+            {/* PROGRESS BAR */}
+            <div className="flex-1 h-1.5 bg-[#EEF2F7] rounded-full overflow-hidden">
+
+              <div
+                className="h-full bg-[#3B82F6] rounded-full transition-all duration-300"
+                style={{
+                  width: `${share}%`,
+                }}
+              />
+
+            </div>
+
+            {/* PERCENTAGE */}
+            <span className="text-[10px] text-[#94A3B8] font-medium w-8 text-right">
+              {share.toFixed(0)}%
+            </span>
+
+          </div>
+
+        </div>
+      );
+    })}
+
+  </div>
+
+
+  {/* EMPTY STATE */}
+  {topImportedProducts.length === 0 && (
+    <div className="py-8 text-center text-xs text-[#94A3B8]">
+      No imported products available.
+    </div>
+  )}
+
+
+  {/* FOOTER */}
+  <button className="w-full text-center text-xs font-bold text-[#2563EB] mt-4 pt-4 border-t border-[#F1F5F9] hover:text-blue-700 transition-colors">
+    View All Products →
+  </button>
+
+</div>
                 {/* Top Export Destinations */}
                 <div className="bg-white border border-[#E2E8F0] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
                     <div>

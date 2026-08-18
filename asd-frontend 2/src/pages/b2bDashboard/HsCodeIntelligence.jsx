@@ -252,11 +252,10 @@ const fetchFilterOptions = async () => {
    { title: "Total Export Shipments", value: dashboard.totalShipments || 0, change: "", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
    { title: "Total Export Value (INR)", value: `₹${((dashboard.totalTradeValue || 0) / 10000000).toFixed(2)} Cr`, change: "", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
    { title: "Total Exporters", value: dashboard.totalExporters || 0, change: "", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
-   { title: "Total Suppliers", value: dashboard.totalSuppliers || 0, change: "", icon: Truck, color: "text-emerald-500", bg: "bg-emerald-50", isUp: true },
+   
    { title: "Countries of Origin", value: dashboard.countries || 0, change: "", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
    { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
-   { title: "Avg. Lead Time (Days)", value: dashboard.avgLeadTime || 0, change: "", icon: Clock3, color: "text-red-500", bg: "bg-red-50", isUp: false },
-  ];
+    ];
   // ==========================================
   // 3. DYNAMIC FILTERING LOGIC
   // ==========================================
@@ -302,7 +301,7 @@ const fetchFilterOptions = async () => {
       </div>
 
       {/* METRICS METERS ROW */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3 mb-5">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (
@@ -411,49 +410,6 @@ const fetchFilterOptions = async () => {
         </div>
       </div>
 
-      {/* TABS NAVIGATION BAR */}
-      <div className="flex border-b border-slate-200 gap-6 mb-5 overflow-x-auto whitespace-nowrap scrollbar-none">
-        {["Overview", "HS Code List", "Trade Flow", "Top Products", "Countries", "Importers", "Exporters", "Trends & Insights"].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`pb-2.5 text-xs font-bold transition-all relative ${
-              activeTab === tab ? "text-emerald-600 font-extrabold" : "text-slate-500 hover:text-slate-800"
-            }`}
-          >
-            {tab}
-            {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-[2.5px] bg-emerald-500 rounded-full" />}
-          </button>
-        ))}
-      </div>
-
-   
-    <section className="w-full border-b border-gray-200 bg-white rounded-xl shadow-sm mb-3 px-2">
-      <div className="mx-auto max-w-7xl">
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex min-w-max items-center gap-7 sm:gap-9 md:gap-10 px-4 sm:px-6 lg:px-0">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`relative whitespace-nowrap py-5 text-xs sm:text-sm font-semibold transition-colors duration-200 ${
-                  activeTab === tab
-                    ? "text-[#33cc99]"
-                    : "text-[#071A5B] hover:text-[#33cc99]"
-                }`}
-              >
-                {tab}
-
-                {activeTab === tab && (
-                  <span className="absolute left-0 bottom-0 h-[3px] w-full rounded-full bg-[#33cc99]" />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-
       {/* CORE CHARTS QUAD GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
         
@@ -462,7 +418,7 @@ const fetchFilterOptions = async () => {
           <div>
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-bold text-xs text-slate-800">Top HS Codes by Trade Value</h3>
-              <button className="text-blue-600 text-[11px] font-bold">View All</button>
+              {/*<button className="text-blue-600 text-[11px] font-bold">View All</button>*/}
             </div>
             <div className="space-y-3">
               {hsCodeList.map((item, idx) => (
@@ -563,7 +519,7 @@ const fetchFilterOptions = async () => {
         <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-bold text-xs text-slate-800">Top HS Codes by Growth <span className="text-[10px] text-slate-400 font-normal">(vs last month)</span></h3>
-            <button className="text-blue-600 text-[11px] font-bold">View All</button>
+            {/*<button className="text-blue-600 text-[11px] font-bold">View All</button>*/}
           </div>
           <div className="divide-y divide-slate-50">
             {importers.map((item, i) => (
@@ -584,7 +540,7 @@ const fetchFilterOptions = async () => {
         <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
           <div className="flex justify-between items-center mb-3">
             <h3 className="font-bold text-xs text-slate-800">Top HS Codes by Shipments</h3>
-            <button className="text-blue-600 text-[11px] font-bold">View All</button>
+           {/* <button className="text-blue-600 text-[11px] font-bold">View All</button>*/}
           </div>
           <div className="space-y-2.5">
             {topProducts.map((item, i) => (
@@ -609,7 +565,7 @@ const fetchFilterOptions = async () => {
           <div>
             <div className="flex justify-between items-center mb-2">
               <h3 className="font-bold text-xs text-slate-800">Trade Value by Top Countries</h3>
-              <button className="text-blue-600 text-[11px] font-bold">View All</button>
+              {/*<button className="text-blue-600 text-[11px] font-bold">View All</button>*/}
             </div>
             <div className="flex items-center justify-between gap-2 h-[140px]">
               <div className="relative w-[100px] h-[100px] shrink-0">
@@ -641,7 +597,7 @@ const fetchFilterOptions = async () => {
         </div>
       </div>
 
-      {/* DYNAMIC METADATA GRID DATA TABLE */}
+      {/* DYNAMIC METADATA GRID DATA TABLE 
       <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm ">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
           <h3 className="font-bold text-sm text-slate-800">HS Code Details</h3>
@@ -706,7 +662,7 @@ const fetchFilterOptions = async () => {
             </table>
           </div>
         </div>
-      </div>
+      </div>*/}
 
       {/* FOOTER METADATA TIMESTAMP */}
       <div className="mt-5 pt-3 border-t border-slate-200/60 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 gap-2">

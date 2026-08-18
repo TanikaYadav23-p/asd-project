@@ -578,60 +578,6 @@ export default function SettingsDashboard() {
             </h3>
 
 
-            <SettingRow
-              icon={<ShieldAlert size={16} className="text-slate-500" />}
-              title="Two-Factor Authentication"
-              desc="Add an additional layer of security."
-              control={
-
-                <button
-                  onClick={async () => {
-
-                    try {
-
-                      const newValue =
-                        !settings?.twoFactorAuth;
-
-                      const res =
-                        await updateSecurity({
-                          twoFactorAuth: newValue,
-                          sessionTimeout:
-                            settings?.sessionTimeout || 30
-                        });
-
-                      setSettings(
-                        res.data.data || {}
-                      );
-
-                    } catch (err) {
-
-                      console.error(err);
-
-                    }
-
-                  }}
-                >
-
-                  {settings?.twoFactorAuth ? (
-
-                    <ToggleRight
-                      size={30}
-                      className="text-blue-600"
-                    />
-
-                  ) : (
-
-                    <ToggleLeft
-                      size={30}
-                      className="text-slate-300"
-                    />
-
-                  )}
-
-                </button>
-
-              }
-            />
 
 
             <div className="border-t border-slate-100" />

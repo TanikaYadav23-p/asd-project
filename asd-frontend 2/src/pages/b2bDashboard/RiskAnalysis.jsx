@@ -534,7 +534,7 @@ const filteredRiskTopCountries = useMemo(() => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 mb-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-5">
           {KPI_STATS.map((stat, idx) => {
             const Icon = stat.icon;
             return (
@@ -563,7 +563,7 @@ const filteredRiskTopCountries = useMemo(() => {
         </div>
 
         <SectionCard className="mb-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 items-end">
             <div>
               <label className="text-[10px] text-slate-400 font-bold block mb-1.5 uppercase">Risk Type</label>
               <div className="relative">
@@ -613,9 +613,9 @@ const filteredRiskTopCountries = useMemo(() => {
               </div>
             </div>
             <div className="flex gap-2">
-              <button className="flex items-center justify-center gap-1.5 bg-slate-50/80 border border-slate-200 text-slate-600 rounded-xl py-2 px-3 text-xs font-semibold hover:bg-slate-100 transition whitespace-nowrap">
+              {/*<button className="flex items-center justify-center gap-1.5 bg-slate-50/80 border border-slate-200 text-slate-600 rounded-xl py-2 px-3 text-xs font-semibold hover:bg-slate-100 transition whitespace-nowrap">
                 <Sliders size={13} className="text-slate-400" /> More Filters
-              </button>
+              </button>*/}
               <button onClick={handleApplyFilters} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl py-2 px-3 transition shadow-xs whitespace-nowrap">
                 Apply Filters
               </button>
