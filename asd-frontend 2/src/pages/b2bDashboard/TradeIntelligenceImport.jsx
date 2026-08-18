@@ -470,7 +470,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-sm text-slate-800">Top Imported Products</h3>
-              <button className="text-blue-600 text-xs font-semibold">View All</button>
+             {/* <button className="text-blue-600 text-xs font-semibold">View All</button>*/}
             </div>
             <div className="space-y-3.5">
               {PRODUCTS.map((prod, i) => (
@@ -497,8 +497,8 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
         <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
           <div className="flex justify-between items-center mb-2">
             <h3 className="font-bold text-sm text-slate-800">Import Value Trend (INR)</h3>
-            <span className="text-[11px] font-bold text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Top Ports</span>
-          </div>
+            {/*<span className="text-[11px] font-bold text-slate-700 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">Top Ports</span>
+     */}     </div>
           <div className="mb-4">
             <span className="text-xl font-bold text-slate-800">₹{(totalImportValue / 10000000).toFixed(2)} Cr</span>
             <span className="text-xs text-green-500 font-medium ml-2"> {importTrend.length > 0 ? "-" : ""}</span>
