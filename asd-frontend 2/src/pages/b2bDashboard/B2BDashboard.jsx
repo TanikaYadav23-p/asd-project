@@ -992,7 +992,7 @@ useEffect(() => {
         { id: 3, title: 'Active Business Partners', value: dashboardMetrics.activeBusinessPartners?.toLocaleString() || "0", growth: '', isPositive: true, color: '#4F46E5', bgColor: '#EEF2FF', icon: 'partner' },
         { id: 4, title: 'New Business Inquiries', value:  dashboardMetrics.pendingBuyers?.toLocaleString() || "0", growth: '', isPositive: true, color: '#06B6D4', bgColor: '#ECFEFF', icon: 'inquiry' },
         { id: 5, title: 'Avg. Shipment Value (INR)', value:  dashboardMetrics.averageShipmentValue ? `₹${(dashboardMetrics.averageShipmentValue / 100000).toFixed(2)} L` : '₹0.00 L', growth: '', isPositive: true, color: '#F59E0B', bgColor: '#FFFBEB', icon: 'avgVal' },
-        { id: 6, title: 'Avg. Lead Time (Days)', value: dashboardMetrics.averageLeadTime?.toFixed(1) || "0.0", growth: '', isPositive: false, color: '#EF4444', bgColor: '#FEF2F2', icon: 'leadTime' },
+        /*{ id: 6, title: 'Avg. Lead Time (Days)', value: dashboardMetrics.averageLeadTime?.toFixed(1) || "0.0", growth: '', isPositive: false, color: '#EF4444', bgColor: '#FEF2F2', icon: 'leadTime' },*/
     ];
   const operationalInsightPills=[
         { title: 'In Transit', value: dashboard.inTransit || 0, growth: '', color: '#0D9488', bgColor: '#F0FDFA', icon: 'ontime' },
@@ -1124,10 +1124,10 @@ const regionMarkers = {
                         <DynamicIcon type="calendar" color="#64748B" size="4" />
                         <span>01 Apr 2025 - 24 Apr 2025</span>
                     </div>
-                    <button className="bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-xs font-bold text-[#334155] px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition">
+                    {/*<button className="bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-xs font-bold text-[#334155] px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition">
                         <DynamicIcon type="bulb" color="#64748B" size="4" />
                         Customize Dashboard
-                    </button>
+                    </button>*/}
                 </div>
             </div>
 
@@ -1152,7 +1152,7 @@ const regionMarkers = {
                     </div>
                 ))}
             </div> */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
             {topMetrics.map((m) => {
               const Icon = iconMap[m.icon];
 

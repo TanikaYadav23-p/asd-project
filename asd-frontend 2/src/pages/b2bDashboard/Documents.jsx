@@ -460,14 +460,14 @@ const handleResetDocumentFilters = () => {
               <Download size={14} className="text-slate-400" />
               Export Report
             </button>
-            <button onClick={() => setUploadShipment(true)} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
+            {/*<button onClick={() => setUploadShipment(true)} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
               <Upload size={14} />
               Upload Shipment
-            </button>
+            </button>*/}
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-5">
           {KPI_STATS.map((stat, idx) => {
             const Icon = stat.icon;
             return (
@@ -487,7 +487,7 @@ const handleResetDocumentFilters = () => {
               </div>
             );
           })}
-          <div className="bg-white border border-slate-100 p-3 sm:p-3.5 rounded-2xl shadow-xs flex flex-col justify-between hover:shadow-md transition duration-200">
+          {/*<div className="bg-white border border-slate-100 p-3 sm:p-3.5 rounded-2xl shadow-xs flex flex-col justify-between hover:shadow-md transition duration-200">
             <div className="flex justify-between items-start gap-2">
               <span className={`text-[10px] sm:text-[11px] font-semibold leading-tight ${HEADING}`}>Storage Used</span>
               <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-indigo-50 text-indigo-500">
@@ -501,7 +501,7 @@ const handleResetDocumentFilters = () => {
               </div>
               <span className="text-[9px] font-bold block mt-1 text-slate-400">{storage.documents || 0} Documents</span>
             </div>
-          </div>
+          </div>*/}
         </div>
 
         <SectionCard className="mb-5">
@@ -611,9 +611,9 @@ const handleResetDocumentFilters = () => {
                   <th className="text-left py-2 font-bold">Related To</th>
                   <th className="text-left py-2 font-bold">Country</th>
                   <th className="text-left py-2 font-bold">Upload Date</th>
-                  <th className="text-left py-2 font-bold">Expiry Date</th>
+                  {/*<th className="text-left py-2 font-bold">Expiry Date</th>*/}
                   <th className="text-left py-2 font-bold">Status</th>
-                  <th className="text-right py-2 font-bold">Actions</th>
+                  {/*<th className="text-right py-2 font-bold">Actions</th>*/}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
@@ -635,13 +635,13 @@ const handleResetDocumentFilters = () => {
                       </span>
                     </td>
                     <td className="py-3 text-slate-500 font-bold whitespace-nowrap">{new Date(d.createdAt).toLocaleDateString()}</td>
-                    <td className="py-3 text-slate-500 font-bold whitespace-nowrap">{d.expiry  ? new Date(d.expiryDate).toLocaleDateString() : "-"}</td>
+                    {/*<td className="py-3 text-slate-500 font-bold whitespace-nowrap">{d.expiry  ? new Date(d.expiryDate).toLocaleDateString() : "-"}</td>*/}
                     <td className="py-3"><StatusBadge status={d.status} /></td>
-                    <td className="py-3 text-right">
+                    {/*<td className="py-3 text-right">
                       <button className="text-slate-400 hover:text-slate-600">
                         <MoreVertical size={15} />
                       </button>
-                    </td>
+                    </td>*/}
                   </tr>
                 ))}
               </tbody>
@@ -701,9 +701,9 @@ const handleResetDocumentFilters = () => {
                 ))}
               </div>
             </div>
-            <button className="text-blue-600 text-xs font-bold text-center mt-3 pt-2 border-t border-slate-50 w-full">
+            {/*<button className="text-blue-600 text-xs font-bold text-center mt-3 pt-2 border-t border-slate-50 w-full">
               View All Types →
-            </button>
+            </button>*/}
           </SectionCard>
 
           <SectionCard>
@@ -733,9 +733,9 @@ const handleResetDocumentFilters = () => {
               <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-amber-400" /> Pending</span>
               <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-rose-500" /> Expired</span>
             </div>
-            <button className="text-blue-600 text-xs font-bold text-center mt-3 pt-2 border-t border-slate-50 w-full">
+           {/* <button className="text-blue-600 text-xs font-bold text-center mt-3 pt-2 border-t border-slate-50 w-full">
               View Detailed Analytics →
-            </button>
+            </button>*/}
           </SectionCard>
 
           <SectionCard>
@@ -762,8 +762,8 @@ const handleResetDocumentFilters = () => {
           </SectionCard>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-4">
-          <SectionCard>
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-5 mb-4">
+          {/*<SectionCard>
             <ViewAllHeader title="Expiring Soon" />
             <div className="space-y-2.5">
               {expiringDocuments.map((doc, i) => {
@@ -790,7 +790,7 @@ const handleResetDocumentFilters = () => {
                 );
               })}
             </div>
-          </SectionCard>
+          </SectionCard>*/}
 
           <SectionCard>
             <ViewAllHeader title="Recent Uploads"  onClick={() => setRecentUpload(true)} />

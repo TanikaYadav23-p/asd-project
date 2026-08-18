@@ -225,8 +225,7 @@ export default function ExportIntelligenceDashboard() {
     { title: "Total Export Shipments", value: dashboard.totalExportShipments || 0, change: "", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
     { title: "Total Export Value (INR)", value: dashboard.totalExportShipments || 0, change: "", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
     { title: "Total Exporters", value: dashboard.totalExporters || 0, change: "", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
-    { title: "Total Suppliers", value: dashboard.totalSuppliers || 0, change: "", icon: Truck, color: "text-emerald-500", bg: "bg-emerald-50", isUp: true },
-    { title: "Countries of Origin", value: dashboard.countries || 0, change: "", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
+   { title: "Countries of Origin", value: dashboard.countries || 0, change: "", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
     { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
     { title: "Avg. Lead Time (Days)", value: dashboard.avgLeadTime || 0, change: "", icon: Clock3, color: "text-red-500", bg: "bg-red-50", isUp: false },
   ];
@@ -335,7 +334,7 @@ export default function ExportIntelligenceDashboard() {
         </div>
 
         {/* METRICS STATS GRID */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
           {INITIAL_STATS.map((item, index) => {
             const Icon = item.icon;
             return (
@@ -471,9 +470,7 @@ export default function ExportIntelligenceDashboard() {
                 ))}
               </div>
             </div>
-            <button className="text-blue-600 text-xs font-semibold text-center mt-4 pt-2 border-t border-slate-50">
-              View All Products →
-            </button>
+            
           </div>
 
           {/* EXPORT VALUE TREND */}
@@ -541,9 +538,7 @@ export default function ExportIntelligenceDashboard() {
                 </div>
               </div>
             </div>
-            <button className="text-blue-600 text-xs font-semibold text-center mt-4 pt-2 border-t border-slate-50">
-              View All Countries →
-            </button>
+           
           </div>
         </div>
 

@@ -582,7 +582,7 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="border-b border-slate-200 mb-5">
+        {/*<div className="border-b border-slate-200 mb-5">
           <div className="flex gap-5 sm:gap-7 overflow-x-auto scrollbar-none">
             {TABS.map((tab) => (
               <button
@@ -597,7 +597,7 @@ useEffect(() => {
               </button>
             ))}
           </div>
-        </div>
+        </div>*/}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
           {KPI_STATS.map((stat, idx) => {
@@ -800,59 +800,10 @@ useEffect(() => {
               </div>
             </div>
 
-             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-4 mt-4">
-          <SectionCard>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className={`font-bold text-sm ${HEADING}`}>Shipments by Mode</h3>
-              <DropdownButton text="This Month" onClick={() => setDateRange(true)} />
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="relative w-[110px] h-[110px] shrink-0">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={SHIPMENTS_BY_MODE} innerRadius={32} outerRadius={50} dataKey="value" stroke="none">
-                      {SHIPMENTS_BY_MODE.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="space-y-1.5 flex-1 text-[10px]">
-                {SHIPMENTS_BY_MODE.map((r, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: r.color }} />
-                      <span className="text-slate-600 font-semibold">{r.name}</span>
-                    </div>
-                    <span className={`font-bold ${HEADING}`}>{r.value} ({r.percent})</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </SectionCard>
+                    </SectionCard>
 
-          <SectionCard>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className={`font-bold text-sm ${HEADING}`}>Top Origin Countries</h3>
-              <DropdownButton text="This Month"   onClick={() => setDateRange(true)}/>
-            </div>
-            <div className="space-y-2.5">
-              {TOP_ORIGINS.map((c, i) => (
-                <div key={i} className="text-[11px]">
-                  <div className="flex justify-between mb-1">
-                    <span className="font-semibold text-slate-700 flex items-center gap-1.5"><Flag country={c.country} /> {c.country}</span>
-                    <span className={`font-bold ${HEADING}`}>{c.value} <span className="text-slate-400 font-semibold">({c.percent})</span></span>
-                  </div>
-                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-blue-500 h-full rounded-full" style={{ width: c.width }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SectionCard>
-
-          <SectionCard>
+          <div className="flex flex-col gap-5">
+             <SectionCard>
             <div className="flex justify-between items-center mb-3">
               <h3 className={`font-bold text-sm ${HEADING}`}>Recent Alerts</h3>
               <button className="text-blue-600 text-[11px] font-bold" onClick={() => setHighRisk(true)}>View All →</button>
@@ -877,14 +828,10 @@ useEffect(() => {
               })}
             </div>
           </SectionCard>
-        </div>
-          </SectionCard>
-
-          <div className="flex flex-col gap-5">
             <SectionCard>
               <div className="flex justify-between items-center mb-3">
                 <h3 className={`font-bold text-sm ${HEADING}`}>Shipment Tracker</h3>
-                <button className="text-blue-600 text-[11px] font-bold shrink-0">View All Trackers →</button>
+               {/* <button className="text-blue-600 text-[11px] font-bold shrink-0">View All Trackers →</button>*/}
               </div>
               <div className="flex justify-between items-start mb-3">
                 <div>
@@ -1000,11 +947,66 @@ useEffect(() => {
                 ))}
               </div>
             </SectionCard>
+            
+          <SectionCard>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className={`font-bold text-sm ${HEADING}`}>Shipments by Mode</h3>
+              <DropdownButton text="This Month" onClick={() => setDateRange(true)} />
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="relative w-[110px] h-[110px] shrink-0">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={SHIPMENTS_BY_MODE} innerRadius={32} outerRadius={50} dataKey="value" stroke="none">
+                      {SHIPMENTS_BY_MODE.map((entry, index) => (
+                        <Cell key={index} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="space-y-1.5 flex-1 text-[10px]">
+                {SHIPMENTS_BY_MODE.map((r, i) => (
+                  <div key={i} className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: r.color }} />
+                      <span className="text-slate-600 font-semibold">{r.name}</span>
+                    </div>
+                    <span className={`font-bold ${HEADING}`}>{r.value} ({r.percent})</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </SectionCard>
+
+          <SectionCard>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className={`font-bold text-sm ${HEADING}`}>Top Origin Countries</h3>
+              <DropdownButton text="This Month"   onClick={() => setDateRange(true)}/>
+            </div>
+            <div className="space-y-2.5">
+              {TOP_ORIGINS.map((c, i) => (
+                <div key={i} className="text-[11px]">
+                  <div className="flex justify-between mb-1">
+                    <span className="font-semibold text-slate-700 flex items-center gap-1.5"><Flag country={c.country} /> {c.country}</span>
+                    <span className={`font-bold ${HEADING}`}>{c.value} <span className="text-slate-400 font-semibold">({c.percent})</span></span>
+                  </div>
+                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                    <div className="bg-blue-500 h-full rounded-full" style={{ width: c.width }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </SectionCard>
+
+         
+        </div>
+
           </div>
         </div>
 
        
-      </div> )}
+       )}
  
  
         {shipment === "shipment" && (

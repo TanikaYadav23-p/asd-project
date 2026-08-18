@@ -242,7 +242,7 @@ const INITIAL_STATS = [
   { title: "Total Import Shipments", value: dashboard.totalShipments || 0, change: "-", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
   { title: "Total Import Value (INR)", value: `₹${((dashboard.totalImportValue || 0) / 10000000).toFixed(2)} Cr`, change: "-", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
   { title: "Total Importers", value: dashboard.totalImporters || 0, change: "-", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
-  { title: "Total Suppliers", value: dashboard.totalSuppliers || 0, change: "-", icon: Truck, color: "text-emerald-500", bg: "bg-emerald-50", isUp: true },
+ 
   { title: "Countries of Origin", value: dashboard.countries || 0, change: "-", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
   { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "▼ 3.2% vs last month", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
   { title: "Avg. Lead Time (Days)", value: dashboard.avgLeadTime || 0, change: "-", icon: Clock3, color: "text-red-500", bg: "bg-red-50", isUp: false },
@@ -368,7 +368,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
       </div>
 
       {/* STATS CARD GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
         {INITIAL_STATS.map((item, index) => {
           const Icon = item.icon;
           return (
@@ -389,7 +389,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
 
       {/* DYNAMIC FILTERS PANEL */}
       <div className="bg-white border border-slate-100 rounded-2xl p-3 shadow-sm mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-5">
           
           {/* Search Bar Input */}
           <div className="relative flex items-center">
@@ -433,7 +433,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
             <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
           </div>
 
-          {/* Buyers Dropdown */}
+          {/* Buyers Dropdown *
           <div className="w-full relative">
             <select value={selectedBuyer} onChange={(e) => setSelectedBuyer(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
               <option value="All Buyers">All Buyers</option>
@@ -442,14 +442,14 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
                ))}
             </select>
             <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-          </div>
+          </div>*
           
           <div className="relative">
             <select className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
               <option>More Filters</option>
             </select>
             <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-          </div>
+          </div>*/}
 
           <div className="flex gap-2">
             <button onClick={handleApplyFilters} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm">
@@ -519,7 +519,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-sm text-slate-800">Imports by Country of Destination</h3>
-              <button className="text-blue-600 text-xs font-semibold">View All</button>
+              {/*<button className="text-blue-600 text-xs font-semibold">View All</button>*/}
             </div>
             <div className="flex items-center justify-between gap-2">
               <div className="relative w-[130px] h-[130px] shrink-0">
@@ -548,8 +548,8 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
               </div>
             </div>
           </div>
-          <button className="text-blue-600 text-xs font-semibold text-center mt-4 pt-2 border-t border-slate-50">View All Countries →</button>
-        </div>
+          {/*<button className="text-blue-600 text-xs font-semibold text-center mt-4 pt-2 border-t border-slate-50">View All Countries →</button>
+ */}       </div>
       </div>
       
       {/* DYNAMIC SHIPMENTS TABLE */}
@@ -619,11 +619,3 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
     </div>
   );
 }
-
-
-
-
-
-
-
-

@@ -416,7 +416,7 @@ export default function ShipmentDatabase() {
       </div>
 
       {/* --- DYNAMIC STATS CARDS GRID --- */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-6">
         {/* Total Shipments - Dynamic */}
         <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between">
@@ -475,7 +475,7 @@ export default function ShipmentDatabase() {
           </div>
         </div>
 
-        {/* Baki Standard Static Cards Metrics Layout ke liye */}
+        {/* Baki Standard Static Cards Metrics Layout ke liye 
         <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-[13px] font-semibold text-slate-600  tracking-wider">
@@ -489,7 +489,7 @@ export default function ShipmentDatabase() {
                
             </span>
           </div>
-        </div>
+        </div>*/}
         <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="text-[13px] font-semibold text-slate-600  tracking-wider">
