@@ -30,8 +30,8 @@ function HeroSection() {
               <button className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
                onClick={() => navigate("/user-dashboard")}> User Dashboard</button>
 
-               {/* <button className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
-               onClick={() => navigate("/chatbot")}> chatbot</button> */}
+               <button className="bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
+               onClick={() => navigate("/chatbot")}> chatbot</button>
              </div>
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-gray-900 leading-tight mb-4">

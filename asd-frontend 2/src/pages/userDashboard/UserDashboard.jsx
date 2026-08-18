@@ -105,6 +105,8 @@ import { FaAnchor, FaShip } from "react-icons/fa";
 import { MdMonitor } from "react-icons/md";
 
 import SavedReports from "./SavedReport";
+import Saved from "./Saved"
+
 import AuditLogs from "./AuditLogs";
 import AnalyticsTrends from "./Analysis&Trends";
 
@@ -364,21 +366,29 @@ const sidebarSections = [
       { icon: FiGift, label: "Incentive Checker" },
       { icon: FiTruck, label: "Freight Calculator" },
       { icon: FiMap, label: "Shipment Planning" },
-    ],
-  },
-  {
-    title: "Reports & Insights",
-    items: [
       {
         icon: FiBookmark,
-        label: "Saved Reports",
-        badge: "New",
+        label: "Saved",
+        // badge: "New",
         badgeColor: "bg-[#2B7FFF]",
       },
-      { icon: FiClipboard, label: "Audit Logs" },
-      { icon: FiBarChart2, label: "Analytics & Trends" },
+      // { icon: FiClipboard, label: "Audit Logs" },
+      // { icon: FiBarChart2, label: "Analytics & Trends" },
     ],
   },
+  // {
+  //   title: "Reports & Insights",
+  //   items: [
+  //     {
+  //       icon: FiBookmark,
+  //       label: "Saved",
+  //       // badge: "New",
+  //       badgeColor: "bg-[#2B7FFF]",
+  //     },
+  //     // { icon: FiClipboard, label: "Audit Logs" },
+  //     // { icon: FiBarChart2, label: "Analytics & Trends" },
+  //   ],
+  // },
   {
     title: "Account & Support",
     items: [
@@ -395,7 +405,7 @@ const sidebarSections = [
         badgeColor: "bg-red-500",
       },
       { icon: FiHelpCircle, label: "Help & Support" },
-      { icon: FiSettings, label: "Profile Settings" },
+      // { icon: FiSettings, label: "Profile Settings" },
     ],
   },
 ];
@@ -881,11 +891,11 @@ export default function UserDashboard() {
 
         {activeTab === "HS Code Lookup" && <HSCodeLookup />}
         {activeTab === "Incentive Checker" && <IncentiveChecker />}
-        {activeTab === "Shipment Planning" && <ShipmentPlanning />}
+        {activeTab === "Shipment Planning" && <ShipmentPlanning setActiveTab={setActiveTab} />}
         {activeTab === "Freight Calculator" && <FreightCalculator />}
 
-        {/* {activeTab === "Saved Reports" && <SavedReports />}
-        {activeTab === "Audit Logs" && <AuditLogs />}
+        {activeTab === "Saved" && <Saved />}
+         {/* {activeTab === "Audit Logs" && <AuditLogs />}
         {activeTab === "Analytics & Trends" && <AnalyticsTrends />} */}
 
       
