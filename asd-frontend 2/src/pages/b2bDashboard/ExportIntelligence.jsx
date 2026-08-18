@@ -509,7 +509,7 @@ export default function ExportIntelligenceDashboard() {
             <div>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold text-sm text-slate-800">Exports by Country of Destination</h3>
-                <button className="text-blue-600 text-xs font-semibold">View All</button>
+                {/*<button className="text-blue-600 text-xs font-semibold">View All</button>*/}
               </div>
               <div className="flex items-center justify-between gap-2">
                 <div className="relative w-[120px] h-[120px] shrink-0">
@@ -546,7 +546,7 @@ export default function ExportIntelligenceDashboard() {
         <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm overflow-hidden">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-bold text-sm text-slate-800">Recent Export Shipments</h3>
-            <span className="text-xs text-blue-600 font-semibold cursor-pointer hover:underline">Filter</span>
+            {/*<span className="text-xs text-blue-600 font-semibold cursor-pointer hover:underline">Filter</span>*/}
           </div>
 
           <div className="overflow-x-auto -mx-5">

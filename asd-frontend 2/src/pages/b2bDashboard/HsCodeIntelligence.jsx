@@ -419,7 +419,7 @@ const fetchFilterOptions = async () => {
           <div>
             <div className="flex justify-between items-center mb-3">
               <h3 className="font-bold text-xs text-slate-800">Top HS Codes by Trade Value</h3>
-              <button className="text-blue-600 text-[11px] font-bold">View All</button>
+              {/*<button className="text-blue-600 text-[11px] font-bold">View All</button>*/}
             </div>
             <div className="space-y-3">
               {hsCodeList.map((item, idx) => (
