@@ -28,13 +28,16 @@ import {
   Tooltip
 } from "recharts";
 import ReactCountryFlag from "react-country-flag";
-
+import CreateInvoice from '../../components/b2bComponent/CreateInvoice';
+import InvoiceInsights from '../../components/b2bComponent/InvoiceInsight';
+import InvoiceInsightsModal from '../../components/b2bComponent/InvoiceInsight';
 export default function InvoicesDashboard() {
-
+  const [createInvoice, setCreateInvoice] = useState(false)
   const [dashboard, setDashboard] = useState({});
   const [invoices, setInvoices] = useState([]);
   const [statusSummary,setStatusSummary] = useState([]);
   ///const [valueTrend,setValueTrend] = useState([]);
+  const [invoiceInsight, setInvoiceInsight] = useState(false)
   const [recentInvoices,setRecentInvoices] = useState([]);
   const [topParties,setTopParties] = useState([]);
   const [overdueInvoices,setOverdueInvoices] = useState([]);
@@ -43,6 +46,7 @@ export default function InvoicesDashboard() {
   const [loading, setLoading] = useState(true);
   const [shipmentStartDate, setShipmentStartDate] = useState(null);
   const [shipmentEndDate, setShipmentEndDate] = useState(null);
+  
   const [dateRange, setDateRange] = useState(false);
   const [exportReport, setExportReport] = useState(false);
     const [startDate, setStartDate] = useState(null);
@@ -277,7 +281,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
         </div>
         
         <div className="flex flex-wrap items-center gap-2.5 self-end md:self-auto">
-          <div className="relative flex-1 md:flex-none">
+          <div className="relative flex-1 md:flex-none ">
             <DatePicker
               selected={shipmentStartDate}
               onChange={(dates) => {
@@ -301,7 +305,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
             <Download size={13} className="text-slate-500" />
             Export Report
           </button>
-          <button className="flex items-center gap-1 bg-blue-600 text-white rounded-lg px-3 py-1.5 font-semibold shadow-sm hover:bg-blue-700 transition-colors">
+          <button onClick={() => setCreateInvoice(true)} className="flex items-center gap-1 bg-blue-600 text-white rounded-lg px-3 py-1.5 font-semibold shadow-sm hover:bg-blue-700 transition-colors">
             <Plus size={14} />
             Create Invoice
           </button>
@@ -337,8 +341,30 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
             <input type="text" name="search" value={filters.search} onChange={(e)=>setFilters({...filters,search:e.target.value})}placeholder="Search by invoice no., party, etc..."className="w-full bg-[#f8fafc] pl-8 pr-2 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none placeholder:text-slate-400 focus:border-blue-500"/>
           </div>
         </div>
+           <div>
+                      <label className="text-[10px] text-[##06145F] font-bold block mb-1.5 uppercase">Date Range</label>
+                      <div className="relative">
+                         <DatePicker
+                  selected={startDate}
+                  onChange={(dates) => {
+                    const [start, end] = dates;
+                    setStartDate(start);
+                    setEndDate(end);
+                  }}
+                  startDate={startDate}
+                  endDate={endDate}
+                  selectsRange
+                  dateFormat="dd MMM yyyy"
+                  placeholderText="Select Date Range"
+                  className="w-full bg-slate-50/70 border border-slate-200 rounded-xl py-2 pl-3 pr-9 text-xs focus:outline-none focus:ring-2 focus:ring-blue-100"
+                />
+        
+                        <CalendarDays size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      </div>
+                    </div>
+
         {[
-          { label:"Date Range", val:"01 Apr 2025 - 24 Apr 2025" },
+         
           { label:"Invoice Type", val:"All Type", options:filterOptions.types, key:"type" },
           { label:"Country / Region", val:"All Countries", options:filterOptions.countries, key:"country" },
           { label:"Party Type", val:"All Parties", options:filterOptions.partyTypes, key:"partyType" },
@@ -642,7 +668,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
               </div>
             </div>
 
-            <button className="w-full mt-4 text-center text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center justify-center gap-1 pt-3 border-t border-slate-50">
+            <button onClick={() => setInvoiceInsight(true)} className="w-full mt-4 text-center text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center justify-center gap-1 pt-3 border-t border-slate-50">
               View Detailed Analytics <ArrowRight size={13} />
             </button>
           </div>
@@ -692,7 +718,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
                 ))}
               </div>
             </div>
-            <button className="w-full mt-4 text-left text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 pt-3 border-t border-slate-50">
+            <button onClick={() => setInvoiceInsight(true)} className="w-full mt-4 text-left text-xs font-bold text-blue-600 hover:text-blue-700 inline-flex items-center gap-1 pt-3 border-t border-slate-50">
               View Detailed Insights <ArrowUpRight size={14} />
             </button>
           </div>
@@ -714,6 +740,14 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
 
       {exportReport && (
         <ExportReport onClose={() => setExportReport(false)} />
+      )}
+
+      {createInvoice && (
+        <CreateInvoice onClose={() => setCreateInvoice(false)}/>
+      )}
+
+      {invoiceInsight && (
+        <InvoiceInsights onClose={() => setInvoiceInsight(false)} />
       )}
     </div>
   );
