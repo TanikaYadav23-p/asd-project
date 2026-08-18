@@ -22,7 +22,7 @@ const Layout = () => {
 
   const hideFooter = location.pathname === '/admin-dashboard' ||
   location.pathname === "/b2b-dashboard" || location.pathname === "/user-dashboard" ||
-  location.pathname === "/chatbot" 
+  location.pathname === "/chatbot" ||
   location.pathname === "/admin-login" || 
   location.pathname === "/signup" || 
   location.pathname === "/b2b-auth" || 
