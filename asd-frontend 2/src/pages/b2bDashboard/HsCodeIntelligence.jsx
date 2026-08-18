@@ -252,11 +252,10 @@ const fetchFilterOptions = async () => {
    { title: "Total Export Shipments", value: dashboard.totalShipments || 0, change: "", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
    { title: "Total Export Value (INR)", value: `₹${((dashboard.totalTradeValue || 0) / 10000000).toFixed(2)} Cr`, change: "", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
    { title: "Total Exporters", value: dashboard.totalExporters || 0, change: "", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
-   { title: "Total Suppliers", value: dashboard.totalSuppliers || 0, change: "", icon: Truck, color: "text-emerald-500", bg: "bg-emerald-50", isUp: true },
+   
    { title: "Countries of Origin", value: dashboard.countries || 0, change: "", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
    { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
-   { title: "Avg. Lead Time (Days)", value: dashboard.avgLeadTime || 0, change: "", icon: Clock3, color: "text-red-500", bg: "bg-red-50", isUp: false },
-  ];
+    ];
   // ==========================================
   // 3. DYNAMIC FILTERING LOGIC
   // ==========================================
@@ -302,7 +301,7 @@ const fetchFilterOptions = async () => {
       </div>
 
       {/* METRICS METERS ROW */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 mb-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-5 gap-3 mb-5">
         {stats.map((stat, i) => {
           const Icon = stat.icon;
           return (

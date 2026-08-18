@@ -245,8 +245,7 @@ const INITIAL_STATS = [
  
   { title: "Countries of Origin", value: dashboard.countries || 0, change: "-", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
   { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "▼ 3.2% vs last month", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
-  { title: "Avg. Lead Time (Days)", value: dashboard.avgLeadTime || 0, change: "-", icon: Clock3, color: "text-red-500", bg: "bg-red-50", isUp: false },
-];
+  ];
 
 const maxValue = topProducts.length > 0 ? Math.max(...topProducts.map((p) => p.value)) : 1;
 const PRODUCTS = topProducts.map((item) => ({
@@ -368,7 +367,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
       </div>
 
       {/* STATS CARD GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 mb-6">
         {INITIAL_STATS.map((item, index) => {
           const Icon = item.icon;
           return (
