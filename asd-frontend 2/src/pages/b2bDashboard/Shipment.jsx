@@ -911,7 +911,7 @@ useEffect(() => {
                   </ResponsiveContainer>
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                     <span className={`font-black text-sm ${HEADING}`}> {dashboard.totalShipments || 0}</span>
-                    <span className="text-[7px] text-slate-400 font-bold uppercase leading-none">Total Shipments</span>
+                    <span className="text-[6px] text-slate-500 font-bold uppercase leading-none">Total Shipments</span>
                   </div>
                 </div>
                 <div className="space-y-1.5 flex-1 text-[10px]">
@@ -964,6 +964,10 @@ useEffect(() => {
                     </Pie>
                   </PieChart>
                 </ResponsiveContainer>
+                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span className={`font-black text-sm ${HEADING}`}> {SHIPMENTS_BY_MODE.length}</span>
+                    <span className="text-[6px] text-slate-500 font-bold uppercase leading-none">Modes</span>
+                  </div>
               </div>
               <div className="space-y-1.5 flex-1 text-[10px]">
                 {SHIPMENTS_BY_MODE.map((r, i) => (

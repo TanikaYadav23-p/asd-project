@@ -543,7 +543,7 @@ export default function ShipmentDatabase() {
 
       {/* --- DYNAMIC FILTERS ROW BAR --- */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 items-end">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 items-end">
           {/* Input Search Box */}
           <div>
             <label className="text-[11px] font-bold text-slate-400 block mb-1 uppercase">

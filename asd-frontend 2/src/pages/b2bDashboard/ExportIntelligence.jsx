@@ -223,8 +223,8 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
 
   const INITIAL_STATS = [
     { title: "Total Export Shipments", value: dashboard.totalExportShipments || 0, change: "", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
-    { title: "Total Export Value (INR)", value: dashboard.totalExportShipments || 0, change: "", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
-    // { title: "Total Exporters", value: dashboard.totalExporters || 0, change: "", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
+    { title: "Total Export Value (INR)", value: `₹${((dashboard.totalExportValue || 0) / 10000000).toFixed(2)} Cr`, change: "", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
+    { title: "Total Exporters", value: dashboard.totalExporters || 0, change: "", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
    { title: "Countries of Origin", value: dashboard.countries || 0, change: "", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
     { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
       ];
@@ -359,7 +359,7 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
 
         {/* FILTERS PANEL */}
         <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 items-end">
             <div>
               <label className="text-[11px] text-slate-400 font-bold block mb-1.5 uppercase">HS Code / Product</label>
               <input
