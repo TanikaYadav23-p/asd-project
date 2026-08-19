@@ -173,6 +173,7 @@ const userGrowthData = [
 const navItems = [
   { icon: MdDashboard, label: "Admin Dashboard", color: "text-orange-400" },
   { icon: MdPeople, label: "Users", color: "text-yellow-400" },
+    { icon: MdPeople, label: "Vendors/ Partners", color: "text-green-400" },
   { icon: MdSecurity, label: "Roles & Permissions", color: "text-purple-400" },
   { icon: MdSubscriptions, label: "Plans/ Subscription", color: "text-teal-400" },
   { icon: MdStorage, label: "Master Data", color: "text-blue-400" },
@@ -180,7 +181,7 @@ const navItems = [
   { icon: MdPublic, label: "Country Rules", color: "text-indigo-400" },
   { icon: MdBusiness, label: "DGFT Schemes", color: "text-pink-400" },
   { icon: MdLocalShipping, label: "Shipment", color: "text-cyan-400" },
-  { icon: MdPeople, label: "Vendors/ Partners", color: "text-green-400" },
+
   { icon: MdSmartToy, label: "AI Assistant", color: "text-blue-500" },
   // { icon: MdInsights, label: "Trade Intelligence", color: "text-rose-400" },
   { icon: MdApi, label: "API Integrations", color: "text-emerald-400" },
@@ -552,8 +553,15 @@ export default function AdminDashboard() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-2 sm:gap-3 mb-4">
                 {statCards.map(({ label, value, icon: Icon, color, bg }) => (
                   <div
+                  onClick={() => {
+                    if(label === "Total Users") {
+                        setActiveNav("Users")
+                    }else if(label === "Active Vendors") {
+                       setActiveNav("Vendors/ Partners")
+                    }
+                  }}
                     key={label}
-                    className="bg-white rounded-xl p-3 shadow-md border border-gray-100 flex flex-col gap-1"
+                    className="bg-white cursor-pointer  rounded-xl p-3 shadow-md border border-gray-100 flex flex-col gap-1"
                   >
                     <p className="text-gray-500 text-sm font-medium  leading-tight">
                       {label}

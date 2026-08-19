@@ -1,12 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FaPlus, FaMagnifyingGlass, FaXmark, FaChevronDown,
   FaStar, FaTruck, FaBoxOpen, FaWarehouse, FaFileContract
 } from "react-icons/fa6";
-
+import {
+  MoreVertical,
+} from "lucide-react";
 const typeOptions = ["All Types", "Shipping Partner", "Freight Forwarder", "Custom Broker", "Warehouse Partner"];
 const statusOptions = ["All Status", "Active", "Inactive"];
 
+import KYCVerificationModal from "../../components/adminComponent/KycVerification";
+import RejectKYCModal from "../../components/adminComponent/RejectKycVerification";
+
+const HEADING = "text-[#07156B]";
 const typeIcon = (type) => {
   if (type === "Shipping Partner") return <FaTruck className="text-blue-400 text-xs" />;
   if (type === "Freight Forwarder") return <FaBoxOpen className="text-orange-400 text-xs" />;
@@ -19,8 +25,18 @@ const typeIcon = (type) => {
   { label: "Total Vendors", value: "1,248", sub: "All vendors",  subColor: "text-green-600", iconColor: "text-green-400" },
   { label: "Active Vendors", value: "1,048", sub: "Active vendors", subColor: "text-green-600", iconColor: "text-green-400" },
   { label: "Total Shipments", value: "200", sub: "This month", subColor: "text-red-500", iconColor: "text-red-400" },
-  { label: "Active Ratings", value: "48", sub: "Out of 5", subColor: "text-purple-500", iconColor: "text-purple-400" },
+  { label: "Verified Vendor", value: "00", sub: "", subColor: "text-purple-500", iconColor: "text-purple-400" },
 ];
+function StatusBadge({ status }) {
+  const styles = {
+    "In Transit": "bg-blue-100 text-blue-600",
+    Pending: "bg-amber-100 text-amber-600",
+    Delayed: "bg-rose-100 text-rose-600",
+    Exception: "bg-purple-100 text-purple-600",
+    Delivered: "bg-green-100 text-green-600",
+  };
+  return <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg whitespace-nowrap ${styles[status]}`}>{status}</span>;
+}
 
 function StatCard({ stat }) {
   return (
@@ -36,14 +52,15 @@ function StatCard({ stat }) {
 }
 
 const initialVendors = Array.from({ length: 6 }, (_, i) => ({
-  id: i + 1, 
-  name: "Global Logistic Inc.",
+  id: i + 1,
+  companyName: "Global Logistic Inc.",
   email: "contact@globallog.com",
-  type: "Shipping Partner",
+  phone: "999999998",
   location: "United States",
-  rating: 4.8,
-  activeShipment: 32,
+  subscriptionPlan: "Premium",
+  shipmentStatus: "In Transit",
   status: "Active",
+  kyc: "Verified",
 }));
 
 function AddVendorModal({ onClose, onAdd }) {
@@ -67,7 +84,7 @@ function AddVendorModal({ onClose, onAdd }) {
   };
 
   const inp = (k) => `w-full border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all ${errors[k] ? "border-red-400" : "border-gray-200"}`;
-
+ 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
@@ -171,14 +188,79 @@ function VendorCard({ vendor }) {
   );
 }
 
+const userByType = [
+  { label: "Basic Plan", value: "2499", percent: "52.2%", color: "bg-purple-500" },
+  { label: "Starter Plan", value: "4999", percent: "52.2%", color: "bg-blue-500" },
+  // { label: "Admins", value: "1,248", percent: "52.2%", color: "bg-green-500" },
+  // { label: "Permission", value: "1,248", percent: "52.2%", color: "bg-gray-300" },
+];
+ 
+const registrationData = [
+  { month: "May", value: 55 },
+  { month: "june", value: 40 },
+  { month: "july", value: 68 },
+  { month: "Aug", value: 30 },
+  { month: "Sep", value: 62 },
+  { month: "Oct", value: 45 },
+];
+
+  const maxReg = Math.max(...registrationData.map((r) => r.value)); 
+
+function DonutRing({ segments, centerValue, centerLabel, onClick }) {
+  let cumulative = 0;
+
+  const gradientParts = segments.map((s) => {
+    const start = cumulative;
+    cumulative += s.percent;
+
+    return `${s.hex} ${start}% ${cumulative}%`;
+  });
+
+  const gradient = `conic-gradient(${gradientParts.join(",")})`;
+
+  return (
+    <div
+      onClick={onClick}
+      className="relative w-32 h-32 min-w-32 min-h-32 aspect-square shrink-0 rounded-full flex items-center justify-center cursor-pointer"
+      style={{
+        background: gradient,
+      }}
+    >
+      <div className="absolute w-10 h-10 min-w-24 min-h-24 aspect-square bg-white rounded-full flex flex-col items-center justify-center">
+        <span className="text-lg font-semibold text-gray-900">
+          {centerValue}
+        </span>
+
+        <span className="text-xs text-gray-500">
+          {centerLabel}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+const vendors = [
+  { name: "Global Logistic Inc.", type: "Shipping Partner", typeColor: "bg-green-100 text-green-700", location: "US", rating: "4.8", shipments: "32", kyc: "Verified", status: "Active" },
+  { name: "Global Logistic Inc.", type: "Shipping Partner", typeColor: "bg-gray-100 text-gray-600", location: "US", rating: "4.8", shipments: "32", kyc: "Verified", status: "Active" },
+  { name: "Global Logistic Inc.", type: "Shipping Partner", typeColor: "bg-indigo-100 text-indigo-600", location: "US", rating: "4.8", shipments: "32", kyc: "Verified", status: "Active" },
+  { name: "Global Logistic Inc.", type: "Shipping Partner", typeColor: "bg-gray-100 text-gray-600", location: "US", rating: "4.8", shipments: "32", kyc: "Verified", status: "Active" },
+  { name: "Global Logistic Inc.", type: "Shipping Partner", typeColor: "bg-purple-100 text-purple-600", location: "US", rating: "4.8", shipments: "32", kyc: "Verified", status: "Active" },
+];
 export default function VendorsPartners() {
   const [vendors, setVendors] = useState(initialVendors);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("All Types");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [showModal, setShowModal] = useState(false);
+  const [openMenu, setOpenMenu] = useState(null);
+  const [kycVerify, setKycVerify] = useState(false)
+  const [rejectKyc, setRejectKyc] = useState(false)
 
   const handleAdd = (vendor) => setVendors(prev => [vendor, ...prev]);
+
+  const handleStatusChange = (id, newStatus) => {
+    setVendors(prev => prev.map(v => v.id === id ? { ...v, status: newStatus } : v));
+  };
 
   const filtered = vendors.filter(v => {
     const q = search.toLowerCase();
@@ -190,6 +272,16 @@ export default function VendorsPartners() {
     return matchSearch && matchType && matchStatus;
   });
 
+  useEffect(() => {
+    const handleClickOutside = () => setOpenMenu(null);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
+    // const [search, setSearch] = useState("");
+const [selectedVendor, setSelectedVendor] = useState(vendors[0]);
+  // const filter = vendors.filter((v) => v.name.toLowerCase().includes(search.toLowerCase()));
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       {showModal && <AddVendorModal onClose={() => setShowModal(false)} onAdd={handleAdd} />}
@@ -200,10 +292,10 @@ export default function VendorsPartners() {
             <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Vendors/Partners</h1>
             <p className="text-xs sm:text-sm text-gray-400 mt-1">Manage vendors relationship and partnership</p>
           </div>
-          <button onClick={() => setShowModal(true)}
+          {/* <button onClick={() => setShowModal(true)}
             className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors shadow-sm whitespace-nowrap">
             <FaPlus className="text-xs" /> Add Vendor
-          </button>
+          </button> */}
         </div>
 
          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -211,6 +303,81 @@ export default function VendorsPartners() {
           <StatCard key={s.label} stat={s} />
         ))}
       </div>
+
+       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <p className="text-sm font-medium text-gray-700 mb-4">Plan type vendor</p>
+          <div className="flex flex-col sm:flex-row items-center gap-6">
+            <DonutRing
+              segments={[
+                { hex: "#a855f7", percent: 25 },
+                { hex: "#3b82f6", percent: 25 },
+                { hex: "#22c55e", percent: 25 },
+                { hex: "#e5e7eb", percent: 25 },
+              ]}
+              centerValue="1,248"
+              centerLabel="Total"
+            />
+            <div className="space-y-2 w-full">
+              {userByType.map((t) => (
+                <div key={t.label} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <span className={`w-2 h-2 rounded-full ${t.color}`} />
+                    {t.label}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-gray-900">{t.value}</span>
+                    <span className="text-gray-400">({t.percent})</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+ 
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <p className="text-sm font-medium text-gray-700 mb-4">Vendor Registration</p>
+          <div className="flex items-end justify-between h-40 gap-2">
+            {registrationData.map((r) => (
+              <div key={r.month} className="flex flex-col items-center flex-1 h-full justify-end gap-2">
+                <div
+                  className="w-full max-w-6 bg-green-400 rounded-sm"
+                  style={{ height: `${(r.value / maxReg) * 100}%` }}
+                />
+                <span className="text-[10px] text-gray-400">{r.month}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+ 
+        <div className="bg-white rounded-xl border border-gray-200 p-5">
+          <p className="text-sm font-medium text-gray-700 mb-4">Vendor by Status</p>
+          <div className="flex flex-col items-center gap-4">
+            <DonutRing
+              segments={[
+                { hex: "#22c55e", percent: 84 },
+                { hex: "#ef4444", percent: 16 },
+              ]}
+              centerValue="84%"
+              centerLabel="Active"
+            />
+            <div className="w-full space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <span className="w-2 h-2 rounded-full bg-green-500" /> Active
+                </div>
+                <span className="text-gray-900">1,048 <span className="text-gray-400">84%</span></span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <span className="w-2 h-2 rounded-full bg-red-500" /> Inactive
+                </div>
+                <span className="text-gray-900">200 <span className="text-gray-400">16%</span></span>
+              </div>
+            </div>
+          </div>
+         </div>
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="flex items-center border border-gray-200 rounded-xl px-3 py-2.5 gap-2 bg-white focus-within:border-teal-500 transition-all flex-1">
@@ -243,11 +410,169 @@ export default function VendorsPartners() {
         {filtered.length === 0 ? (
           <div className="text-center py-16 text-gray-400 text-sm">No vendors found</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filtered.map(v => <VendorCard key={v.id} vendor={v} />)}
-          </div>
+           <div className="w-full overflow-x-auto rounded-xl border border-gray-100 bg-white px-6 py-4 [-webkit-overflow-scrolling:touch]">
+          <table className="w-full text-[11px] min-w-[900px]">
+            <thead>
+              <tr className="text-sm text-[#081B6B] uppercase font-bold border-b border-slate-100">
+                <th className="text-left py-2 font-bold">Company</th>
+                <th className="text-left py-2 font-bold">Email</th>
+                <th className="text-left py-2 font-bold">Phone</th>
+                <th className="text-left py-2 font-bold">Location</th>
+                <th className="text-left py-2 font-bold">Subscription Plan</th>
+                <th className="text-left py-2 font-bold">Shipment Status</th>
+                <th className="text-left py-2 font-bold">Status</th>
+                <th className="text-left py-2 font-bold">KYC</th>
+                <th className="text-right py-2 font-bold">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50 ">
+              {filtered.map((v, i) => (
+                <tr key={v.id} className="text-xs">
+                  <td  onClick={() => {
+                     setSelectedVendor(v);
+                        document.getElementById("users-section")?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }} className="py-3 whitespace-nowrap cursor-pointer">
+                    <div className={`font-bold ${HEADING}`}>{v.companyName}</div>
+                  </td>
+                  <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.email}</td>
+                  <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.phone}</td>
+                  <td className="py-3 whitespace-nowrap font-medium text-slate-600">{v.location}</td>
+                  <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.subscriptionPlan}</td>
+                  <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.shipmentStatus}</td>
+                  <td className="py-3">
+                    <StatusBadge status={v.status} />
+                  </td>
+                  <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.kyc}</td>
+                  <td className="py-3 text-right relative">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenu(openMenu === i ? null : i);
+                      }}
+                      className="text-slate-400 hover:text-slate-600"
+                    >
+                      <MoreVertical size={15} />
+                    </button>
+                    {openMenu === i && (
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="absolute right-0 top-7 z-20 w-36 bg-white border border-gray-200 rounded-xl shadow-lg p-1.5 flex flex-col gap-1 text-left"
+                      >
+                        <button
+                          onClick={() => {
+                            setSelectedVendor(v);
+                            setOpenMenu(null);
+                          }}
+                          className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleStatusChange(v.id, "Active");
+                            setOpenMenu(null);
+                          }}
+                          className="w-full py-1.5 px-2.5 rounded-lg bg-green-50 text-green-700 font-medium text-xs text-left hover:bg-green-100 transition-colors"
+                        >
+                          Active
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleStatusChange(v.id, "Suspended");
+                            setOpenMenu(null);
+                            setRejectKyc(true)
+                          }}
+                          className="w-full py-1.5 px-2.5 rounded-lg bg-red-50 text-red-600 font-medium text-xs text-left hover:bg-red-100 transition-colors"
+                        >
+                          Suspend
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedVendor(v);
+                            setOpenMenu(null);
+                            setKycVerify(true)
+                          }}
+                          className="w-full py-1.5 px-2.5 rounded-lg bg-amber-50 text-amber-700 font-medium text-xs text-left hover:bg-amber-100 transition-colors"
+                        >
+                          KYC
+                        </button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         )}
       </div>
+
+
+      <div className="w-full max-w-7xl bg-white rounded-2xl border border-gray-200 p-5 sm:p-6"  id="users-section">
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-3">
+            <p className="font-semibold text-gray-900">{selectedVendor.companyName}</p>
+            <span className="text-xs font-medium text-green-600">Active</span>
+          </div>
+          {/* <span className="text-sm font-medium text-green-600">Overview</span> */}
+          <div className="flex items-start justify-around gap-3">
+            <button className="w-full whitespace-nowrap  py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-center  hover:bg-blue-100 transition-colors">Plan Change</button>
+            <button className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-center hover:bg-blue-100 transition-colors">Actions</button>
+          </div>
+        </div>
+ 
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm mb-6">
+          <div>
+            <p className="font-semibold text-gray-900 mb-2">Basic Information</p>
+            <div className="space-y-1.5 text-gray-500">
+              <p>Company Name <span className="block text-gray-900">{selectedVendor.companyName}</span></p>
+              {/* <p>Type <span className="block text-gray-900">{selectedVendor.type}</span></p> */}
+              <p>Email <span className="block text-blue-500 underline">{selectedVendor.email}</span></p>
+              <p>Phone <span className="block text-gray-900">{selectedVendor.phone}</span></p>
+              {/* <p>Website <span className="block text-gray-900">1234567890</span></p> */}
+              {/* <p>Country <span className="block text-gray-900">{selectedVendor.location}</span></p> */}
+              {/* <p>Address <span className="block text-gray-900">123 Logistics Way, Los Angeles, CA 90001</span></p> */}
+            </div>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 mb-2">Business Information</p>
+            <div className="space-y-1.5 text-gray-500">
+              <p>GST/VAT Number <span className="block text-gray-900">US987654321</span></p>
+              <p>Registration Number <span className="block text-gray-900">GLI-2021-001</span></p>
+              <p>Business Type <span className="block text-gray-900">Private Limited</span></p>
+              <p>Year of Establishment <span className="block text-gray-900">2018</span></p>
+              <p>Associated With <span className="block text-gray-900">Indo Global Pvt. Ltd.</span></p>
+            </div>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 mb-2">KYC Status</p>
+            <div className="space-y-1.5 text-gray-500">
+              <p>KYC Status <span className="block text-green-600">{selectedVendor.kyc}</span></p>
+              <p>Verified On <span className="block text-gray-900">12 May 2024</span></p>
+              <p>Verified By <span className="block text-gray-900">Admin User</span></p>
+              <p>Next Review Date <span className="block text-gray-900">12 May 2025</span></p>
+            </div>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 mb-2">Bank Details</p>
+            <div className="space-y-1.5 text-gray-500">
+              <p>Bank Name <span className="block text-gray-900">Chase Bank</span></p>
+              <p>Account Holder <span className="block text-gray-900">Global Logistic Inc.</span></p>
+              <p>Account Number <span className="block text-gray-900">1234 **** **** 5678</span></p>
+              <p>IFSC Code <span className="block text-gray-900">CHASUS33XXX</span></p>
+              <p>SWIFT Code <span className="block text-gray-900">CHASUS33</span></p>
+            </div>
+          </div>
+        </div>
+
+      
+    </div>
+
+        {kycVerify && (<KYCVerificationModal onClose={() => setKycVerify(false)}/>)}
+        {rejectKyc && (<RejectKYCModal onClose={() =>  setRejectKyc(false)}/>)}
     </div>
   );
 }

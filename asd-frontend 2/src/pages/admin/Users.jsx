@@ -83,6 +83,7 @@ import {
   import { FaCalendarAlt, FaTimes } from "react-icons/fa";
   import API from "../../api/axios";
 import { toast } from "react-toastify";
+import { MoreVertical} from "lucide-react"
 
   const stats = [
   { label: "Total Users", value: "1,248", sub: "12.5% from last 30 days", subColor: "text-green-600", iconColor: "text-green-400" },
@@ -101,19 +102,19 @@ const initialUsers = [
  
 
 const userByType = [
-  { label: "B2B Users", value: "1,248", percent: "52.2%", color: "bg-purple-500" },
-  { label: "B2C Users", value: "1,248", percent: "52.2%", color: "bg-blue-500" },
-  { label: "Admins", value: "1,248", percent: "52.2%", color: "bg-green-500" },
-  { label: "Permission", value: "1,248", percent: "52.2%", color: "bg-gray-300" },
+  { label: "Basic Plan", value: "2499", percent: "52.2%", color: "bg-purple-500" },
+  { label: "Starter Plan", value: "4999", percent: "52.2%", color: "bg-blue-500" },
+  // { label: "Admins", value: "1,248", percent: "52.2%", color: "bg-green-500" },
+  // { label: "Permission", value: "1,248", percent: "52.2%", color: "bg-gray-300" },
 ];
  
 const registrationData = [
-  { day: "12 May", value: 55 },
-  { day: "13 May", value: 40 },
-  { day: "14 May", value: 68 },
-  { day: "15 May", value: 30 },
-  { day: "16 May", value: 62 },
-  { day: "17 May", value: 45 },
+  { month: "May", value: 55 },
+  { month: "june", value: 40 },
+  { month: "july", value: 68 },
+  { month: "Aug", value: 30 },
+  { month: "Sep", value: 62 },
+  { month: "Oct", value: 45 },
 ];
 
 function DeleteModal({ setDeleteUser, handleDelete }) {
@@ -545,11 +546,54 @@ function DonutRing({ segments, centerValue, centerLabel, onClick }) {
 
 export default function UsersSection({ setShowNotice }) {
  
-const [loading, setLoading] = useState(false);
-  const [users, setUsers] = useState([]);
+const [loading, setLoading] = useState(false); 
+// {name: "HELLO"}, {email: "hello@gmail.com"}, {phone: "222222"}, {companyName: "global.com"}
+  const [users, setUsers] = useState([
+  {
+    _id: "1",
+    name: "HELLO",
+    email: "hello@gmail.com",
+    phone: "222222",
+    companyName: "Global.com",
+    status: "active",
+  },
+  {
+    _id: "2",
+    name: "Aman Sharma",
+    email: "aman@gmail.com",
+    phone: "9876543210",
+    companyName: "Tech Solutions",
+    status: "active",
+  },
+  {
+    _id: "3",
+    name: "Rahul Verma",
+    email: "rahul@gmail.com",
+    phone: "9123456780",
+    companyName: "ABC Pvt Ltd",
+    status: "inactive",
+  },
+  {
+    _id: "4",
+    name: "Priya Singh",
+    email: "priya@gmail.com",
+    phone: "9988776655",
+    companyName: "Digital World",
+    status: "active",
+  },
+  {
+    _id: "5",
+    name: "Neha Gupta",
+    email: "neha@gmail.com",
+    phone: "9090909090",
+    companyName: "",
+    status: "inactive",
+  },
+]);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+ const [openMenu, setOpenMenu] = useState(null);
 
   const itemsPerPage = 5;
 
@@ -568,6 +612,12 @@ const [loading, setLoading] = useState(false);
    
   }, [page, search]);
   
+  useEffect(() => {
+    const handleClickOutside = () => setOpenMenu(null);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   const fetchUsers = async () => {
     try {
       setLoading(true);
@@ -617,12 +667,12 @@ const [loading, setLoading] = useState(false);
           </p>
         </div>
 
-        <button
+        {/* <button
           onClick={() => setShowModal(true)}
           className="bg-teal-500 text-white px-4 py-2 rounded-md  text-xs sm:text-sm"
         >
           + Add users
-        </button>
+        </button> */}
       </div>
 
        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -633,7 +683,7 @@ const [loading, setLoading] = useState(false);
        
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-xl border border-gray-200 p-5">
-          <p className="text-sm font-medium text-gray-700 mb-4">User by type</p>
+          <p className="text-sm font-medium text-gray-700 mb-4">Plan type user</p>
           <div className="flex flex-col sm:flex-row items-center gap-6">
             <DonutRing
               segments={[
@@ -666,12 +716,12 @@ const [loading, setLoading] = useState(false);
           <p className="text-sm font-medium text-gray-700 mb-4">User Registration</p>
           <div className="flex items-end justify-between h-40 gap-2">
             {registrationData.map((r) => (
-              <div key={r.day} className="flex flex-col items-center flex-1 h-full justify-end gap-2">
+              <div key={r.month} className="flex flex-col items-center flex-1 h-full justify-end gap-2">
                 <div
                   className="w-full max-w-6 bg-green-400 rounded-sm"
                   style={{ height: `${(r.value / maxReg) * 100}%` }}
                 />
-                <span className="text-[10px] text-gray-400">{r.day}</span>
+                <span className="text-[10px] text-gray-400">{r.month}</span>
               </div>
             ))}
           </div>
@@ -705,6 +755,7 @@ const [loading, setLoading] = useState(false);
           </div>
          </div>
         </div>
+        
       <div className="bg-white rounded-xl shadow p-4">
         <div className="relative mb-4">
           <FiSearch className="absolute left-3 top-3 text-gray-400" />
@@ -728,14 +779,14 @@ const [loading, setLoading] = useState(false);
                 <th>Email</th>
                 <th>Phone no</th>
                 <th>Company name</th>
-                <th>Password</th>
+                <th className="text-center">Subcription (Plan)</th>
                 <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
 
             <tbody>
-              {currentData.map((u) => (
+              {currentData.map((u,i) => (
                 <tr key={u._id} className="border-t">
                   <td className="py-2 flex items-center gap-2">
                     <span className="w-7 h-7 hidden rounded-full bg-teal-100 text-teal-600 sm:flex items-center justify-center text-xs">
@@ -746,8 +797,41 @@ const [loading, setLoading] = useState(false);
                   <td>{u.email}</td>
                   <td>{u.phone}</td>
                   <td className=" text-xs sm:text-sm">{u.companyName || "-"}</td>
-                  <td>-</td>
-                  <td>
+                    <td className="py-3 text-center relative ">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                       setOpenMenu(openMenu === i ? null : i);
+                                      }}
+                                      className="text-slate-400 hover:text-slate-600"
+                                    >
+                                      <MoreVertical size={15} />
+                                    </button>
+                  
+                                    {openMenu === i && (
+                                      <div
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="absolute right-0 top-7 z-20 w-28 bg-white border border-gray-200 rounded-xl shadow-lg p-1.5 flex flex-col gap-1 text-left"
+                                      >
+                                         <button
+                                         
+                                          className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
+                                        >
+                                      Basic
+                                        </button>
+                                        <button
+                                         
+                                          className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
+                                        >
+                                       Starter
+                                        </button>
+                  
+ 
+                                      
+                                      </div>
+                                        )}
+                                      </td>
+                     <td>
                   <span
   onClick={async () => {
     await API.put(`/users/toggle/${u._id}`);

@@ -825,8 +825,8 @@ useEffect(() => {
                         Delete
                       </button>
                     </div>
-                  )}
-                </td>
+                      )}
+                    </td>
                     </tr>
                   ))}
                 </tbody>
