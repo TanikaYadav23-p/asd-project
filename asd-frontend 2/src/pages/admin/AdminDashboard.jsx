@@ -131,6 +131,8 @@ import order from '../../assets/icon/orders.png'
 import logo from "../../assets/Images/logo.png";
 import CreateNewInvoice from "./CreateNewInvoice";
 
+import MessagesModal from "../../components/Messages";
+import NotificationsModal from "../../components/Notifications";
 
 const fabActions = [
   { label: "New Booking", icon: <BsCalendarCheck size={22} className="text-teal-600" /> },
@@ -420,8 +422,9 @@ export default function AdminDashboard() {
   const [showNotice, setShowNotice] = useState(false);
   const [showAddPlan, setShowAddPlan] = useState(false);
    const [showBot, setShowBot] = useState(false);
-     const [fabOpen, setFabOpen] = useState(false);
-   
+    const [fabOpen, setFabOpen] = useState(false);
+    const [messages, setMessage] = useState(false)
+  const [notifications, setNotifications] = useState(false)
   // console.log('ac', activeNav)
   
   const handleFabAction = (label) => {
@@ -505,16 +508,14 @@ export default function AdminDashboard() {
           </div>
 
           <div className="flex items-center gap-1.5 ml-auto">
-            <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600 relative">
-              <FiBell size={16} />
-              <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
-            </button>
-            <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
-              <FiMail size={16} />
-            </button>
-            <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
-              <FiSun size={16} />
-            </button>
+            <button onClick={() => setNotifications(true)} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600 relative">
+                 <FiBell size={16} />
+                 <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
+               </button>
+               <button onClick={() => setMessage(true)} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
+                 <FiMail size={16} />
+               </button>
+           
             <div className="flex items-center gap-2 ml-1 pl-2 py-2 border-l border-gray-200">
               <div className="w-7 h-7 bg-teal-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                 A
@@ -882,6 +883,8 @@ export default function AdminDashboard() {
            {/* <CreateNewInvoice /> */}
         </main>
       </div>
+          {messages && (<MessagesModal onClose={() => setMessage(false)} />)}
+          {notifications && (<NotificationsModal onClose={() => setNotifications(false)} />)}
 
 
       {showNotice && <CreateNotice setShowNotice={setShowNotice} />}

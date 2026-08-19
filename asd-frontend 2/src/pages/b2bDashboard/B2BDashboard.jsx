@@ -202,7 +202,8 @@ import SelectRangeModal from "../../components/b2bComponent/SelectDateRange";
 import MarketIntelligencePopup from "../../components/b2bComponent/MarketIntelligence";
 
 import ShipmentForm from "../../components/ShipmentForm"
-
+import MessagesModal from "../../components/Messages";
+import NotificationsModal from "../../components/Notifications";
 
 const iconMap = {
   shipment: Package,
@@ -402,6 +403,9 @@ export default function B2BDashboard() {
   const [activeSubTab, setActiveSubTab] = useState('Import Intelligence');
   const [openMenu, setOpenMenu] = useState("Import Intelligence"); // null
   const [shipment, setShipment] = useState("")
+  const [messages, setMessage] = useState(false)
+  const [notifications, setNotifications] = useState(false)
+
 const [accountSummary, setAccountSummary] = useState({});
   const [chatInput, setChatInput] = useState("");
   const riskColor = {
@@ -464,16 +468,16 @@ const [accountSummary, setAccountSummary] = useState({});
              </div>
      
              <div className="flex items-center gap-1.5 ml-auto">
-               <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600 relative">
+               <button onClick={() => setNotifications(true)} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600 relative">
                  <FiBell size={16} />
                  <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
                </button>
-               <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
+               <button onClick={() => setMessage(true)} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
                  <FiMail size={16} />
                </button>
-               <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
+               {/* <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
                  <FiSun size={16} />
-               </button>
+               </button> */}
                <div className="flex items-center gap-2 ml-1 pl-2 py-2 border-l border-gray-200">
                  <div className="hidden sm:block leading-tight">
                    <p className="text-xs sm:text-sm font-semibold text-gray-800">
@@ -569,12 +573,12 @@ const [accountSummary, setAccountSummary] = useState({});
                     Valid till 24 may 26
                    </p>
 
-                     <button
+                     {/* <button
                    onClick={() => setActiveTab("UpgradePlan")}
                    className="mt-4 bg-white text-[#073D89] text-xs px-5 font-semibold py-2 rounded-lg"
                  >
                    View plan details
-                 </button>
+                 </button> */}
                  </div>
      
                
@@ -585,15 +589,15 @@ const [accountSummary, setAccountSummary] = useState({});
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden  ">  
         <main className="flex-1 overflow-y-auto bg-gray-50 p-3  ">
           {activeTab === "Dashboard" && (
-              <Dashboard />
+              <Dashboard setMainTab={setActiveTab} />
           )}
 
           {activeTab === "Import Intelligence" &&  (
-           <TradeIntelligenceImport   />
+           <TradeIntelligenceImport   setMainTab={setActiveTab} />
           )}
 
           {activeTab === "Export Intelligence" &&  (
-           <ExportIntelligence   />
+           <ExportIntelligence setMainTab={setActiveTab}  />
           )}
           {activeTab === "HS code Intelligence" &&  (
            <HSCodeIntelligence   />
@@ -641,7 +645,8 @@ const [accountSummary, setAccountSummary] = useState({});
         </main>   
       </div>
 
-
+       {messages && (<MessagesModal onClose={() => setMessage(false)} />)}
+        {notifications && (<NotificationsModal onClose={() => setNotifications(false)} />)}
       {/* <SelectRangeModal /> */}
       {/* <MarketIntelligencePopup /> */}
     </div>
@@ -861,7 +866,7 @@ const regionMarkers = {
   </div>
 );*/
 
- function Dashboard() {
+ function Dashboard({ setMainTab }) {
     const [activeTab, setActiveTab] = useState('Overview');
     const [selectedTrend] = useState('This Month');
 
@@ -1003,6 +1008,7 @@ useEffect(() => {
     ];
     const geoUrl =
   "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
+
   function WorldMap() {
   return (
     <div className="w-full h-[300px] rounded-xl overflow-hidden bg-white">
@@ -1319,7 +1325,7 @@ const regionMarkers = {
 
 
   {/* FOOTER */}
-  <button className="w-full text-center text-xs font-bold text-[#2563EB] mt-4 pt-4 border-t border-[#F1F5F9] hover:text-blue-700 transition-colors">
+  <button onClick={() => setMainTab && setMainTab("Shipments")}  className="w-full text-center text-xs font-bold text-[#2563EB] mt-4 pt-4 border-t border-[#F1F5F9] hover:text-blue-700 transition-colors">
     View All Products →
   </button>
 
@@ -1361,7 +1367,7 @@ const regionMarkers = {
                             </table>
                         </div>
                     </div>
-                    <button className="text-xs font-bold text-[#2563EB] text-center mt-3 pt-3 border-t border-[#F1F5F9]">View All Countries</button>
+                    {/* <button className="text-xs font-bold text-[#2563EB] text-center mt-3 pt-3 border-t border-[#F1F5F9] " >View All Countries</button> */}
                 </div>
 
                 {/* Recent Shipments */}
@@ -1394,7 +1400,7 @@ const regionMarkers = {
                             </table>
                         </div>
                     </div>
-                    <button className="text-xs font-bold text-[#2563EB] text-center mt-3 pt-3 border-t border-[#F1F5F9]">View All Shipments</button>
+                    <button className="text-xs font-bold text-[#2563EB] text-center mt-3 pt-3 border-t border-[#F1F5F9]" onClick={() => setMainTab && setMainTab("Shipments")} >View All Shipments</button>
                 </div>
             </div>
 

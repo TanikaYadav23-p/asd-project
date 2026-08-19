@@ -251,7 +251,7 @@ const fetchFilterOptions = async () => {
   const stats = [
    { title: "Total Export Shipments", value: dashboard.totalShipments || 0, change: "", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
    { title: "Total Export Value (INR)", value: `₹${((dashboard.totalTradeValue || 0) / 10000000).toFixed(2)} Cr`, change: "", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
-   { title: "Total Exporters", value: dashboard.totalExporters || 0, change: "", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
+  //  { title: "Total Exporters", value: dashboard.totalExporters || 0, change: "", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
    
    { title: "Countries of Origin", value: dashboard.countries || 0, change: "", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
    { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
@@ -393,15 +393,7 @@ const fetchFilterOptions = async () => {
             </div>
           </div>
           
-           <div className="relative">
-                      <select className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
-                        <option>More Filters</option>
-                      </select>
-                      <ChevronDown
-                        size={14}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                      />
-            </div>
+          
           
           <div className="flex gap-2 w-full">
             <button onClick={handleApply} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 transition shadow-sm">Apply Filters</button>

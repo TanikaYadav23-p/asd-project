@@ -666,15 +666,7 @@ export default function ShipmentDatabase() {
             </div>
           </div>
 
-          <div className="relative">
-            <select className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
-              <option>More Filters</option>
-            </select>
-            <ChevronDown
-              size={14}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-            />
-          </div>
+        
 
           {/* Reset Filters Control */}
           <div className="flex gap-2">

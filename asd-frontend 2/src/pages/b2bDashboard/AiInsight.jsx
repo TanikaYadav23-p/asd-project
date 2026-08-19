@@ -65,7 +65,7 @@ const KPI_STATS = [
   { title: "Data Signals Analyzed", value: "2.4M+", desc: "Trade events & signals", link: "View Data Coverage", icon: Zap, bg: "bg-purple-50", color: "text-purple-500" },
 ];
 
-const TABS = ["Smart Summary", "Opportunity Insights", "Market Predictions", "Risk Insights", "Price Insights", "Trend Signals"];
+const TABS = ["Smart Summary", "Opportunity Insights", "Market Predictions", "Risk Insights", "Price Insights"];
 
 const SMART_SUMMARY = [
   { icon: Sparkles, bg: "bg-emerald-50", color: "text-emerald-600", text: "Global trade value is predicted to grow by 12.6% in next 3 months, driven by Electronics, Machinery & Pharmaceuticals." },
@@ -201,7 +201,7 @@ export default function AIInsightsDashboard() {
                 </div>
                 {stat.value && <div className={`text-lg font-black mb-1 ${HEADING}`}>{stat.value}</div>}
                 <p className="text-[11px] text-slate-500 leading-snug mb-2">{stat.desc}</p>
-                <button className="text-blue-600 text-[11px] font-bold">{stat.link} →</button>
+                {/* <button className="text-blue-600 text-[11px] font-bold">{stat.link} →</button> */}
               </div>
             );
           })}
@@ -225,7 +225,7 @@ export default function AIInsightsDashboard() {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
-          <SectionCard>
+         {activeTab === "Smart Summary" &&  ( <SectionCard>
             <div className="flex items-center gap-1.5 mb-1">
               <Sparkles size={14} className="text-blue-500" />
               <h3 className={`font-bold text-sm ${HEADING}`}>AI Smart Summary</h3>
@@ -244,10 +244,10 @@ export default function AIInsightsDashboard() {
                 );
               })}
             </div>
-            <button className="text-blue-600 text-xs font-bold mt-2">View Full AI Summary →</button>
-          </SectionCard>
+            {/* <button className="text-blue-600 text-xs font-bold mt-2">View Full AI Summary →</button> */}
+          </SectionCard> )}
 
-          <SectionCard>
+        {activeTab ===  "Opportunity Insights"  && ( <SectionCard>
             <ViewAllHeader title="Top Growth Opportunities (AI Score)" />
             <div className="space-y-3">
               {GROWTH_OPPORTUNITIES.map((o, i) => (
@@ -268,9 +268,9 @@ export default function AIInsightsDashboard() {
                 High demand growth, low competition, favorable market conditions & supplier availability.
               </p>
             </div>
-          </SectionCard>
+          </SectionCard> )}
 
-          <SectionCard>
+          {activeTab ===  "Opportunity Insights"  && ( <SectionCard>
             <div className="flex justify-between items-center mb-3">
               <h3 className={`font-bold text-sm ${HEADING}`}>AI Opportunity Heatmap</h3>
               <button className="flex items-center gap-1 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 shrink-0">
@@ -312,11 +312,12 @@ export default function AIInsightsDashboard() {
                 </button>
               </div>
             </div>
-          </SectionCard>
+          </SectionCard> )}
+
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
-          <SectionCard>
+        {activeTab === "Market Predictions" && ( <SectionCard>
             <ViewAllHeader title="Market Prediction (Next 3 Months)" />
             <div className="overflow-x-auto">
               <table className="w-full text-[11px] min-w-[280px]">
@@ -348,9 +349,9 @@ export default function AIInsightsDashboard() {
                 </tbody>
               </table>
             </div>
-          </SectionCard>
+          </SectionCard>)} 
 
-          <SectionCard>
+         {activeTab === "Risk Insights" && ( <SectionCard>
             <h3 className={`font-bold text-sm mb-3 ${HEADING}`}>AI Risk Radar</h3>
             <div className="h-[240px] w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -371,9 +372,9 @@ export default function AIInsightsDashboard() {
                 </div>
               ))}
             </div>
-          </SectionCard>
+          </SectionCard> )}
 
-          <SectionCard>
+         {activeTab === "Price Insights" && (  <SectionCard>
             <ViewAllHeader title="Price Trend Insights (AI)" />
             <div className="overflow-x-auto">
               <table className="w-full text-[11px] min-w-[300px]">
@@ -405,7 +406,7 @@ export default function AIInsightsDashboard() {
                 </tbody>
               </table>
             </div>
-          </SectionCard>
+          </SectionCard> )}
         </div>
 
         <div className="mb-4">
@@ -422,7 +423,7 @@ export default function AIInsightsDashboard() {
                     <Icon size={16} />
                   </div>
                   <p className="text-[11px] text-slate-600 font-medium leading-snug mb-2.5">{a.text}</p>
-                  <button className="text-blue-600 text-[11px] font-bold">{a.link} →</button>
+                  {/* <button className="text-blue-600 text-[11px] font-bold">{a.link} →</button> */}
                 </div>
               );
             })}

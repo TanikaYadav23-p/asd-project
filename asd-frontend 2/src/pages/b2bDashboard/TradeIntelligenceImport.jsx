@@ -92,7 +92,7 @@ const INITIAL_SHIPMENTS = [
   { id: "EXP-2025-2841", hsCode: "39", desc: "Plastics & Articles", exporter: "Omega Exports Pvt. Ltd.", buyer: "Domestic Distributors", country: "Bangladesh", port: "Kolkata", date: "20 Apr 2025", value: "₹ 16.20 Cr", status: "PENDING" },
 ];*/
 
-export default function ImportIntelligence() {
+export default function ImportIntelligence({setMainTab}) {
 
   const [dashboard, setDashboard] = useState({});
   const [filterOptions, setFilterOptions] = useState({});
@@ -489,7 +489,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
               ))}
             </div>
           </div>
-          <button className="text-blue-600 text-xs font-semibold text-center mt-4 pt-2 border-t border-slate-50">View All Products →</button>
+          {/* <button className="text-blue-600 text-xs font-semibold text-center mt-4 pt-2 border-t border-slate-50" >View All Products →</button> */}
         </div>
 
         {/* IMPORT VALUE TREND */}
@@ -611,7 +611,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
         </div>
 
           <div className="text-center ">
-             <button className="text-blue-600 text-xs font-semibold text-center mt-4 pt-2 border-t border-slate-50">View All Shipments →</button>
+             <button className="text-blue-600 text-xs font-semibold text-center mt-4 pt-2 border-t border-slate-50" onClick={() => setMainTab && setMainTab("Shipments")}>View All Shipments →</button>
            </div>
       </div>
 

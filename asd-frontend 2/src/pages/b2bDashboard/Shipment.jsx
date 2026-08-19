@@ -928,7 +928,7 @@ useEffect(() => {
               </div>
             </SectionCard>
 
-            <SectionCard>
+            {/* <SectionCard>
               <div className="flex justify-between items-center mb-3">
                 <h3 className={`font-bold text-sm ${HEADING}`}>Top Destination Countries</h3>
                 <DropdownButton text="This Month"  onClick={() => setDateRange(true)} />
@@ -946,7 +946,7 @@ useEffect(() => {
                   </div>
                 ))}
               </div>
-            </SectionCard>
+            </SectionCard> */}
             
           <SectionCard>
             <div className="flex justify-between items-center mb-3">

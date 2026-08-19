@@ -92,7 +92,7 @@ const INITIAL_SHIPMENTS = [
   { id: "EXP-2025-2041", hsCode: "39", desc: "Plastics & Articles", exporter: "Omega Exports Pvt. Ltd.", buyer: "Oceanic Distributors", country: "Bangladesh", port: "Kolkata", date: "20 Apr 2025", value: "₹ 16.20 Cr", status: "PENDING" },
 ];*/
 
-export default function ExportIntelligenceDashboard() {
+export default function ExportIntelligenceDashboard({setMainTab}) {
 
   const [dashboard, setDashboard] = useState({});
   const [filterOptions, setFilterOptions] = useState({});
@@ -224,7 +224,7 @@ export default function ExportIntelligenceDashboard() {
   const INITIAL_STATS = [
     { title: "Total Export Shipments", value: dashboard.totalExportShipments || 0, change: "", icon: Package, color: "text-blue-500", bg: "bg-blue-50", isUp: true },
     { title: "Total Export Value (INR)", value: dashboard.totalExportShipments || 0, change: "", icon: IndianRupee, color: "text-green-500", bg: "bg-green-50", isUp: true },
-    { title: "Total Exporters", value: dashboard.totalExporters || 0, change: "", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
+    // { title: "Total Exporters", value: dashboard.totalExporters || 0, change: "", icon: Users, color: "text-cyan-500", bg: "bg-cyan-50", isUp: true },
    { title: "Countries of Origin", value: dashboard.countries || 0, change: "", icon: Globe, color: "text-purple-500", bg: "bg-purple-50", isUp: true },
     { title: "Avg. Shipment Value (INR)", value: `₹${((dashboard.avgShipmentValue || 0) / 100000).toFixed(2)} L`, change: "", icon: IndianRupee, color: "text-orange-500", bg: "bg-orange-50", isUp: false },
       ];
@@ -423,12 +423,6 @@ export default function ExportIntelligenceDashboard() {
               </div>
             </div>
 
-            <div className="relative">
-              <select className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
-                <option>More Filters</option>
-              </select>
-              <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-            </div>
 
             <div className="flex gap-2 w-full">
               <button onClick={handleApplyFilters} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm">
@@ -598,7 +592,7 @@ export default function ExportIntelligenceDashboard() {
             </div>
           </div>
           <div className="text-center mt-4 pt-3 border-t border-slate-50">
-            <button className="text-blue-600 hover:text-blue-700 text-xs font-semibold">
+            <button onClick={() => setMainTab && setMainTab("Shipments")} className="text-blue-600 hover:text-blue-700 text-xs font-semibold">
               View All Shipments →
             </button>
           </div>

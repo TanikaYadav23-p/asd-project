@@ -131,19 +131,19 @@ const notifications = [
 
 export default function NotificationsModal({ onClose }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/80 p-3 sm:p-6 overflow-y-auto">
-      <div className="w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-2xl mt-4 sm:mt-10">
-        <div className="p-4 sm:p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-3 sm:p-6">
+      <div className="w-full max-w-md sm:max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col max-h-[80vh]">
+        <div className="p-4 sm:p-6 shrink-0">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
-                <FiBell size={20} />
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center shrink-0">
+                <FiBell size={18} />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+                <h2 className="text-base sm:text-lg font-bold text-gray-900">
                   Notifications
                 </h2>
-                <p className="text-xs sm:text-sm text-gray-500">
+                <p className="text-xs text-gray-500">
                   Stay updated with the latest activities.
                 </p>
               </div>
@@ -152,20 +152,22 @@ export default function NotificationsModal({ onClose }) {
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 shrink-0"
             >
-              <FiX size={22} />
+              <FiX size={20} />
             </button>
           </div>
  
           <div className="mt-4">
-            <span className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 text-sm font-medium px-3 py-1.5 rounded-full">
+            <span className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 text-xs font-medium px-3 py-1.5 rounded-full">
               All
-              <span className="bg-teal-600 text-white text-xs font-semibold w-5 h-5 rounded-full flex items-center justify-center">
+              <span className="bg-teal-600 text-white text-[10px] font-semibold w-4 h-4 rounded-full flex items-center justify-center">
                 12
               </span>
             </span>
           </div>
- 
-          <div className="mt-4 space-y-3">
+        </div>
+
+        <div className="overflow-y-auto px-4 sm:px-6 pb-4 sm:pb-6 pr-1">
+          <div className="space-y-3">
             {notifications.map((n) => {
               const Icon = n.icon;
               return (
@@ -174,29 +176,29 @@ export default function NotificationsModal({ onClose }) {
                   className="border border-gray-100 rounded-xl p-3 flex gap-3"
                 >
                   <div
-                    className={`w-9 h-9 rounded-full ${n.iconBg} ${n.iconColor} flex items-center justify-center shrink-0`}
+                    className={`w-8 h-8 rounded-full ${n.iconBg} ${n.iconColor} flex items-center justify-center shrink-0`}
                   >
-                    <Icon size={16} />
+                    <Icon size={14} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="text-sm font-semibold text-gray-900">
+                      <p className="text-xs font-semibold text-gray-900">
                         {n.title}
                       </p>
-                      <span className="text-xs text-gray-400 whitespace-nowrap shrink-0">
+                      <span className="text-[11px] text-gray-400 whitespace-nowrap shrink-0">
                         {n.time}
                       </span>
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
+                    <p className="text-[11px] sm:text-xs text-gray-500 mt-0.5">
                       {n.desc}
                     </p>
                     <div className="flex items-center justify-between mt-2">
                       <span
-                        className={`${n.tagBg} ${n.tagColor} text-xs font-medium px-2.5 py-1 rounded-full`}
+                        className={`${n.tagBg} ${n.tagColor} text-[11px] font-medium px-2.5 py-1 rounded-full`}
                       >
                         {n.tag}
                       </span>
-                      <span className={`w-2 h-2 rounded-full ${n.dot}`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${n.dot}`} />
                     </div>
                   </div>
                 </div>
@@ -208,4 +210,3 @@ export default function NotificationsModal({ onClose }) {
     </div>
   );
 }
- 

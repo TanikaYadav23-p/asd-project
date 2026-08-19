@@ -116,8 +116,8 @@ import NotificationDashboard from "./Notification";
 import HelpSupportDashboard from "./Help&Support";
 import ProfileSettingsDashboard from "./ProfileSettings";
 import { useNavigate } from "react-router-dom";
-import MessagesModal from "../../components/userComponent/Messages";
-import NotificationsModal from "../../components/userComponent/Notifications";
+import MessagesModal from "../../components/Messages";
+import NotificationsModal from "../../components/Notifications";
 import FreightCalculatorModal from "../../components/FreightCalculator";
 import IncentivesCheckerModal from "../../components/IncentiveChecker";
 import TrackShipmentModal from "../../components/userComponent/TrackShipment";
@@ -780,9 +780,9 @@ export default function UserDashboard() {
           <button   onClick={() => setShowMessages(true)} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
             <FiMail size={16} />
           </button>
-          <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
+          {/* <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
             <FiSun size={16} />
-          </button>
+          </button> */}
           <div className="flex items-center gap-2 ml-1 pl-2 py-2 border-l border-gray-200">
             <div className="hidden sm:block leading-tight">
               <p className="text-xs sm:text-sm font-semibold text-gray-800">
