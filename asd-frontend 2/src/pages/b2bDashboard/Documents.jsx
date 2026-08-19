@@ -586,7 +586,7 @@ const handleResetDocumentFilters = () => {
               </div>
             </div>
              <div className="flex justify-end gap-2 mt-3">
-            <button onClick={handleApplyDocumentFilters} className="flex-1 bg-slate-50/80 border border-slate-200 text-slate-600 rounded-xl py-2 px-4 text-xs font-semibold hover:bg-slate-100 transition">
+            <button onClick={handleApplyDocumentFilters} className="flex-1  whitespace-nowrap bg-slate-50/80 border border-slate-200 text-slate-600 rounded-xl py-2 px-4 text-xs font-semibold hover:bg-slate-100 transition">
               Apply Filters
             </button>
             <button onClick={handleResetDocumentFilters} className="flex-1 text-slate-400 hover:text-slate-600 text-xs font-medium px-1">Reset</button>

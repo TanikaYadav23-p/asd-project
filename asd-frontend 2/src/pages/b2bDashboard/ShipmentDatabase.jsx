@@ -697,7 +697,7 @@ export default function ShipmentDatabase() {
           <div className="flex gap-2">
             <button
               onClick={handleApplyFilters}
-              className="flex-1  bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm"
+              className="flex-1  bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm  whitespace-nowrap"
             >
               Apply Filters
             </button>

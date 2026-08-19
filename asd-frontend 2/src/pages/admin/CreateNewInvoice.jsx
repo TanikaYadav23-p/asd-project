@@ -32,8 +32,7 @@ export default function CreateNewInvoice({onClose}) {
   const [editingId, setEditingId] = useState(null);
   const [editValues, setEditValues] = useState(emptyItem);
   const [file, setFile] = useState(null);
-  const [dragging, setDragging] = useState(false);
-  const fileInputRef = useRef(null);
+ 
 
   const handleChange = (field) => (e) => setForm({ ...form, [field]: e.target.value });
 
@@ -60,11 +59,7 @@ export default function CreateNewInvoice({onClose}) {
     if (f) setFile(f);
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragging(false);
-    handleFile(e.dataTransfer.files[0]);
-  };
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -276,37 +271,7 @@ export default function CreateNewInvoice({onClose}) {
             </div>
           </div>
 
-          <div className="border border-gray-100 rounded-lg p-4">
-            <p className="text-purple-600 font-semibold text-sm mb-4">Attached Document (optional)</p>
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragging(true);
-              }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current.click()}
-              className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer ${
-                dragging ? "border-purple-400 bg-purple-50" : "border-gray-200"
-              }`}
-            >
-              <UploadCloud className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-              <p className="text-sm text-gray-600 mb-1">Drag & Upload file here.</p>
-              <p className="text-xs text-gray-400 mb-2">or</p>
-              <span className="text-sm text-purple-600 font-medium border border-purple-200 rounded-full px-4 py-1.5 inline-block">
-                Browse Files
-              </span>
-              <p className="text-xs text-gray-400 mt-2">PDF,PNG,JPG up to 100 mb.</p>
-              {file && <p className="text-xs text-gray-600 mt-2">{file.name}</p>}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".pdf,.png,.jpg,.jpeg"
-                onChange={(e) => handleFile(e.target.files[0])}
-                className="hidden"
-              />
-            </div>
-          </div>
+        
 
           <button
             type="submit"

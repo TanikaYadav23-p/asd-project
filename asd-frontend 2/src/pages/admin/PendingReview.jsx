@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Clock, FileText, FileClock, Timer, Search ,MoreVertical} from "lucide-react";
 import {
   FaPlus, FaMagnifyingGlass, FaXmark, FaChevronDown,
@@ -78,6 +78,11 @@ export default function PendingReviews({setPendingReview,}) {
     } catch (err) {}
   };
 
+  useEffect(() => {
+  const handleClickOutside = () => setOpenMenu(null);
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
   return (
    <>
    <div className="w-full  grid grid-cols-1   gap-2 ">

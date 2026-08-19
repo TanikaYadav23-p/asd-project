@@ -532,6 +532,12 @@ useEffect(() => {
   }
 }, [shipments]);
 
+useEffect(() => {
+  const handleClickOutside = () => setOpenMenu(null);
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
+
   return (
     <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600 font-sans antialiased pt-5">
   {!shipment && ( <div className="max-w-[1500px] mx-auto p-3 sm:p-4 md:p-6">
@@ -709,7 +715,7 @@ useEffect(() => {
             </div>
 
             <div className="flex items-center justify-end gap-2 mt-3">
-            <button onClick={handleApplyFilters} className=" flex bg-blue-100 border border-slate-200 text-slate-600 rounded-xl py-2 px-4 text-xs font-semibold hover:bg-slate-100 transition">
+            <button onClick={handleApplyFilters} className=" flex bg-blue-100 border border-slate-200 text-slate-600 rounded-xl py-2 px-4 text-xs font-semibold hover:bg-slate-100 transition  whitespace-nowrap">
               Apply Filters
             </button>
             <button onClick={handleResetFilters} className="  flex-1 text-slate-400 hover:text-slate-600 text-xs font-medium px-1">Reset</button>

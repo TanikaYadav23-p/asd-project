@@ -131,6 +131,7 @@ import {
   TrendingUp,
   Clock3,Lightbulb ,ChartNoAxesCombined  , SquareChartGantt ,Binoculars 
 } from "lucide-react";
+import { TbChartBar } from "react-icons/tb";
 
 import { LuChartNoAxesCombined, LuLightbulb ,  } from "react-icons/lu";
   import { MapContainer, TileLayer, CircleMarker } from "react-leaflet";
@@ -308,7 +309,7 @@ const sidebarSections = [
         badgeColor: "bg-teal-500",
       },
       { icon: FiHash, label: "Export Intelligence" },
-      { icon: SquareChartGantt , label: "HS code Intelligence" },
+      { icon: TbChartBar , label: "HS code Intelligence" },
       { icon: FiMap, label: "Shipment Database" },
       { icon: FiTruck, label: "Risk Analysis" },
       { icon: FaRobot , label: "Ai Insight" },

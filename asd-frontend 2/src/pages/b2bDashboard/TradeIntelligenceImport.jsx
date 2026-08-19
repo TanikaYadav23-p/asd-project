@@ -474,7 +474,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
           </div>*/}
 
           <div className="flex gap-2">
-            <button onClick={handleApplyFilters} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm">
+            <button onClick={handleApplyFilters} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm  whitespace-nowrap">
               Apply Filters
             </button>
             <button onClick={handleResetFilters} className="text-slate-400 hover:text-slate-600 font-medium text-xs rounded-xl py-2 px-2 transition border border-slate-200 bg-white">

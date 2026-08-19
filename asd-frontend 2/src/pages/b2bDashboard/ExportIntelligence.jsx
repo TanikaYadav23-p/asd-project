@@ -447,7 +447,7 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
 
 
             <div className="flex gap-2 w-full">
-              <button onClick={handleApplyFilters} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm">
+              <button onClick={handleApplyFilters} className="flex-1  whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm">
                 Apply Filters
               </button>
               <button onClick={handleResetFilters} className="text-slate-400 hover:text-slate-600 font-medium text-xs rounded-xl py-2 px-2 transition border border-slate-200 bg-white">
@@ -465,7 +465,7 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
             <div>
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold text-sm text-slate-800">Top Exported Products</h3>
-                <button className="text-blue-600 text-xs font-semibold">View All</button>
+                {/* <button className="text-blue-600 text-xs font-semibold">View All</button> */}
               </div>
               <div className="space-y-3">
                 {topProducts.map((prod, i) => (

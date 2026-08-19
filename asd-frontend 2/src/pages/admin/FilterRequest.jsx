@@ -100,7 +100,7 @@ export default function FilterRequests({ onClose, onApply }) {
             </button>
             <button
               onClick={handleApply}
-              className="flex items-center gap-2 px-6 py-2 rounded-lg bg-indigo-600 text-white text-sm hover:bg-indigo-700"
+              className="flex items-center gap-2 px-6 py-2 rounded-lg bg-indigo-600 text-white text-sm hover:bg-indigo-700  whitespace-nowrap"
             >
               <Filter className="w-4 h-4" /> Apply Filters
             </button>

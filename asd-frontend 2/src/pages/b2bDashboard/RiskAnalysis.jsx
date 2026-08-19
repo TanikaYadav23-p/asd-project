@@ -520,7 +520,7 @@ const filteredRiskTopCountries = useMemo(() => {
 ];
 
   return (
-    <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600 font-sans antialiased">
+    <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600 font-sans antialiased pt-8">
       <div className="max-w-[1400px] mx-auto p-3 sm:p-4 md:p-6">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
           <div>

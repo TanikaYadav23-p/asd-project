@@ -420,7 +420,7 @@ const fetchFilterOptions = async () => {
           
           
           <div className="flex gap-2 w-full">
-            <button onClick={handleApply} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 transition shadow-sm">Apply Filters</button>
+            <button onClick={handleApply} className="flex-1 bg-blue-600  whitespace-nowrap hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 transition shadow-sm">Apply Filters</button>
             <button onClick={handleReset} className="text-slate-400 hover:text-slate-600 text-xs font-semibold px-2 border border-slate-200 rounded-xl bg-white">Reset</button>
           </div>
         </div>
@@ -454,7 +454,7 @@ const fetchFilterOptions = async () => {
               ))}
             </div>
           </div>
-          <button className="text-blue-600 text-xs font-bold text-center mt-3 pt-2 border-t border-slate-50">View All HS Codes →</button>
+          {/* <button className="text-blue-600 text-xs font-bold text-center mt-3 pt-2 border-t border-slate-50">View All HS Codes →</button> */}
         </div>
 
         {/* PANEL 2: TRADE VALUE TREND */}

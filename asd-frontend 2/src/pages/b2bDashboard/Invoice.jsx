@@ -387,7 +387,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
           </div>
         ))}
         <div className="flex gap-2 h-8">
-          <button className="flex-1 flex items-center justify-center gap-1 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
+          <button className="flex-1 flex items-center  whitespace-nowrap justify-center gap-1 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
             <SlidersHorizontal size={12} /> Apply Filters
           </button>
           <button onClick={() =>
