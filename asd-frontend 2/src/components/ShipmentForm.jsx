@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect,useRef } from "react";
 import {
   FiChevronDown,
@@ -32,7 +31,7 @@ import { CloudCog } from "lucide-react";
 
 function Label({ children, required = true }) {
   return (
-    <label className="block text-xs font-semibold text-gray-700 mb-1">
+    <label className="block text-[11px] font-semibold text-slate-700 mb-2 leading-tight">
       {children}
       {required && <span className="text-red-500 ml-0.5">*</span>}
     </label>
@@ -58,7 +57,7 @@ function Input({
         onChange={onChange}
         placeholder={placeholder}
         disabled={disabled}
-        className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+        className="w-full min-w-0 h-10 border border-slate-200 bg-white rounded-xl px-3 text-[13px] text-slate-700 placeholder-slate-400 shadow-sm transition focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:bg-slate-50 disabled:text-slate-400 overflow-hidden text-ellipsis whitespace-nowrap"
       />
     </div>
   );
@@ -74,11 +73,11 @@ function DateInput({ label, value, name, onChange, required = false }) {
           name={name}
           value={value || ""}
           onChange={onChange}
-          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full h-10 border border-slate-200 bg-white rounded-xl px-3 text-sm text-slate-700 placeholder-slate-400 shadow-sm transition focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
         />
         <FiCalendar
           size={14}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
         />
       </div>
     </div>
@@ -102,14 +101,14 @@ function Select({
           name={name}
           value={value || ""}
           onChange={onChange}
-          className="w-full appearance-none border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full min-w-0 h-10 appearance-none border border-slate-200 bg-white rounded-xl px-3 pr-9 text-[13px] text-slate-700 shadow-sm transition focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 overflow-hidden text-ellipsis whitespace-nowrap"
         >
           <option value="">{placeholder}</option>
           {children}
         </select>
         <FiChevronDown
           size={14}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
         />
       </div>
     </div>
@@ -120,8 +119,8 @@ function RadioGroup({ label, name, value, onChange, required = true }) {
   return (
     <div>
       <Label required={required}>{label}</Label>
-      <div className="flex items-center gap-4 mt-2">
-        <label className="flex items-center gap-1.5 text-sm text-gray-700">
+      <div className="flex items-center gap-5 mt-2.5">
+        <label className="flex items-center gap-2 text-xs font-medium text-slate-600">
           <input
             type="radio"
             name={name}
@@ -131,7 +130,7 @@ function RadioGroup({ label, name, value, onChange, required = true }) {
           />
           Yes
         </label>
-        <label className="flex items-center gap-1.5 text-sm text-gray-700">
+        <label className="flex items-center gap-2 text-xs font-medium text-slate-600">
           <input
             type="radio"
             name={name}
@@ -147,25 +146,25 @@ function RadioGroup({ label, name, value, onChange, required = true }) {
 }
 
 function Grid2({ children }) {
-  return <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>;
+  return <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">{children}</div>;
 }
 
 function SectionCard({ number, title, subtitle, children }) {
   return (
-    <div className="bg-white grid grid-cols-1 border border-gray-200 rounded-xl p-2 shadow-sm">
+    <section className="bg-white border border-slate-200 rounded-2xl p-5 shadow-[0_4px_18px_rgba(15,23,42,0.05)] hover:shadow-[0_8px_24px_rgba(15,23,42,0.07)] transition-shadow">
       <div className="flex items-center gap-2">
-        <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shrink-0">
+        <span className="w-7 h-7 rounded-full bg-blue-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0 shadow-sm shadow-blue-200">
           {number}
         </span>
-        <h3 className="text-sm font-bold text-gray-900">{title}</h3>
+        <h3 className="text-[15px] font-bold text-slate-900 tracking-tight">{title}</h3>
       </div>
       {subtitle && (
-        <p className="text-xs text-gray-500 whitespace-nowrap mt-1 ml-7">
+        <p className="text-xs text-slate-500 mt-1 ml-9">
           {subtitle}
         </p>
       )}
-      <div className="mt-4 space-y-4">{children}</div>
-    </div>
+      <div className="mt-5 space-y-4">{children}</div>
+    </section>
   );
 }
 
@@ -186,22 +185,22 @@ function DocumentsUpload({
   fileInputRef
   }){
   return (
-    <SectionCard number={4} title="Documents Upload" subtitle="Upload all relevant documents">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1">
+    <SectionCard number={5} title="Documents Upload" subtitle="Upload all relevant documents">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         {docTypes.map((d) => {
           const Icon = d.icon;
           return (
             <div
               key={d.label}
-              className="border border-gray-200 items-center rounded-lg p-1 text-center"
+              className="border border-slate-200 bg-slate-50/50 items-center rounded-xl p-2.5 text-center hover:bg-white hover:border-blue-200 transition-colors"
             >
               <div
-                className={`w-8 h-8 rounded-full mx-auto flex items-center justify-center ${d.color}`}
+                className={`w-9 h-9 rounded-xl mx-auto flex items-center justify-center ${d.color}`}
               >
                 <Icon size={14} />
               </div>
               <div>
-                <p className="xl:text-[9px] text-xs font-semibold text-gray-700 mt-1.5">
+                <p className="text-[10px] font-semibold text-slate-700 mt-2 leading-[1.15] min-h-[23px] flex items-center justify-center">
                   {d.label}
                 </p>
                 <>
@@ -224,7 +223,7 @@ type="button"
 onClick={()=>
 fileInputRef.current[d.label].click()
 }
-className="xl:text-[9px] text-xs text-blue-600 font-medium mt-0.5"
+className="text-[10px] text-blue-600 font-semibold mt-1"
 >
 
 {uploadedDocs[d.label]
@@ -238,7 +237,7 @@ className="xl:text-[9px] text-xs text-blue-600 font-medium mt-0.5"
           );
         })}
       </div>
-      <p className="text-[10px] text-gray-400">
+      <p className="text-[10px] text-slate-400 mt-2 leading-relaxed">
         Accepted formats: PDF, JPG, PNG (Max size: 10MB per file)
       </p>
     </SectionCard>
@@ -261,18 +260,18 @@ function AIOutputAnalysis({ analysis }) {
   ];
 
   return (
-    <SectionCard number={5} title="AI Output After Analysis">
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 xl:gap-1">
+    <SectionCard number={6} title="AI Output After Analysis">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-2">
         {aiTopStats.map((s) => (
-          <div key={s.label} className={`flex flex-col justify-around rounded-lg p-3 xl:p-1 ${s.color}`}>
+          <div key={s.label} className={`flex flex-col justify-around rounded-xl p-3 ${s.color} border border-white shadow-sm`}>
             <p className="text-xs xl:text-[10px] font-medium">{s.label}</p>
             <p className="text-xs xl:text-[9px] font-bold mt-0.5">{s.value}</p>
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 xl:gap-1">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-2">
         {aiBottomStats.map((s) => (
-          <div key={s.label} className="rounded-lg p-3 xl:p-1 bg-gray-50">
+          <div key={s.label} className="rounded-xl p-3 bg-slate-50 border border-slate-100">
             <p className="text-sm xl:text-[10px] text-gray-500">{s.label}</p>
             <p
               className={`text-sm xl:text-[10px] font-bold mt-0.5 ${
@@ -285,7 +284,7 @@ function AIOutputAnalysis({ analysis }) {
           </div>
         ))}
       </div>
-      <button type="button" className="w-full flex items-center justify-center gap-2 border border-gray-200 rounded-lg py-2 text-sm font-semibold text-blue-600">
+      <button type="button" className="w-full flex items-center justify-center gap-2 border border-blue-100 bg-blue-50/50 rounded-xl py-2.5 text-sm font-semibold text-blue-600 hover:bg-blue-50 transition">
         <FiExternalLink size={13} />
         View Full Analysis Report
       </button>
@@ -479,239 +478,300 @@ function InvoiceValue({ formData, handleDirectChange, handleRadioChange }) {
 }
 
 function ProductDetails({
-    formData,
-    handleNestedChange,
-    handleRadioChange,
-    hsCodes
-  }) {
-  return (
-    <SectionCard number={6} title="Product Details">
-      <div className="grid grid-cols-2 gap-2">
-        <Grid2>
-          <Input
-            label="Product Details"
-            placeholder="Enter product name"
-            value={formData.cargo.productName}
-            onChange={(e) => handleNestedChange("cargo", "productName", e.target.value)}
-          />
-          <Input
-            label="Product Description"
-            placeholder="Enter product description"
-            value={formData.cargo.productDescription}
-            onChange={(e) => handleNestedChange("cargo", "productDescription", e.target.value)}
-          />
-        </Grid2>
-        <Grid2>
-        <Select
-  label="HS Code"
-  placeholder="Select HS Code"
-  value={formData.cargo.hsCode}
-  onChange={(e) => {
-    console.log("Selected HS:", e.target.value);
+  formData,
+  handleNestedChange,
+  handleRadioChange,
+  hsCodes,
+}) {
+  const cargo = formData.cargo;
 
-    handleNestedChange(
-      "cargo",
-      "hsCode",
-      e.target.value
-    );
-  }}
->
-  {hsCodes.map((item) => (
-    <option key={item._id} value={item._id}>
-      {item.hsCode}
-    </option>
-  ))}
-</Select>
-          <Select
-            label="Product Category"
-            placeholder="Select category"
-            value={formData.cargo.category}
-            onChange={(e) => handleNestedChange("cargo", "category", e.target.value)}
-          >
-            <option value="Electronics">Electronics</option>
-            <option value="Textiles">Textiles</option>
-            <option value="General">General Cargo</option>
-          </Select>
-        </Grid2>
-        <Grid2>
-          <Input
-            label="Quantity"
-            placeholder="Enter quantity"
-            value={formData.cargo.quantity}
-            onChange={(e) => handleNestedChange("cargo", "quantity", e.target.value)}
-          />
-          <Select
-            label="Unit"
-            placeholder="Select unit"
-            value={formData.cargo.unit}
-            onChange={(e) => handleNestedChange("cargo", "unit", e.target.value)}
-          >
-            <option value="PCS">PCS</option>
-            <option value="KG">KG</option>
-            <option value="BOX">BOX</option>
-          </Select>
-        </Grid2>
-        <Grid2>
-          <RadioGroup
-            label="Dangerous Goods (DG)"
-            name="isDangerous"
-            value={formData.cargo.isDangerous}
-            onChange={(name, val) => handleNestedChange("cargo", name, val)}
-          />
-          <RadioGroup
-            label="Temperature Controlled"
-            name="isTemperatureControlled"
-            value={formData.cargo.isTemperatureControlled}
-            onChange={(name, val) => handleNestedChange("cargo", name, val)}
-          />
-        </Grid2>
-        <Grid2>
-          <Input
-            label="Net Weight (Kg)"
-            placeholder="Enter net weight"
-            value={formData.cargo.weight}
-            onChange={(e) => handleNestedChange("cargo", "weight", e.target.value)}
-          />
-          <Input
-            label="Gross Weight (Kg)"
-            placeholder="Enter gross weight"
-            value={formData.cargo.grossWeight}
-            onChange={(e) => handleNestedChange("cargo", "grossWeight", e.target.value)}
-          />
-        </Grid2>
-        <div>
-          <Label>Dimensions (L×W×H)</Label>
-          <div className="flex items-center gap-2 mt-1">
-            <input
-              placeholder="Length"
-              value={formData.cargo.dimensions?.length || ""}
+  const updateDimension = (key, value) => {
+    handleNestedChange("cargo", "dimensions", {
+      ...cargo.dimensions,
+      [key]: value,
+    });
+  };
+
+  return (
+    <SectionCard number={4} title="Product Details">
+      <div className="space-y-5">
+        {/* Row 1 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="min-w-0">
+            <Input
+              label="Product Details"
+              placeholder="Enter product name"
+              value={cargo.productName}
               onChange={(e) =>
-                handleNestedChange("cargo", "dimensions", {
-                  ...formData.cargo.dimensions,
-                  length: e.target.value,
-                })
+                handleNestedChange("cargo", "productName", e.target.value)
               }
-              className="w-full border border-gray-200 rounded-lg px-1 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <input
-              placeholder="Width"
-              value={formData.cargo.dimensions?.width || ""}
+          </div>
+
+          <div className="min-w-0">
+            <Input
+              label="Product Description"
+              placeholder="Enter product description"
+              value={cargo.productDescription}
               onChange={(e) =>
-                handleNestedChange("cargo", "dimensions", {
-                  ...formData.cargo.dimensions,
-                  width: e.target.value,
-                })
+                handleNestedChange("cargo", "productDescription", e.target.value)
               }
-              className="w-full border border-gray-200 rounded-lg px-1 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <input
-              placeholder="Height"
-              value={formData.cargo.dimensions?.height || ""}
+          </div>
+
+          <div className="min-w-0">
+            <Select
+              label="HS Code"
+              placeholder="Select HS Code"
+              value={cargo.hsCode}
               onChange={(e) =>
-                handleNestedChange("cargo", "dimensions", {
-                  ...formData.cargo.dimensions,
-                  height: e.target.value,
-                })
+                handleNestedChange("cargo", "hsCode", e.target.value)
               }
-              className="w-full border border-gray-200 rounded-lg px-1 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {hsCodes.map((item) => (
+                <option key={item._id} value={item._id}>
+                  {item.hsCode}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <div className="min-w-0">
+            <Select
+              label="Product Category"
+              placeholder="Select category"
+              value={cargo.category}
+              onChange={(e) =>
+                handleNestedChange("cargo", "category", e.target.value)
+              }
+            >
+              <option value="Electronics">Electronics</option>
+              <option value="Textiles">Textiles</option>
+              <option value="General">General Cargo</option>
+            </Select>
+          </div>
+        </div>
+
+        {/* Row 2 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="min-w-0">
+            <Input
+              label="Quantity"
+              placeholder="Enter quantity"
+              value={cargo.quantity}
+              onChange={(e) =>
+                handleNestedChange("cargo", "quantity", e.target.value)
+              }
             />
-            <div className="relative shrink-0 w-20">
-              <select
-                value={formData.cargo.dimensions?.unit || "CM"}
-                onChange={(e) =>
-                  handleNestedChange("cargo", "dimensions", {
-                    ...formData.cargo.dimensions,
-                    unit: e.target.value,
-                  })
-                }
-                className="w-full appearance-none border border-gray-200 rounded-lg px-2 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="CM">CM</option>
-                <option value="INCH">INCH</option>
-              </select>
-              <FiChevronDown
-                size={12}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+          </div>
+
+          <div className="min-w-0">
+            <Select
+              label="Unit"
+              placeholder="Select unit"
+              value={cargo.unit}
+              onChange={(e) =>
+                handleNestedChange("cargo", "unit", e.target.value)
+              }
+            >
+              <option value="PCS">PCS</option>
+              <option value="KG">KG</option>
+              <option value="BOX">BOX</option>
+            </Select>
+          </div>
+
+          <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
+            <RadioGroup
+              label="Dangerous Goods (DG)"
+              name="isDangerous"
+              value={cargo.isDangerous}
+              onChange={(name, val) => handleNestedChange("cargo", name, val)}
+            />
+          </div>
+
+          <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
+            <RadioGroup
+              label="Temperature Controlled"
+              name="isTemperatureControlled"
+              value={cargo.isTemperatureControlled}
+              onChange={(name, val) => handleNestedChange("cargo", name, val)}
+            />
+          </div>
+        </div>
+
+        {/* Row 3 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="min-w-0">
+            <Input
+              label="Net Weight (Kg)"
+              placeholder="Enter net weight"
+              value={cargo.weight}
+              onChange={(e) =>
+                handleNestedChange("cargo", "weight", e.target.value)
+              }
+            />
+          </div>
+
+          <div className="min-w-0">
+            <Input
+              label="Gross Weight (Kg)"
+              placeholder="Enter gross weight"
+              value={cargo.grossWeight}
+              onChange={(e) =>
+                handleNestedChange("cargo", "grossWeight", e.target.value)
+              }
+            />
+          </div>
+
+          <div className="xl:col-span-2 min-w-0">
+            <Label>Dimensions (L × W × H)</Label>
+            <div className="grid grid-cols-[1fr_1fr_1fr_82px] gap-2 mt-1.5">
+              <input
+                type="text"
+                placeholder="Length"
+                value={cargo.dimensions?.length || ""}
+                onChange={(e) => updateDimension("length", e.target.value)}
+                className="min-w-0 w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 placeholder-slate-400 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
               />
+              <input
+                type="text"
+                placeholder="Width"
+                value={cargo.dimensions?.width || ""}
+                onChange={(e) => updateDimension("width", e.target.value)}
+                className="min-w-0 w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 placeholder-slate-400 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+              />
+              <input
+                type="text"
+                placeholder="Height"
+                value={cargo.dimensions?.height || ""}
+                onChange={(e) => updateDimension("height", e.target.value)}
+                className="min-w-0 w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 placeholder-slate-400 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+              />
+              <div className="relative min-w-0">
+                <select
+                  value={cargo.dimensions?.unit || "CM"}
+                  onChange={(e) => updateDimension("unit", e.target.value)}
+                  className="w-full h-10 appearance-none border border-slate-200 rounded-xl px-3 pr-7 text-sm text-slate-700 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
+                >
+                  <option value="CM">CM</option>
+                  <option value="INCH">INCH</option>
+                </select>
+                <FiChevronDown
+                  size={13}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        <Grid2>
+        {/* Row 4 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="min-w-0">
+            <Input
+              label="Volumetric Weight"
+              placeholder="Auto Calculate"
+              value={cargo.volumetricWeight}
+              onChange={(e) =>
+                handleNestedChange("cargo", "volumetricWeight", e.target.value)
+              }
+            />
+          </div>
+
+          <div className="min-w-0">
+            <Input
+              label="No. of Packages"
+              placeholder="Enter number"
+              value={cargo.packages}
+              onChange={(e) =>
+                handleNestedChange("cargo", "packages", e.target.value)
+              }
+            />
+          </div>
+
+          <div className="min-w-0">
+            <Select
+              label="Packing Type"
+              placeholder="Select type"
+              value={cargo.packingType}
+              onChange={(e) =>
+                handleNestedChange("cargo", "packingType", e.target.value)
+              }
+            >
+              <option value="Carton">Carton</option>
+              <option value="Pallet">Pallet</option>
+              <option value="Wooden Crate">Wooden Crate</option>
+            </Select>
+          </div>
+
+          <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
+            <RadioGroup
+              label="Stackable"
+              name="isStackable"
+              value={cargo.isStackable}
+              onChange={(name, val) => handleNestedChange("cargo", name, val)}
+            />
+          </div>
+        </div>
+
+        {/* Row 5 */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
+            <RadioGroup
+              label="Fragile"
+              name="isFragile"
+              value={cargo.isFragile}
+              onChange={(name, val) => handleNestedChange("cargo", name, val)}
+            />
+          </div>
+
+          <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
+            <RadioGroup
+              label="Battery Included"
+              name="hasBattery"
+              value={cargo.hasBattery}
+              onChange={(name, val) => handleNestedChange("cargo", name, val)}
+            />
+          </div>
+
+          <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
+            <RadioGroup
+              label="Lithium Battery"
+              name="isLithium"
+              value={cargo.isLithium}
+              onChange={(name, val) => handleNestedChange("cargo", name, val)}
+            />
+          </div>
+
+          <div className="min-w-0" />
+        </div>
+
+        {/* Optional fields */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pt-1 border-t border-slate-100">
           <Input
-            label="Volumetric Weight"
-            placeholder="Auto Calculate"
-            value={formData.cargo.volumetricWeight}
-            onChange={(e) => handleNestedChange("cargo", "volumetricWeight", e.target.value)}
+            label="UN Number (if DG)"
+            placeholder="Enter UN number"
+            required={false}
+            value={cargo.unNumber}
+            onChange={(e) =>
+              handleNestedChange("cargo", "unNumber", e.target.value)
+            }
           />
           <Input
-            label="No. of Packages"
-            placeholder="Enter number"
-            value={formData.cargo.packages}
-            onChange={(e) => handleNestedChange("cargo", "packages", e.target.value)}
+            label="Package Marks & Numbers"
+            placeholder="Enter marks & numbers"
+            required={false}
+            value={cargo.packageMarks}
+            onChange={(e) =>
+              handleNestedChange("cargo", "packageMarks", e.target.value)
+            }
           />
-        </Grid2>
-        <Grid2>
-          <Select
-            label="Packing Type"
-            placeholder="Select type"
-            value={formData.cargo.packingType}
-            onChange={(e) => handleNestedChange("cargo", "packingType", e.target.value)}
-          >
-            <option value="Carton">Carton</option>
-            <option value="Pallet">Pallet</option>
-            <option value="Wooden Crate">Wooden Crate</option>
-          </Select>
-        </Grid2>
-        <Grid2>
-          <RadioGroup
-            label="Stackable"
-            name="isStackable"
-            value={formData.cargo.isStackable}
-            onChange={(name, val) => handleNestedChange("cargo", name, val)}
-          />
-          <RadioGroup
-            label="Fragile"
-            name="isFragile"
-            value={formData.cargo.isFragile}
-            onChange={(name, val) => handleNestedChange("cargo", name, val)}
-          />
-        </Grid2>
-        <Grid2>
-          <RadioGroup
-            label="Battery Included"
-            name="hasBattery"
-            value={formData.cargo.hasBattery}
-            onChange={(name, val) => handleNestedChange("cargo", name, val)}
-          />
-          <RadioGroup
-            label="Lithium Battery"
-            name="isLithium"
-            value={formData.cargo.isLithium}
-            onChange={(name, val) => handleNestedChange("cargo", name, val)}
-          />
-        </Grid2>
-      </div>
-      <div className="grid grid-cols-2 gap-2 mt-2">
-        <Input
-          label="UN Number (if DG)"
-          placeholder="Enter UN number"
-          required={false}
-          value={formData.cargo.unNumber}
-          onChange={(e) => handleNestedChange("cargo", "unNumber", e.target.value)}
-        />
-        <Input
-          label="Package Marks & Numbers"
-          placeholder="Enter marks & numbers"
-          required={false}
-          value={formData.cargo.packageMarks}
-          onChange={(e) => handleNestedChange("cargo", "packageMarks", e.target.value)}
-        />
+        </div>
       </div>
     </SectionCard>
   );
 }
-
+{/*
 function DimensionsCard({ calculatedMetrics }) {
   const dimensionRows = [
     { label: "Volume (CBM)", value: calculatedMetrics?.cbm ? `${calculatedMetrics.cbm} CBM` : "--" },
@@ -726,7 +786,7 @@ function DimensionsCard({ calculatedMetrics }) {
       <div className="space-y-2.5">
         {dimensionRows.map((r) => (
           <div key={r.label} className="flex items-center justify-between">
-            <span className="text-xs text-gray-500">{r.label}</span>
+            <span className="text-xs text-slate-400">{r.label}</span>
             <span className="text-xs font-bold text-gray-900">{r.value}</span>
           </div>
         ))}
@@ -776,7 +836,7 @@ function StatusFlowCard({ currentStatus = "Draft" }) {
       </div>
     </div>
   );
-}
+}*/}
 
 const quickTips = [
   "Fill all mandatory fields marked with *",
@@ -787,11 +847,11 @@ const quickTips = [
 
 function QuickTipsCard() {
   return (
-    <div className="bg-amber-50 border border-amber-100 rounded-xl p-4">
-      <h3 className="text-sm font-bold text-gray-900 mb-2">Quick Tips</h3>
-      <ul className="space-y-1.5">
+    <div className="bg-gradient-to-br from-amber-50 to-yellow-50 border border-amber-100 rounded-2xl p-5 shadow-sm">
+      <h3 className="text-[15px] font-bold text-slate-900 mb-3">Quick Tips</h3>
+      <ul className="space-y-2.5">
         {quickTips.map((t) => (
-          <li key={t} className="text-xs text-gray-600 flex gap-1.5">
+          <li key={t} className="text-xs text-slate-600 flex gap-2 leading-relaxed">
             <span>•</span>
             <span>{t}</span>
           </li>
@@ -817,14 +877,14 @@ function Header({
         Dashboard <span className="mx-1 text-gray-300">›</span> Shipment Operations{" "}
         <span className="mx-1 text-gray-300">›</span> My Shipments{" "}
         <span className="mx-1 text-gray-300">›</span>
-        <span className="text-gray-700 font-medium">New Shipment</span>
+        <span className="text-slate-600 font-semibold">New Shipment</span>
       </p>
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mt-2">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             New Shipment Form
           </h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-slate-500 mt-1.5">
             Enter shipment details to generate HS code, freight estimate,
             document checklist and risk score.
           </p>
@@ -834,7 +894,7 @@ function Header({
             type="button"
             onClick={handleSaveDraft}
             disabled={loading}
-            className="border border-gray-300 text-gray-700 text-sm font-semibold px-4 py-2 rounded-lg disabled:opacity-50"
+            className="h-10 border border-slate-200 bg-white text-slate-700 text-sm font-semibold px-4 rounded-xl shadow-sm hover:bg-slate-50 hover:border-slate-300 transition disabled:opacity-50"
           >
             Save Draft
           </button>
@@ -842,7 +902,7 @@ function Header({
             type="button"
             onClick={handleAnalyze}
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2 rounded-lg disabled:opacity-50"
+            className="h-10 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 rounded-xl shadow-sm shadow-blue-200 transition disabled:opacity-50"
           >
             Analyze Shipment
           </button>
@@ -850,7 +910,7 @@ function Header({
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="bg-green-600 hover:bg-green-700 text-white text-sm font-semibold px-4 py-2 rounded-lg disabled:opacity-50"
+            className="h-10 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 rounded-xl shadow-sm shadow-emerald-200 transition disabled:opacity-50"
           >
             Submit to Admin
           </button>
@@ -860,7 +920,7 @@ function Header({
            setShipment("");
               setActiveTab(currentTab);
             }}
-            className="border border-red-300 text-red-600 text-sm font-semibold px-4 py-2 rounded-lg"
+            className="h-10 border border-red-200 text-red-600 bg-white text-sm font-semibold px-4 rounded-xl hover:bg-red-50 transition"
           >
             Cancel
           </button>
@@ -872,7 +932,7 @@ function Header({
 
 function Footer() {
   return (
-    <div className="border-t border-gray-200 mt-6 pt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-500">
+    <div className="border-t border-slate-200 mt-8 pt-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
       <p>2025 ASC CargoMatrix. All rights reserved</p>
       <div className="flex items-center gap-4">
         <span>Privacy Policy</span>
@@ -1123,8 +1183,8 @@ export default function Shipment({ setActiveTab, setShipment, currentTab }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-3 sm:p-6 ">
-      <div className="max-w-[1400px] mx-auto">
+    <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-[1440px] mx-auto">
         <Header
           setActiveTab={setActiveTab}
           setShipment={setShipment}
@@ -1135,47 +1195,57 @@ export default function Shipment({ setActiveTab, setShipment, currentTab }) {
           currentTab={currentTab}
         />
 
-        <div className="mt-6 grid grid-cols-1 xl:grid-cols-12 gap-2">
-          <div className="xl:col-span-3 flex flex-col gap-2">
-            <BasicShipmentDetails
-              formData={formData}
-              handleDirectChange={handleDirectChange}
-              handleNestedChange={handleNestedChange}
-              referenceNumber={referenceNumber}
-            />
-           <DocumentsUpload
-uploadedDocs={uploadedDocs}
-handleDocumentUpload={handleDocumentUpload}
-fileInputRef={fileInputRef}
-/>
-            <AIOutputAnalysis analysis={analysis} />
-          </div>
-
-          <div className="xl:col-span-6 flex flex-col gap-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <OriginDestination
+        <div className="mt-7 grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+          {/* MAIN CONTENT - 9 columns */}
+          <div className="xl:col-span-9 grid grid-cols-1 xl:grid-cols-9 gap-5 items-start">
+            {/* Basic Shipment Details */}
+            <div className="xl:col-span-3">
+              <BasicShipmentDetails
                 formData={formData}
                 handleDirectChange={handleDirectChange}
                 handleNestedChange={handleNestedChange}
-              />
-              <InvoiceValue
-                formData={formData}
-                handleDirectChange={handleDirectChange}
-                handleRadioChange={handleRadioChange}
+                referenceNumber={referenceNumber}
               />
             </div>
-            <ProductDetails
-  formData={formData}
-  handleNestedChange={handleNestedChange}
-  handleRadioChange={handleRadioChange}
-  hsCodes={hsCodes}
-/>
+
+            {/* Origin, Destination + Invoice */}
+            <div className="xl:col-span-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <OriginDestination
+                  formData={formData}
+                  handleDirectChange={handleDirectChange}
+                  handleNestedChange={handleNestedChange}
+                />
+                <InvoiceValue
+                  formData={formData}
+                  handleDirectChange={handleDirectChange}
+                  handleRadioChange={handleRadioChange}
+                />
+              </div>
+            </div>
+
+            {/* Product Details - full width of main content */}
+            <div className="xl:col-span-9">
+              <ProductDetails
+                formData={formData}
+                handleNestedChange={handleNestedChange}
+                handleRadioChange={handleRadioChange}
+                hsCodes={hsCodes}
+              />
+            </div>
           </div>
 
-          <div className="xl:col-span-3 flex flex-col gap-2">
-            <DimensionsCard calculatedMetrics={analysis?.metrics} />
-            <StatusFlowCard currentStatus={currentStatus} />
+          {/* RIGHT SIDEBAR - 3 columns */}
+          <div className="xl:col-span-3 flex flex-col gap-5">
             <QuickTipsCard />
+
+            <DocumentsUpload
+              uploadedDocs={uploadedDocs}
+              handleDocumentUpload={handleDocumentUpload}
+              fileInputRef={fileInputRef}
+            />
+
+            <AIOutputAnalysis analysis={analysis} />
           </div>
         </div>
 
