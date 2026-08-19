@@ -10,6 +10,9 @@ import {
   getPortWiseExports,
   getRecentShipments
 } from '../../api/ExportIntelApi';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
 import {
   CalendarDays,
   Download,
@@ -36,6 +39,7 @@ import {
   Tooltip,
 } from "recharts";
 
+const HEADING = "text-[#07156B]";
 // ==========================================
 // 1. RAW EXPORT DATA (Image {B06B6444-DD0A-4D01-9B45-F1AF036CA639}.png के अनुसार)
 // ==========================================
@@ -112,6 +116,10 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
   const [selectedCountry, setSelectedCountry] = useState("All Countries");
   const [selectedExporter, setSelectedExporter] = useState("All Exporters");
   const [selectedBuyer, setSelectedBuyer] = useState("All Buyers");
+   const [shipmentStartDate, setShipmentStartDate] = useState(null);
+    const [shipmentEndDate, setShipmentEndDate] = useState(null);
+     const [dateRange, setDateRange] = useState(false)
+     const [exportReport, setExportReport] = useState(false)
 
   const fetchDashboard = async () => {
     try {
@@ -319,17 +327,31 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
               Discover export performance, markets, buyers, and opportunities.
             </p>
           </div>
-
-          <div className="flex items-center gap-3 w-full lg:w-auto">
-            <button className="flex-1 lg:flex-none bg-white border border-slate-200 px-4 py-2 rounded-xl flex items-center justify-center gap-2 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50 transition">
-              <CalendarDays size={16} className="text-slate-400" />
-              01 Apr 2025 - 24 Apr 2025
-            </button>
-            <button className="flex-1 lg:flex-none bg-white border border-slate-200 px-4 py-2 rounded-xl flex items-center justify-center gap-2 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50 transition">
-              <Download size={16} className="text-slate-400" />
-              Export Report
-            </button>
-          </div>
+                <div className="flex gap-3"> 
+               <div className="relative flex-1 ">
+                      <DatePicker
+                        selected={shipmentStartDate}
+                        onChange={(dates) => {
+                          const [start, end] = dates;
+                          setShipmentStartDate(start);
+                          setShipmentEndDate(end);
+                        }}
+                        startDate={shipmentStartDate}
+                        endDate={shipmentEndDate}
+                        selectsRange
+                        dateFormat="dd MMM yyyy"
+                        placeholderText="01 Apr 2025 - 24 Apr 2025"
+                        className={`bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold pl-3 pr-9 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer ${HEADING}`}
+                      />
+                      <CalendarDays
+                        size={14}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                      />
+                    </div>
+                    <button onClick={() => setExportReport(true)} className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
+                      <Download size={14} className="text-slate-400" />
+                      Export Report
+                    </button> </div>
         </div>
 
         {/* METRICS STATS GRID */}
@@ -610,6 +632,11 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
           <span>Help Center</span>
         </div>
       </div>
+
+       {exportReport && (
+                        <ExportReport onClose={() => setExportReport(false)} />
+                      )}
+
     </div>
   );
 }

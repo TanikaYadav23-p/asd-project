@@ -23,6 +23,10 @@ import {
   Info,
   HelpCircle,
 } from "lucide-react";
+
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
 import {
   ResponsiveContainer,
   LineChart,
@@ -165,6 +169,10 @@ function ViewAllHeader({ title }) {
 
 export default function AIInsightsDashboard() {
   const [activeTab, setActiveTab] = useState("Smart Summary");
+   const [shipmentStartDate, setShipmentStartDate] = useState(null);
+    const [shipmentEndDate, setShipmentEndDate] = useState(null);
+     const [dateRange, setDateRange] = useState(false)
+     const [exportReport, setExportReport] = useState(false)
 
   return (
     <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600 font-sans antialiased">
@@ -177,14 +185,30 @@ export default function AIInsightsDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto">
-            <button className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
-              <CalendarDays size={14} className="text-slate-400" />
-              01 Apr 2025 - 24 Apr 2025
-            </button>
-            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
-              <Download size={14} />
-              Export Report
-            </button>
+              <div className="relative flex-1 md:flex-none">
+                         <DatePicker
+                           selected={shipmentStartDate}
+                           onChange={(dates) => {
+                             const [start, end] = dates;
+                             setShipmentStartDate(start);
+                             setShipmentEndDate(end);
+                           }}
+                           startDate={shipmentStartDate}
+                           endDate={shipmentEndDate}
+                           selectsRange
+                           dateFormat="dd MMM yyyy"
+                           placeholderText="01 Apr 2025 - 24 Apr 2025"
+                           className={`bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold pl-3 pr-9 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer ${HEADING}`}
+                         />
+                         <CalendarDays
+                           size={14}
+                           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                         />
+                       </div>
+                       <button onClick={() => setExportReport(true)} className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
+                         <Download size={14} className="text-slate-400" />
+                         Export Report
+                       </button>
           </div>
         </div>
 
@@ -439,6 +463,11 @@ export default function AIInsightsDashboard() {
           </span>
         </div>
       </div>
+
+       {exportReport && (
+                  <ExportReport onClose={() => setExportReport(false)} />
+                )}
+
     </div>
   );
 }

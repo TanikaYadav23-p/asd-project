@@ -21,10 +21,11 @@ import Quotation from "./Quotation"
 import CreateNewInvoice from "./CreateNewInvoice";
 const actions = [
   { icon: Pencil, bg: "bg-purple-50", color: "text-purple-600", title: "Edit Shipment", desc: "Make changes to shipment details." },
-  { icon: FileText, bg: "bg-green-50", color: "text-green-600", title: "Create Invoice", desc: "Create invoice for this shipment." },
   { icon: FileSignature, bg: "bg-blue-50", color: "text-blue-600", title: "Create quotation", desc: "Generate and share quotation",},
-  { icon: Share2, bg: "bg-orange-50", color: "text-orange-500", title: "Share Quotation", desc: "Share quotation with client." },
+  // { icon: Share2, bg: "bg-orange-50", color: "text-orange-500", title: "Share Quotation", desc: "Share quotation with client." },
   { icon: RefreshCcw, bg: "bg-blue-50", color: "text-blue-500", title: "Change Status", desc: "Change Shipment status." },
+    { icon: FileText, bg: "bg-green-50", color: "text-green-600", title: "Create Invoice", desc: "Create invoice for this shipment." },
+
 ];
 
 export default function ReviewShipment({onClose}) {
@@ -218,9 +219,9 @@ const handleAdditionalInfoSave = async () => {
 };
 
   return (
-  <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50 ">
+  <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/50  ">
    {!viewShipmentDetail && (  
-    <div className="w-full max-w-7xl max-h-[90vh] overflow-y-auto hide-scrollbar">
+    <div className="w-full max-h-[90vh] overflow-y-auto hide-scrollbar ">
     
     <div className="w-full max-w-7xl mx-auto grid lg:grid-cols-[70%_30%] gap-4">
       <div className=" bg-white rounded-2xl shadow-xl p-4 sm:p-6">

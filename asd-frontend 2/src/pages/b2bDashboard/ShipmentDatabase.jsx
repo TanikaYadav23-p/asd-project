@@ -5,8 +5,11 @@ import {
   getShipments,
   exportReport
 } from '../../api/ShipmentDatabaseApi';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
 import {
-  Calendar,
+  Calendar,  CalendarDays,
   ChevronDown,
   List,
   Clock,
@@ -41,6 +44,8 @@ const countryCodes = {
   Singapore: "SG",
   Australia: "AU",
 };
+const HEADING = "text-[#07156B]";
+
 export default function ShipmentDatabase() {
   // Static Raw Data
   /*const rawShipmentsData = [
@@ -229,6 +234,10 @@ export default function ShipmentDatabase() {
   const [selectedImporter, setSelectedImporter] = useState("All Importers");
   const [selectedExporter, setSelectedExporter] = useState("All Exporters");
   const [selectedPort, setSelectedPort] = useState("All Ports");
+   const [shipmentStartDate, setShipmentStartDate] = useState(null);
+    const [shipmentEndDate, setShipmentEndDate] = useState(null);
+     const [dateRange, setDateRange] = useState(false)
+     const [exportReport, setExportReport] = useState(false)
 
   const fetchDashboard = async () => {
     try {
@@ -398,10 +407,26 @@ export default function ShipmentDatabase() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <button className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
-            <Calendar className="w-4 h-4 text-blue-600" />
-            <span>01 Apr 2025 - 24 Apr 2025</span>
-          </button>
+            <div className="relative flex-1 md:flex-none">
+                       <DatePicker
+                         selected={shipmentStartDate}
+                         onChange={(dates) => {
+                           const [start, end] = dates;
+                           setShipmentStartDate(start);
+                           setShipmentEndDate(end);
+                         }}
+                         startDate={shipmentStartDate}
+                         endDate={shipmentEndDate}
+                         selectsRange
+                         dateFormat="dd MMM yyyy"
+                         placeholderText="01 Apr 2025 - 24 Apr 2025"
+                         className={`bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold pl-3 pr-9 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer ${HEADING}`}
+                       />
+                       <CalendarDays
+                         size={14}
+                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                       />
+                     </div>
 
           <button className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
             <FileSpreadsheet className="w-4 h-4 text-emerald-600" />

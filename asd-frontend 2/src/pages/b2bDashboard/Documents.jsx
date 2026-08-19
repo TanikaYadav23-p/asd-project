@@ -324,7 +324,7 @@ const handleResetDocumentFilters = () => {
     {title: "Total Documents", value: dashboard.totalDocuments || 0, change: "", icon: FileText, bg: "bg-blue-50", color: "text-blue-500", up: true,},
     {title: "Uploaded This Month", value: dashboard.uploadedThisMonth || 0, change: "", icon: Upload, bg: "bg-emerald-50", color: "text-emerald-500", up: true,},
     {title: "Pending Verification", value: dashboard.pendingVerification || 0, change: "", icon: Clock, bg: "bg-orange-50", color: "text-orange-500", up: false,},
-    {title: "Expiring Soon", value: dashboard.expiringSoon || 0, change: "", icon: CalendarClock, bg: "bg-rose-50", color: "text-rose-500", up: false,},
+    // {title: "Expiring Soon", value: dashboard.expiringSoon || 0, change: "", icon: CalendarClock, bg: "bg-rose-50", color: "text-rose-500", up: false,},
     {title: "Verified Documents", value: dashboard.verifiedDocuments || 0, change: "", icon: CheckCircle2, bg: "bg-teal-50", color: "text-teal-500", up: true,},
   ];
   const colors = ["#2563EB", "#10B981", "#1E3A8A", "#F59E0B", "#B91C1C", "#94A3B8",];

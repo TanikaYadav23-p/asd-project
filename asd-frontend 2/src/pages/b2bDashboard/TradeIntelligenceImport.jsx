@@ -11,6 +11,9 @@ import {
   getPortWiseImports,
   getRecentShipments
 } from '../../api/ImportIntelApi';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
 import {
   CalendarDays,
   Download,
@@ -33,7 +36,7 @@ import {
   XAxis,
   Tooltip,
 } from "recharts";
-
+const HEADING = "text-[#07156B]";
 // ==========================================
 // 1. RAW DATA (यह डेटा API से आ सकता है)
 // ==========================================
@@ -103,15 +106,17 @@ export default function ImportIntelligence({setMainTab}) {
   const [topImporters, setTopImporters] = useState([]);
   const [portWiseImports, setPortWiseImports] = useState([]);
   const [recentShipments, setRecentShipments] = useState([]);
-  // ==========================================
-  // 2. DYNAMIC STATES (फ़िल्टर स्टेट्स)
-  // ==========================================
+   
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedHsCode, setSelectedHsCode] = useState("All HsCode");
   const [selectedPort, setSelectedPort] = useState("All Ports");
   const [selectedCountry, setSelectedCountry] = useState("All Countries");
   const [selectedExporter, setSelectedExporter] = useState("All Exporters");
   const [selectedBuyer, setSelectedBuyer] = useState("All Buyers");
+   const [shipmentStartDate, setShipmentStartDate] = useState(null);
+    const [shipmentEndDate, setShipmentEndDate] = useState(null);
+     const [dateRange, setDateRange] = useState(false)
+     const [exportReport, setExportReport] = useState(false)
 
   // Filter Active State (ताकि 'Apply Filters' पर ही बड़े बदलाव दिखें)
   const [appliedFilters, setAppliedFilters] = useState({
@@ -357,12 +362,30 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
         </div>
 
         <div className="flex items-center gap-3 w-full lg:w-auto">
-          <button className="flex-1 lg:flex-none bg-white border border-slate-200 px-4 py-2 rounded-xl flex items-center justify-center gap-2 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50 transition">
-            <CalendarDays size={16} className="text-slate-400" /> 01 Apr 2025 - 24 Apr 2025
-          </button>
-          <button className="flex-1 lg:flex-none bg-white border border-slate-200 px-4 py-2 rounded-xl flex items-center justify-center gap-2 text-sm font-medium text-slate-600 shadow-sm hover:bg-slate-50 transition">
-            <Download size={16} className="text-slate-400" /> Export Report
-          </button>
+            <div className="relative flex-1 md:flex-none">
+                       <DatePicker
+                         selected={shipmentStartDate}
+                         onChange={(dates) => {
+                           const [start, end] = dates;
+                           setShipmentStartDate(start);
+                           setShipmentEndDate(end);
+                         }}
+                         startDate={shipmentStartDate}
+                         endDate={shipmentEndDate}
+                         selectsRange
+                         dateFormat="dd MMM yyyy"
+                         placeholderText="01 Apr 2025 - 24 Apr 2025"
+                         className={`bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold pl-3 pr-9 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer ${HEADING}`}
+                       />
+                       <CalendarDays
+                         size={14}
+                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                       />
+                     </div>
+                     <button onClick={() => setExportReport(true)} className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
+                       <Download size={14} className="text-slate-400" />
+                       Export Report
+                     </button>
         </div>
       </div>
 
@@ -615,6 +638,9 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
            </div>
       </div>
 
+         {exportReport && (
+               <ExportReport onClose={() => setExportReport(false)} />
+          )}
     </div>
   );
 }

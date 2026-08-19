@@ -12,6 +12,9 @@ import {
   getRiskFilterOptions
 } from '../../api/RiskAnalysisApi';
 import ReactCountryFlag from "react-country-flag";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
 import {
   CalendarDays,
   Download,
@@ -264,6 +267,10 @@ export default function RiskAnalysis() {
   const [selectedRiskLevel, setSelectedRiskLevel] = useState("");
   const [selectedRiskCategory, setSelectedRiskCategory] = useState("");
   const [selectedHSCode, setSelectedHSCode] = useState("");
+   const [shipmentStartDate, setShipmentStartDate] = useState(null);
+    const [shipmentEndDate, setShipmentEndDate] = useState(null);
+     const [dateRange, setDateRange] = useState(false)
+     const [exportReport, setExportReport] = useState(false)
 
   const fetchRiskDashboard = async () => {
     try {
@@ -521,17 +528,32 @@ const filteredRiskTopCountries = useMemo(() => {
             <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
               Identify, assess and monitor risks that may impact your global trade operations.
             </p>
-          </div>
-          <div className="flex items-center gap-2 w-full md:w-auto">
-            <button className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
-              <CalendarDays size={14} className="text-slate-400" />
-              01 Apr 2025 - 24 Apr 2025
-            </button>
-            <button className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
-              <Download size={14} />
-              Export Report
-            </button>
-          </div>
+          </div>  
+            <div className="flex gap-3"> 
+           <div className="relative flex-1 ">
+                      <DatePicker
+                        selected={shipmentStartDate}
+                        onChange={(dates) => {
+                          const [start, end] = dates;
+                          setShipmentStartDate(start);
+                          setShipmentEndDate(end);
+                        }}
+                        startDate={shipmentStartDate}
+                        endDate={shipmentEndDate}
+                        selectsRange
+                        dateFormat="dd MMM yyyy"
+                        placeholderText="01 Apr 2025 - 24 Apr 2025"
+                        className={`bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold pl-3 pr-9 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer ${HEADING}`}
+                      />
+                      <CalendarDays
+                        size={14}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                      />
+                    </div>
+                    <button onClick={() => setExportReport(true)} className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
+                      <Download size={14} className="text-slate-400" />
+                      Export Report
+                    </button> </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 mb-5">
@@ -903,6 +925,10 @@ const filteredRiskTopCountries = useMemo(() => {
           </span>
         </div>
       </div>
+
+       {exportReport && (
+                        <ExportReport onClose={() => setExportReport(false)} />
+                      )}
     </div>
   );
 }

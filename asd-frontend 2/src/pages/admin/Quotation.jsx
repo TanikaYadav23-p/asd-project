@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { LuX } from "react-icons/lu";
  import { LuFileText, LuDownload, LuMapPin, LuUser, LuBuilding2, LuFileCheck, LuClipboardCheck } from "react-icons/lu";
 import DenyQuotation from "./DenyQuotation";
 import React from "react";
@@ -28,7 +28,14 @@ export default function Quotation({onClose}) {
   return (
     <div className=" fixed inset-0 z-[20] bg-black/50 backdrop-blur-sm p-4 sm:p-6 flex items-center  transparent justify-center">
     { !deny && ( 
-       <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-200 p-5 sm:p-8 shadow-2xl">
+       <div className="w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-200 p-5 shadow-2xl">
+       <div className="flex flex-col"> 
+        <div className="flex justify-end p-1"> 
+
+         {/* <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-500 shrink-0"> */}
+              <LuX onClick={onClose} size={22} className="cursor-pointer" />
+            
+             </div>
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <LuFileText className="text-blue-500" size={20} />
@@ -38,6 +45,7 @@ export default function Quotation({onClose}) {
           <button className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-300 text-xs font-medium text-gray-700">
             <LuDownload size={14} /> Download PDF
           </button>
+        </div>
         </div>
 
         <div className="border border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">

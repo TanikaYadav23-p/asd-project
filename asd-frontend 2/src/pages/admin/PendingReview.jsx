@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Clock, FileText, FileClock, Timer, Search } from "lucide-react";
+import { Clock, FileText, FileClock, Timer, Search ,MoreVertical} from "lucide-react";
 import {
   FaPlus, FaMagnifyingGlass, FaXmark, FaChevronDown,
   FaStar, FaTruck, FaBoxOpen, FaWarehouse, FaFileContract
@@ -50,6 +50,7 @@ export default function PendingReviews({setPendingReview,}) {
   const itemsPerPage = 5;
   const [selected, setSelected] = useState(requests[0]);
   const [reviews, setReviews] = useState(false);
+  const [openMenu, setOpenMenu] = useState(null);
 
   const filtered = requests.filter((r) => {
     const term = search.trim().toLowerCase();
@@ -79,7 +80,7 @@ export default function PendingReviews({setPendingReview,}) {
 
   return (
    <>
-   <div className="w-full  grid grid-cols-1 lg:grid-cols-[70%_30%]  gap-2 ">
+   <div className="w-full  grid grid-cols-1   gap-2 ">
       <div className=" bg-white rounded-2xl shadow-xl p-4 sm:p-6 mb-3">
         <div className="flex  justify-between items-start"> 
         <div className="flex items-center gap-3 mb-6">
@@ -128,48 +129,102 @@ export default function PendingReviews({setPendingReview,}) {
           </button>
         </div>
 
-        <div className="overflow-x-auto border border-gray-100 rounded-xl">
-          <div className="min-w-[900px]">
-            <div className="grid grid-cols-7 bg-gray-50 px-4 py-3 text-xs font-bold text-gray-900">
-              <span>Request ID</span>
-              <span>Company / User</span>
-              <span className="text-center">Route</span>
-              <span>Submitted On</span>
-              <span className="text-center">Shipment Type</span>
-              <span className="text-center"> Status</span>
-              <span className="text-right">Actions</span>
-            </div>
-            {paginatedRequests.length > 0 ? (
-              paginatedRequests.map((r) => (
-                <div
-                  key={r.key}
-                  onClick={() => setSelected(r)}
-                  className="grid grid-cols-7 items-center px-4 py-3 border-t border-gray-100 cursor-pointer hover:bg-gray-50"
-                >
-                  <span className="text-xs text-blue-600 font-medium">{r.id}</span>
-                  <div>
-                    <p className="text-xs text-gray-800">{r.company}</p>
-                    <p className="text-xs text-gray-400">{r.email}</p>
-                  </div>
-                  <span className="text-xs text-gray-500 text-center">{r.route}</span>
-                  <span className="text-xs text-gray-500">{r.submittedOn}</span>
-                  <span className="text-xs text-center text-gray-500">{r.shipmentType}</span>
-                  <span className="text-xs text-left text-yellow-600 bg-yellow-50 px-2 py-1 rounded-full w-fit">
-                    {r.status}
-                  </span>
-                  <button onClick={() => {  
-                    setReviews(true)}} className="text-xs border border-gray-300 rounded-lg px-3 py-1.5">
-                    Review
-                  </button>
-                </div>
-              ))
-            ) : (
-              <div className="px-4 py-8 text-center text-sm text-gray-500 border-t border-gray-100">
-                No requests found matching your search.
-              </div>
-            )}
+        {/* <div className="overflow-x-auto border border-gray-100 rounded-xl"> */}
+        <div className="w-full overflow-x-auto rounded-xl border border-gray-100 [-webkit-overflow-scrolling:touch]">
+        <div className="min-w-[900px]">
+          <div className="grid grid-cols-[1.1fr_1.5fr_1fr_1.3fr_0.9fr_110px_50px] gap-x-3 bg-gray-50 px-4 py-3 text-xs font-semibold text-gray-700 tracking-wide">
+            <span>Request ID</span>
+            <span>Company / User</span>
+            <span className="text-center">Route</span>
+            <span>Submitted On</span>
+            <span className="text-center">Shipment Type</span>
+            <span className="text-center">Status</span>
+            <span className="text-right">Actions</span>
           </div>
+
+          {paginatedRequests.length > 0 ? (
+            paginatedRequests.map((r) => (
+              <div
+                key={r.key}
+                onClick={() => setSelected(r)}
+                className="grid grid-cols-[1.1fr_1.5fr_1fr_1.3fr_0.9fr_110px_50px] gap-x-3 items-center px-4 py-3 border-t border-gray-100 cursor-pointer hover:bg-gray-50/70 transition-colors"
+              >
+                <span className="text-xs text-blue-600 font-medium truncate">{r.id}</span>
+
+                <div className="min-w-0">
+                  <p className="text-xs text-gray-800 font-medium truncate">{r.company}</p>
+                  <p className="text-xs text-gray-400 truncate">{r.email}</p>
+                </div>
+
+                <span className="text-xs text-gray-600 text-center">{r.route}</span>
+                <span className="text-xs text-gray-500">{r.submittedOn}</span>
+                <span className="text-xs text-gray-600 text-center">{r.shipmentType}</span>
+
+                <span className="text-xs font-medium text-yellow-700 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full w-fit mx-auto">
+                  {r.status}
+                </span>
+
+                <div className="flex items-center justify-end relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpenMenu(openMenu === r.key ? null : r.key);
+                    }}
+                    className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <MoreVertical size={18} className="text-gray-500" />
+                  </button>
+
+                  {openMenu === r.key && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-0 top-9 z-20 w-36 bg-white border border-gray-200 rounded-xl shadow-lg p-1.5 flex flex-col gap-1"
+                    >
+                      <button
+                        onClick={() => {
+                          setSelected(r);
+                          setReviews(true);
+                          setOpenMenu(null);
+                        }}
+                        className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
+                      >
+                        Review
+                      </button>
+                      <button
+                          onClick={() => {
+                            setSelected(r);
+                            handleDecision("accept");
+                            setOpenMenu(null);
+                          }}
+                          className="w-full py-1.5 px-2.5 rounded-lg bg-green-50 text-green-700 font-medium text-xs text-left hover:bg-green-100 transition-colors"
+                        >
+                          Accept
+                        </button>
+                      <button
+                        onClick={() => {
+                          setSelected(r);
+                          handleDecision("reject");
+                          setOpenMenu(null);
+                        }}
+                        className="w-full py-1.5 px-2.5 rounded-lg bg-red-50 text-red-600 font-medium text-xs text-left hover:bg-red-100 transition-colors"
+                      >
+                        Reject
+                      </button>
+
+                     
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-8 text-center text-sm text-gray-500 border-t border-gray-100">
+              No requests found matching your search.
+            </div>
+          )}
         </div>
+      </div>
+        {/* </div> */}
 
         {/* Pagination Controls */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
@@ -209,7 +264,7 @@ export default function PendingReviews({setPendingReview,}) {
         </div>
       </div>
 
-      {selected && (
+      {/* {selected && (
         <div className="bg-white rounded-2xl w-full shadow-xl p-4 sm:p-6 h-fit">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-gray-900">Request Details</h3>
@@ -241,18 +296,7 @@ export default function PendingReviews({setPendingReview,}) {
             Review the shipment details and approve or request more information.
           </p>
 
-          <button
-            onClick={() => handleDecision("reject")}
-            className="w-full py-2.5 rounded-lg bg-red-50 text-red-500 font-medium text-sm mb-3"
-          >
-            Reject Request
-          </button>
-          <button
-            onClick={() => handleDecision("accept")}
-            className="w-full py-2.5 rounded-lg bg-green-100 text-green-700 font-medium text-sm mb-4"
-          >
-            Accept Request
-          </button>
+         
 
           <div className="border border-gray-100 rounded-lg p-3">
             <p className="text-sm font-semibold text-gray-900 mb-2">Quick Information</p>
@@ -272,7 +316,7 @@ export default function PendingReviews({setPendingReview,}) {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
     </div>
 

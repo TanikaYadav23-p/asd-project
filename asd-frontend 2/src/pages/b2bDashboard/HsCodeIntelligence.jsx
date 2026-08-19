@@ -11,6 +11,9 @@ import {
   getCountries,
   getFilterOptions
 } from '../../api/HsCodeIntelApi';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import ExportReport from "../../components/b2bComponent/ExportReport";
 import {
   CalendarDays,
   Download,
@@ -43,7 +46,7 @@ import {
 // ==========================================
 // STATIC RAW DATA (As per Image {2BE9DE08-E6B8-4112-B604-497638DB5188}.png)
 // ==========================================
-
+const HEADING = "text-[#07156B]";
 const tabs = [
   "Overview",
   "HS Code List",
@@ -119,6 +122,10 @@ export default function HSCodeIntelligence() {
   const [exporters, setExporters] = useState([]);
   const [countries, setCountries] = useState([]);
   const [filterOptions, setFilterOptions] = useState({});
+   const [shipmentStartDate, setShipmentStartDate] = useState(null);
+    const [shipmentEndDate, setShipmentEndDate] = useState(null);
+     const [dateRange, setDateRange] = useState(false)
+     const [exportReport, setExportReport] = useState(false)
   // ==========================================
   // 2. STATE MANAGEMENT
   // ==========================================
@@ -290,14 +297,31 @@ const fetchFilterOptions = async () => {
           <h1 className="text-2xl font-bold text-[#1e293b]">HS Code Intelligence</h1>
           <p className="text-xs text-slate-400 mt-0.5">Explore detailed global shipment records with advanced search and filters.</p>
         </div>
-        <div className="flex items-center gap-2 w-full lg:w-auto">
-          <button className="flex items-center justify-center gap-2 bg-white border border-slate-200 text-xs font-semibold px-4 py-2 rounded-xl text-slate-600 shadow-sm">
-            <CalendarDays size={14} className="text-slate-400" /> 01 Apr 2025 - 24 Apr 2025
-          </button>
-          <button className="flex items-center justify-center gap-2 bg-white border border-slate-200 text-xs font-semibold px-4 py-2 rounded-xl text-slate-600 shadow-sm">
-            <Download size={14} className="text-slate-400" /> Export Report
-          </button>
-        </div>
+        <div className="flex gap-3"> 
+                <div className="relative">
+                     <DatePicker
+                       selected={shipmentStartDate}
+                       onChange={(dates) => {
+                         const [start, end] = dates;
+                         setShipmentStartDate(start);
+                         setShipmentEndDate(end);
+                       }}
+                       startDate={shipmentStartDate}
+                       endDate={shipmentEndDate}
+                       selectsRange
+                       dateFormat="dd MMM yyyy"
+                       placeholderText="01 Apr 2025 - 24 Apr 2025"
+                       className={`bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold pl-3 pr-9 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap outline-none cursor-pointer ${HEADING}`}
+                     />
+                     <CalendarDays
+                       size={14}
+                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
+                     />
+                   </div>
+                   <button onClick={() => setExportReport(true)} className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
+                     <Download size={14} className="text-slate-400" />
+                     Export Report
+                   </button></div>
       </div>
 
       {/* METRICS METERS ROW */}
@@ -668,6 +692,9 @@ const fetchFilterOptions = async () => {
         </div>
       </div>
 
+        {exportReport && (
+                         <ExportReport onClose={() => setExportReport(false)} />
+                       )}
     </div>
   );
 }

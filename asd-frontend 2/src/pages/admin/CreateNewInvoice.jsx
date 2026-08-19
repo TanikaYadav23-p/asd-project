@@ -48,7 +48,7 @@ export default function CreateNewInvoice({onClose}) {
   };
 
   const deleteItem = (id) => setItems((prev) => prev.filter((i) => i.id !== id));
-
+  const gst = "18%"
   const subtotal = items.reduce((sum, i) => sum + Number(i.qty) * Number(i.unitPrice), 0);
   const discount = parseFloat(form.discount.replace(/,/g, "")) || 0;
   const taxable = subtotal - discount;
@@ -264,6 +264,10 @@ export default function CreateNewInvoice({onClose}) {
               <div className="flex justify-between">
                 <span className="text-gray-500">SGST(9%)</span>
                 <span className="text-gray-900">₹{sgst.toFixed(2)}</span>
+              </div>
+                <div className="flex justify-between">
+                <span className="text-gray-500">GST(18%)</span>
+                <span className="text-gray-900">₹{gst}</span>
               </div>
               <div className="flex justify-between pt-2 border-t border-gray-100">
                 <span className="text-purple-600 font-bold">Total Amount</span>

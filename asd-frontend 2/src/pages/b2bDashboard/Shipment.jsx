@@ -177,7 +177,7 @@ const [selectedStatus, setSelectedStatus] = useState("");
 const [selectedOrigin, setSelectedOrigin] = useState("");
 const [selectedDestination, setSelectedDestination] = useState("");
 const [selectedMode, setSelectedMode] = useState("");
-
+const [openMenu, setOpenMenu] = useState(null);
 const [appliedFilters, setAppliedFilters] = useState({
   search: "",
   status: "",
@@ -773,11 +773,54 @@ useEffect(() => {
                         <div className="text-[10px] text-slate-400">{s.cargo?.hsCode?.hsCode}</div>
                       </td>
                       <td className="py-3 text-right font-bold text-slate-800 whitespace-nowrap">₹{(s.cargo?.value / 10000000).toFixed(2)} Cr</td>
-                      <td className="py-3 text-right">
-                        <button className="text-slate-400 hover:text-slate-600">
-                          <MoreVertical size={15} />
-                        </button>
-                      </td>
+                      <td className="py-3 text-right relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                     setOpenMenu(openMenu === i ? null : i);
+                    }}
+                    className="text-slate-400 hover:text-slate-600"
+                  >
+                    <MoreVertical size={15} />
+                  </button>
+
+                  {openMenu === i && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute right-0 top-7 z-20 w-36 bg-white border border-gray-200 rounded-xl shadow-lg p-1.5 flex flex-col gap-1 text-left"
+                    >
+                      <button
+                        onClick={() => {
+                          setSelected(s);
+                          setOpenMenu(null);
+                        }}
+                        className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
+                      >
+                        View
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setSelected(s);
+                          setOpenMenu(null);
+                        }}
+                        className="w-full py-1.5 px-2.5 rounded-lg bg-amber-50 text-amber-700 font-medium text-xs text-left hover:bg-amber-100 transition-colors"
+                      >
+                        Quotation
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          handleDelete(s.id);
+                          setOpenMenu(null);
+                        }}
+                        className="w-full py-1.5 px-2.5 rounded-lg bg-red-50 text-red-600 font-medium text-xs text-left hover:bg-red-100 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </td>
                     </tr>
                   ))}
                 </tbody>

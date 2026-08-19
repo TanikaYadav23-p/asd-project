@@ -220,12 +220,12 @@ export default function RolesPermission() {
             <h1 className="text-xl sm:text-3xl font-semibold text-gray-800">Roles & Permissions</h1>
             <p className="text-xs sm:text-sm text-gray-400 mt-1">Manage user rooles and their permissions</p>
           </div>
-          <button
+          {/* <button
             onClick={() => setShowModal(true)}
             className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors shadow-sm whitespace-nowrap"
           >
             <FaPlus className="text-xs" /> Add User
-          </button>
+          </button> */}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4">
