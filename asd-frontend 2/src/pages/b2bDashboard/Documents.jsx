@@ -467,7 +467,7 @@ const handleResetDocumentFilters = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-5">
           {KPI_STATS.map((stat, idx) => {
             const Icon = stat.icon;
             return (

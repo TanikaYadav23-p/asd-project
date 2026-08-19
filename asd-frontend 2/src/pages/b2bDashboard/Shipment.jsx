@@ -16,6 +16,8 @@ import {
   getFilterOptions,
   getShipmentDetails,
 } from "../../api/ShipmentApi";
+import B2BQuotation from "../../components/b2bComponent/B2BQuotation";
+import ViewShipment from "../../components/b2bComponent/ShipmentView";
 import {
   CalendarDays,
   Download,
@@ -178,6 +180,10 @@ const [selectedOrigin, setSelectedOrigin] = useState("");
 const [selectedDestination, setSelectedDestination] = useState("");
 const [selectedMode, setSelectedMode] = useState("");
 const [openMenu, setOpenMenu] = useState(null);
+const [selectedShipment, setSelectedShipment] = useState(null);
+const [showShipmentView, setShowShipmentView] = useState(false);
+const [viewShipmentId, setViewShipmentId] = useState(null);
+const [showQuotation, setShowQuotation] = useState(false);
 const [appliedFilters, setAppliedFilters] = useState({
   search: "",
   status: "",
@@ -538,6 +544,11 @@ useEffect(() => {
   return () => document.removeEventListener("click", handleClickOutside);
 }, []);
 
+useEffect(() => {
+  console.log("showQuotation:", showQuotation);
+  console.log("selectedShipment:", selectedShipment);
+}, [showQuotation, selectedShipment]);
+
   return (
     <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600 font-sans antialiased pt-5">
   {!shipment && ( <div className="max-w-[1500px] mx-auto p-3 sm:p-4 md:p-6">
@@ -715,7 +726,7 @@ useEffect(() => {
             </div>
 
             <div className="flex items-center justify-end gap-2 mt-3">
-            <button onClick={handleApplyFilters} className=" flex bg-blue-100 border border-slate-200 text-slate-600 rounded-xl py-2 px-4 text-xs font-semibold hover:bg-slate-100 transition  whitespace-nowrap">
+            <button onClick={handleApplyFilters} className=" flex bg-blue-100 border border-slate-200 text-slate-600 rounded-xl py-2 px-4 text-xs font-semibold hover:bg-slate-100 transition">
               Apply Filters
             </button>
             <button onClick={handleResetFilters} className="  flex-1 text-slate-400 hover:text-slate-600 text-xs font-medium px-1">Reset</button>
@@ -796,24 +807,30 @@ useEffect(() => {
                       className="absolute right-0 top-7 z-20 w-36 bg-white border border-gray-200 rounded-xl shadow-lg p-1.5 flex flex-col gap-1 text-left"
                     >
                       <button
-                        onClick={() => {
-                          setSelected(s);
-                          setOpenMenu(null);
-                        }}
-                        className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
-                      >
-                        View
-                      </button>
+  onClick={() => {
+    setViewShipmentId(s._id);
+    setShowShipmentView(true);
+    setOpenMenu(null);
+  }}
+  className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
+>
+  View
+</button>
 
-                      <button
-                        onClick={() => {
-                          setSelected(s);
-                          setOpenMenu(null);
-                        }}
-                        className="w-full py-1.5 px-2.5 rounded-lg bg-amber-50 text-amber-700 font-medium text-xs text-left hover:bg-amber-100 transition-colors"
-                      >
-                        Quotation
-                      </button>
+<button
+  onClick={(e) => {
+    e.stopPropagation();
+
+    console.log("Quotation clicked:", s);
+
+    setSelectedShipment(s);
+    setShowQuotation(true);
+    setOpenMenu(null);
+  }}
+  className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-green-600 font-medium text-xs text-left hover:bg-green-100 transition-colors"
+>
+  Quotation
+</button>
 
                       <button
                         onClick={() => {
@@ -860,8 +877,19 @@ useEffect(() => {
             <div className="space-y-2.5">
               {recentAlerts.map((a, i) => {
                 const Icon = AlertTriangle;
-                const color = a.type === "Critical" ? "text-red-500" : alert.type === "Warning" ? "text-orange-500" : "text-blue-500";
-                const bg = a.type === "Critical" ? "bg-red-50" : alert.type === "Warning" ? "bg-orange-50" : "bg-blue-50";
+                const color =
+  a.type === "Critical"
+    ? "text-red-500"
+    : a.type === "Warning"
+    ? "text-orange-500"
+    : "text-blue-500";
+
+const bg =
+  a.type === "Critical"
+    ? "bg-red-50"
+    : a.type === "Warning"
+    ? "bg-orange-50"
+    : "bg-blue-50";
                 return (
                   <div key={a._id || i} className="flex items-start gap-2.5">
                     <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${bg} ${color}`}>
@@ -1066,6 +1094,28 @@ useEffect(() => {
             <ShipmentForm setActiveTab={setActiveTab} setShipment={setShipment} currentTab={"Shipments"} />
           )}
       
+      {showQuotation && selectedShipment && (
+  <B2BQuotation
+    shipment={selectedShipment}
+    onClose={() => {
+      setShowQuotation(false);
+      setSelectedShipment(null);
+    }}
+  />
+)}
+{showShipmentView && viewShipmentId && (
+  <ViewShipment
+    shipmentId={viewShipmentId}
+    onBack={() => {
+      setShowShipmentView(false);
+      setViewShipmentId(null);
+    }}
+    onEdit={(shipment) => {
+      console.log("Edit shipment:", shipment);
+    }}
+  />
+)}
+
         {highRisk && (<RecentHighRiskAlertsModal onClose={() => setHighRisk(false)}/>)}
 
           {dateRange && (
