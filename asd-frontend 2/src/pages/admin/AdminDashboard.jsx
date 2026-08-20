@@ -133,7 +133,7 @@ import CreateNewInvoice from "./CreateNewInvoice";
 
 import MessagesModal from "../../components/Messages";
 import NotificationsModal from "../../components/Notifications";
-import MyAccount from "../../components/adminComponent/MyAccount";
+import MyAccount from "../admin/MyAccount";
 
 const fabActions = [
   { label: "New Booking", icon: <BsCalendarCheck size={22} className="text-teal-600" /> },
@@ -509,7 +509,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 ml-auto">
+            <div className="flex items-center gap-1.5 ml-auto">
             <button onClick={() => setNotifications(true)} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600 relative">
                  <FiBell size={16} />
                  <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
@@ -519,10 +519,10 @@ export default function AdminDashboard() {
                </button>
            
             <div className="flex items-center gap-2 ml-1 pl-2 py-2 border-l border-gray-200">
-              <div onClick={() => setAccount(true)} className="w-7 h-7 bg-teal-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+              <div onClick={() => setAccount(true)} className="w-7 h-7 bg-teal-500  cursor-pointer rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                 A
               </div>
-              <div className="hidden sm:block leading-tight" onClick={() => setAccount(true)} >
+              <div className="hidden sm:block leading-tight cursor-pointer" onClick={() => setAccount(true)} >
                 <p className="text-xs sm:text-sm font-semibold text-gray-800">
                   Admin Panel
                 </p>
@@ -899,7 +899,7 @@ export default function AdminDashboard() {
       {showNotice && <CreateNotice setShowNotice={setShowNotice} />}
       
        
-        {fabOpen && <div className="fixed inset-0 z-30" onClick={() => setFabOpen(false)} />}
+      {fabOpen && <div className="fixed inset-0 z-30" onClick={() => setFabOpen(false)} />}
           
       <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-40">
         {fabOpen && (
@@ -919,7 +919,8 @@ export default function AdminDashboard() {
           {fabOpen ? <FiX size={22} /> : <FiPlus size={24} />}
         </button>
       </div>
- {account && <MyAccount onClose={() => setAccount(false)} />}
+
+      {account && <MyAccount onClose={() => setAccount(false)} />}
       
     </div>
   );

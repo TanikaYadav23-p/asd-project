@@ -10,7 +10,7 @@ import {
   Clock,
   Pencil,
 } from "lucide-react";
-
+import { LuX } from "react-icons/lu";
 const initialProfile = {
   fullName: "Arjun Soni",
   email: "arjun.soni@trwtech.in",
@@ -22,6 +22,7 @@ const initialProfile = {
   address: "201, Tech Tower, Sector 62, Noida, Uttar Pradesh - 201309",
   joinedDate: "12 Jan 2024",
   lastLogin: "28 Jun 2026, 10:45 AM",
+   profileImage: "",
 };
 
 const initialPermissions = [
@@ -36,7 +37,7 @@ const initialPermissions = [
 
 const allActions = ["View", "Create", "Edit", "Delete", "Export"];
 
-export default function MyAccount() {
+export default function MyAccount({onClose}) {
   const [profile, setProfile] = useState(initialProfile);
   const [editProfile, setEditProfile] = useState(false);
   const [profileForm, setProfileForm] = useState(initialProfile);
@@ -89,15 +90,21 @@ export default function MyAccount() {
   const inputClass = "border border-gray-300 rounded-lg px-3 py-1.5 text-sm w-full";
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-4">
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-3 sm:p-6 rounded-xl">
+    <div className="w-full max-w-4xl max-h-[95vh] overflow-y-auto space-y-4 bg-white p-5 rounded-2xl">
       <div>
+        <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-900">My Account</h1>
+        <button onClick={onClose}>
+           <LuX className="text-lg"/>
+        </button>
+          </div>
         <p className="text-sm text-gray-500">Dashboard &lt; My Account</p>
       </div>
 
       <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6">
-        <div className="flex items-center justify-between mb-6 gap-3">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900">Personal Information</h2>
+        <div className="flex items-center justify-end mb-6 gap-3">
+          {/* <h2 className="text-lg sm:text-xl font-bold text-gray-900">Personal Information</h2> */}
           <button
             onClick={() => {
               if (editProfile) saveProfile();
@@ -114,12 +121,56 @@ export default function MyAccount() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-6">
-          <div className="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold shrink-0 relative">
+          {/* <div className="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold shrink-0 relative">
             {profile.fullName.charAt(0)}
             <span className="absolute bottom-0 right-0 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow">
               <Pencil className="w-3 h-3 text-gray-600" />
             </span>
-          </div>
+          </div> */}
+          <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="profileImage"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+
+                    if (file) {
+                      const imageUrl = URL.createObjectURL(file);
+
+                      setProfile((prev) => ({
+                        ...prev,
+                        profileImage: imageUrl,
+                      }));
+                    }
+                  }}
+                />
+
+               <div className="relative w-20 h-20 shrink-0">
+                      <label
+                        htmlFor="profileImage"
+                        className="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold overflow-hidden cursor-pointer block"
+                      >
+                        {profile.profileImage ? (
+                          <img
+                            src={profile.profileImage}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          profile.fullName.charAt(0)
+                        )}
+                      </label>
+
+                      <label
+                        htmlFor="profileImage"
+                        className="absolute bottom-0 right-0 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow cursor-pointer z-10"
+                      >
+                        <Pencil size={14} className="text-gray-600" strokeWidth={2} />
+                      </label>
+                    </div>
+              </div>
 
           <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4 flex-1">
             <div className="flex items-center gap-3">
@@ -316,6 +367,7 @@ export default function MyAccount() {
           </div>
         </div>
       </div>
+    </div> 
     </div>
   );
 }
