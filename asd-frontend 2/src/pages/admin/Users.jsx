@@ -163,6 +163,10 @@ function EditDrawer({ user, setEditUser, setUsers }) {
     status: user.status ?? true,
     plan: user.plan || "Pro",
     expiry: user.expiryDate?.split("T")[0] || "",
+     suspend: false,
+      startDate: "",
+     endDate: "",
+     
   });
 
   const handleSubmit = async (e) => {
@@ -250,14 +254,14 @@ function EditDrawer({ user, setEditUser, setUsers }) {
           <div className="border-t pt-4">
             <p className="text-sm font-medium mb-2">Basic Info</p>
 
-            <div className="flex gap-4 items-center mb-3">
+            {/* <div className="flex gap-4 items-center mb-3">
               <div className="w-14 h-14 border rounded-md flex items-center justify-center text-gray-400">
                 <FiCamera />
               </div>
               <p className="text-xs text-gray-400">
                 Upload Photo JPG, PNG up to 2 MB
               </p>
-            </div>
+            </div> */}
 
             <input
               value={form.name}
@@ -268,7 +272,8 @@ function EditDrawer({ user, setEditUser, setUsers }) {
 
             <input
               value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              disabled={true}
+              // onChange={(e) => setForm({ ...form, email: e.target.value })}
               placeholder="Email Address"
               className="w-full border px-3 py-2 rounded mb-2"
             />
@@ -279,9 +284,11 @@ function EditDrawer({ user, setEditUser, setUsers }) {
               placeholder="Phone Number"
               className="w-full border px-3 py-2 rounded"
             />
+
+        
           </div>
 
-          <div className="border-t pt-4">
+          {/* <div className="border-t pt-4">
             <p className="text-sm font-medium mb-2">Account Type</p>
 
             <select
@@ -294,10 +301,10 @@ function EditDrawer({ user, setEditUser, setUsers }) {
               <option>B2B</option>
               <option>B2C</option>
             </select>
-          </div>
+          </div> */}
 
           <div className="border-t pt-4">
-            <p className="text-sm font-medium mb-2">Company Info</p>
+            <p className="text-sm font-medium mb-2">Company name</p>
 
             <input
               value={form.company}
@@ -305,8 +312,8 @@ function EditDrawer({ user, setEditUser, setUsers }) {
               placeholder="Company Name"
               className="w-full border px-3 py-2 rounded mb-2"
             />
-
-            <input
+          </div>
+          {/*   <input
               value={form.gst}
               onChange={(e) => setForm({ ...form, gst: e.target.value })}
               placeholder="GST Number"
@@ -321,44 +328,104 @@ function EditDrawer({ user, setEditUser, setUsers }) {
               <option>Exporter</option>
               <option>Manufacturer</option>
             </select>
-          </div>
+          </div> */}
+
+         <div className="border-t pt-4">
+  <p className="text-sm font-medium mb-2">Status</p>
+
+  <div className="flex items-center gap-6">
+    {/* Active */}
+    <div className="flex items-center gap-2">
+      <input
+        type="checkbox"
+        checked={form.status}
+        onChange={(e) =>
+          setForm({ ...form, status: e.target.checked })
+        }
+      />
+      <span className="text-sm">Active</span>
+    </div>
+
+    {/* Suspend */}
+    <div className="flex items-center gap-2">
+      <input
+        type="checkbox"
+        checked={form.suspend}
+        onChange={(e) =>
+          setForm({
+            ...form,
+            suspend: e.target.checked,
+          })
+        }
+      />
+      <span className="text-sm">Suspend</span>
+    </div>
+  </div>
+</div>
+
+          
 
           <div className="border-t pt-4">
-            <p className="text-sm font-medium mb-2">Status</p>
-
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={form.status}
-                onChange={(e) => setForm({ ...form, status: e.target.checked })}
-              />
-              <span className="text-sm">Active</span>
-            </div>
-          </div>
-
-          <div className="border-t pt-4">
-            <p className="text-sm font-medium mb-2">Subscription</p>
+            <p className="text-sm font-medium mb-2">Subscription Plan</p>
 
             <div className="grid grid-cols-2 gap-2">
-              <select
-                value={form.plan}
-                onChange={(e) => setForm({ ...form, plan: e.target.value })}
-                className="border px-3 py-2 rounded"
-              >
-                <option>Pro</option>
-                <option>Basic</option>
-              </select>
+             <div className="flex flex-col gap-1">
+            <label className="text-sm font-medium text-gray-700">
+              Plan Name
+            </label>
 
-              <input
+            <select
+              value={form.plan}
+              onChange={(e) =>
+                setForm({ ...form, plan: e.target.value })
+              }
+              className="w-full border border-gray-300 px-3 py-2 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="Pro">Pro</option>
+              <option value="Basic">Basic</option>
+                <option value="Basic">Starter</option>
+            </select>
+          </div>
+              {/* <input
                 type="date"
+
                 value={form.expiry}
                 onChange={(e) => setForm({ ...form, expiry: e.target.value })}
                 className="border px-3 py-2 rounded"
-              />
+              /> */}
+
+         <div>
+  <label className="block text-sm font-medium mb-1">
+    Start Date
+  </label>
+  <input
+    type="date"
+    value={form.startDate}
+    onChange={(e) =>
+      setForm({ ...form, startDate: e.target.value })
+    }
+    className="border px-3 py-2 rounded w-full"
+  />
+</div>
+
+    {/* End Date */}
+    <div>   <label className="block text-sm font-medium mb-1">
+    End Date
+  </label>
+   <input
+      type="date"
+      value={form.endDate}
+      onChange={(e) =>
+        setForm({ ...form, endDate: e.target.value })
+      }
+      className="border px-3 py-2 rounded"
+    />
+  </div>
+   
             </div>
           </div>
 
-          <div className="border-t pt-4 space-y-2">
+          {/* <div className="border-t pt-4 space-y-2">
           <button
   type="button"
   onClick={handleResetPassword}
@@ -374,7 +441,7 @@ function EditDrawer({ user, setEditUser, setUsers }) {
 >
   <FiSend /> Send Invite Link
 </button>
-          </div>
+          </div> */}
 
           <button className="w-full bg-teal-500 text-white py-2 rounded mt-2">
             Save Changes
@@ -798,23 +865,23 @@ const [loading, setLoading] = useState(false);
                   <td>{u.phone}</td>
                   <td className=" text-xs sm:text-sm">{u.companyName || "-"}</td>
                     <td className="py-3 text-center relative ">
-                                    <button
+                                    {/* <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                       setOpenMenu(openMenu === i ? null : i);
+                                   
                                       }}
                                       className="text-slate-400 hover:text-slate-600"
                                     >
-                                      <MoreVertical size={15} />
-                                    </button>
+                                      
+                                      Basic
+                                    </button> */}
                   
-                                    {openMenu === i && (
+                                    {/* {openMenu === i && (
                                       <div
                                         onClick={(e) => e.stopPropagation()}
                                         className="absolute right-0 top-7 z-20 w-28 bg-white border border-gray-200 rounded-xl shadow-lg p-1.5 flex flex-col gap-1 text-left"
                                       >
                                          <button
-                                         
                                           className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
                                         >
                                       Basic
@@ -825,12 +892,11 @@ const [loading, setLoading] = useState(false);
                                         >
                                        Starter
                                         </button>
-                  
- 
-                                      
                                       </div>
-                                        )}
-                                      </td>
+                                        )}*/}
+
+                                        Basic
+                                      </td> 
                      <td>
                   <span
   onClick={async () => {
@@ -852,10 +918,10 @@ const [loading, setLoading] = useState(false);
                       onClick={() => setEditUser(u)}
                       className="cursor-pointer text-blue-500"
                     />
-                    <FiTrash2
+                    {/* <FiTrash2
                       onClick={() => setDeleteUser(u)}
                       className="cursor-pointer text-red-500"
-                    />
+                    />  */}
                   </td>
                 </tr>
               ))}

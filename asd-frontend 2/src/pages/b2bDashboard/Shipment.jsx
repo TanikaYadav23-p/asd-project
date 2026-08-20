@@ -49,6 +49,7 @@ import ShipmentForm from "../../components/ShipmentForm";
 import RecentHighRiskAlertsModal from "../../components/b2bComponent/RecentHighRisk";
 import DateRangeModal from "../../components/b2bComponent/DateRange";
 import ExportReport from "../../components/b2bComponent/ExportReport";
+import ShipmentTrackingModal from "../../components/b2bComponent/ShipmentTracking";
 const COUNTRY_CODES = {
   China: "CN",
   India: "IN",
@@ -184,6 +185,7 @@ const [selectedShipment, setSelectedShipment] = useState(null);
 const [showShipmentView, setShowShipmentView] = useState(false);
 const [viewShipmentId, setViewShipmentId] = useState(null);
 const [showQuotation, setShowQuotation] = useState(false);
+ const [shipmentTracking, setShipmentTracking] = useState(false)
 const [appliedFilters, setAppliedFilters] = useState({
   search: "",
   status: "",
@@ -914,14 +916,20 @@ const bg =
                 <h3 className={`font-bold text-sm ${HEADING}`}>Shipment Tracker</h3>
                {/* <button className="text-blue-600 text-[11px] font-bold shrink-0">View All Trackers →</button>*/}
               </div>
-              <div className="flex justify-between items-start mb-3">
+              <div className="flex justify-between flex-col">
+                <div className="flex justify-end pr-3"> 
+                   <button className="text-xs  font-semibold  hover:underline text-blue-600" onClick={() => setShipmentTracking(true)}> View </button>
+                </div>
+                <div className="flex justify-between items-start mb-2"> 
                 <div>
                   <div className={`font-bold text-xs ${HEADING}`}>{shipmentTracker?.referenceNumber || shipmentTracker?.sbNumber}</div>
                   <div className="text-[10px] text-slate-400 flex items-center gap-1">
                     {shipmentTracker?.route?.originCity},{" "}{shipmentTracker?.route?.originCountry} <Flag country={shipmentTracker?.route?.originCountry} size={11} /> → <Flag country={shipmentTracker?.route?.destinationCountry} size={11} />{shipmentTracker?.route?.destinationCity},{" "}{shipmentTracker?.route?.destinationCountry}
                   </div>
                 </div>
+               
                 <StatusBadge status={shipmentTracker?.shipmentStatus} />
+                </div>
               </div>
 
               <div className="relative h-[150px] rounded-xl overflow-hidden border border-slate-100" style={{ backgroundColor: "#CFE8CF" }}>
@@ -1132,6 +1140,10 @@ const bg =
           {exportReport && (
             <ExportReport onClose={() => setExportReport(false)} />
           )}
+
+          {shipmentTracking && (
+              <ShipmentTrackingModal onClose={() => setShipmentTracking(false)} />
+            )}
       
     </div>
   );
