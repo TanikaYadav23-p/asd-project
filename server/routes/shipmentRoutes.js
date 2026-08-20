@@ -62,7 +62,7 @@ router.get(
     adminOnly,
     shipmentController.assignCarrier
 );
-
+router.get("/:id/tracking",protect,shipmentController.getShipmentTracking);
 router.post(
   "/:id/tracking",
   protect,

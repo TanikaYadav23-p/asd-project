@@ -8,13 +8,13 @@ import {
   getShipments,
   getDashboard,
   getShipmentStatusOverview,
-  getShipmentTracker,
   getShipmentsByMode,
   getTopOriginCountries,
   getRecentAlerts,
   getTopDestinationCountries,
   getFilterOptions,
   getShipmentDetails,
+  getShipmentTracker,
 } from "../../api/ShipmentApi";
 import B2BQuotation from "../../components/b2bComponent/B2BQuotation";
 import ViewShipment from "../../components/b2bComponent/ShipmentView";
@@ -89,54 +89,6 @@ function StatusBadge({ status }) {
  
 const TABS = ["All Shipments", "In Transit", "Pending", "Delivered", "Delayed", "Exception"];
 
-/*   const SHIPMENTS = [
-  { id: "SHP-2025-1045", bl: "MAEU123456789", origin: "China", originCity: "Shanghai, China", dest: "India", destCity: "Nhava Sheva, India", status: "In Transit", etd: "10 Apr 2025", atd: "11 Apr 2025", eta: "28 Apr 2025", etaNote: "In 4 days", noteColor: "text-blue-500", mode: "Sea", commodity: "Electrical Transformers", hs: "8504", value: "₹12.45 Cr" },
-  { id: "SHP-2025-1044", bl: "OOLU765432189", origin: "South Korea", originCity: "Busan, South Korea", dest: "Netherlands", destCity: "Rotterdam, Netherlands", status: "In Transit", etd: "09 Apr 2025", atd: "10 Apr 2025", eta: "02 May 2025", etaNote: "In 8 days", noteColor: "text-blue-500", mode: "Sea", commodity: "Automotive Parts", hs: "8708", value: "₹8.75 Cr" },
-  { id: "SHP-2025-1043", bl: "TKCU987654321", origin: "Germany", originCity: "Hamburg, Germany", dest: "UAE", destCity: "Dubai, UAE", status: "Pending", etd: "24 Apr 2025", atd: "—", eta: "05 May 2025", etaNote: "In 11 days", noteColor: "text-blue-500", mode: "Sea", commodity: "Machinery Parts", hs: "8482", value: "₹5.32 Cr" },
-  { id: "SHP-2025-1042", bl: "MEDU456789123", origin: "USA", originCity: "Los Angeles, USA", dest: "India", destCity: "Mumbai, India", status: "Delayed", etd: "05 Apr 2025", atd: "06 Apr 2025", eta: "26 Apr 2025", etaNote: "Delayed", noteColor: "text-rose-500", mode: "Sea", commodity: "Plastic Raw Materials", hs: "3901", value: "₹3.15 Cr" },
-  { id: "SHP-2025-1041", bl: "AIR897654123", origin: "Germany", originCity: "Frankfurt, Germany", dest: "India", destCity: "Bengaluru, India", status: "In Transit", etd: "12 Apr 2025", atd: "13 Apr 2025", eta: "24 Apr 2025", etaNote: "Arriving today", noteColor: "text-emerald-500", mode: "Air", commodity: "Medical Devices", hs: "9018", value: "₹4.60 Cr" },
-  { id: "SHP-2025-1040", bl: "SUDU112233445", origin: "Singapore", originCity: "Singapore, Singapore", dest: "Indonesia", destCity: "Jakarta, Indonesia", status: "In Transit", etd: "11 Apr 2025", atd: "11 Apr 2025", eta: "23 Apr 2025", etaNote: "Arrived", noteColor: "text-emerald-500", mode: "Sea", commodity: "Electronic Components", hs: "8535", value: "₹2.28 Cr" },
-  { id: "SHP-2025-1039", bl: "ONEYS54433221", origin: "Japan", originCity: "Tokyo, Japan", dest: "Australia", destCity: "Sydney, Australia", status: "Exception", etd: "08 Apr 2025", atd: "09 Apr 2025", eta: "—", etaNote: "", noteColor: "", mode: "Sea", commodity: "Textile Yarn", hs: "5205", value: "₹1.75 Cr" },
-  { id: "SHP-2025-1038", bl: "MAEU998877665", origin: "Belgium", originCity: "Antwerp, Belgium", dest: "India", destCity: "Chennai, India", status: "Delivered", etd: "28 Mar 2025", atd: "29 Mar 2025", eta: "08 Apr 2025", etaNote: "Delivered", noteColor: "text-emerald-500", mode: "Sea", commodity: "Chemicals", hs: "2905", value: "₹6.10 Cr" },
-]; 
-
-const STATUS_OVERVIEW = [
-  { name: "In Transit", value: 642, percent: "51.6%", color: "#6366F1" },
-  { name: "Delivered", value: 523, percent: "42.0%", color: "#10B981" },
-  { name: "Pending", value: 98, percent: "7.7%", color: "#F59E0B" },
-  { name: "Delayed", value: 58, percent: "4.7%", color: "#EF4444" },
-  { name: "Exception", value: 22, percent: "1.8%", color: "#A855F7" },
-];*/
-/*const TOP_DESTINATIONS = [
-  { country: "India", value: "512", percent: "41.1%", width: "100%" },
-  { country: "Netherlands", value: "180", percent: "14.5%", width: "36%" },
-  { country: "UAE", value: "150", percent: "12.0%", width: "30%" },
-  { country: "USA", value: "130", percent: "10.4%", width: "26%" },
-  { country: "Australia", value: "95", percent: "7.6%", width: "19%" },
-];*/
-/*
-const SHIPMENTS_BY_MODE = [
-  { name: "Sea", value: 892, percent: "71.7%", color: "#6366F1" },
-  { name: "Air", value: 218, percent: "17.5%", color: "#10B981" },
-  { name: "Road", value: 98, percent: "7.9%", color: "#F59E0B" },
-  { name: "Rail", value: 37, percent: "3.0%", color: "#A855F7" },
-]; */
-
-/*const TOP_ORIGINS = [
-  { country: "China", value: "420", percent: "33.7%", width: "100%" },
-  { country: "Germany", value: "210", percent: "16.9%", width: "50%" },
-  { country: "USA", value: "165", percent: "13.3%", width: "39%" },
-  { country: "South Korea", value: "120", percent: "9.6%", width: "29%" },
-  { country: "Singapore", value: "98", percent: "7.9%", width: "23%" },
-];*/
-
-/*const RECENT_ALERTS = [
-  { icon: AlertTriangle, color: "text-orange-500", bg: "bg-orange-50", text: "Delay expected for SHP-2025-1042.", sub: "ETA updated to 26 Apr 2025.", time: "1h ago" },
-  { icon: AlertTriangle, color: "text-orange-500", bg: "bg-orange-50", text: "Customs clearance delayed for SHP-2025-1039.", sub: "Additional documents required.", time: "3h ago" },
-  { icon: Clock, color: "text-blue-500", bg: "bg-blue-50", text: "Shipment SHP-2025-1041 arriving today.", sub: "ETA 24 Apr 2025.", time: "5h ago" },
-  { icon: Check, color: "text-emerald-500", bg: "bg-emerald-50", text: "Shipment SHP-2025-1038 delivered.", sub: "Delivered on 08 Apr 2025.", time: "1d ago" },
-];*/
-
 function SectionCard({ children, className = "" }) {
   return (
     <div className={`bg-white border border-slate-100 rounded-2xl p-4 shadow-xs ${className}`}>
@@ -161,7 +113,17 @@ export default function Shipment({setActiveTab:setParentTab, activeTab:parentTab
   const [statusOverview, setStatusOverview] = useState([]);
   const [shipmentModes, setShipmentModes] = useState([]);
   const [originCountries, setOriginCountries] = useState([]);
+
+  // ---- Shipment Tracker state ----
+  // shipmentTracker  -> holds the ACTUAL tracking data fetched from the backend
+  // showTrackingModal -> boolean that controls whether the tracking modal is open
+  // (previously these two got mixed up, which is why tracking never showed up)
   const [shipmentTracker, setShipmentTracker] = useState(null);
+  const [showTrackingModal, setShowTrackingModal] = useState(false);
+  const [trackingId, setTrackingId] = useState("");
+  const [trackingLoading, setTrackingLoading] = useState(false);
+  const [trackingShipmentId, setTrackingShipmentId] = useState("");
+
   const [destinationCountries, setDestinationCountries] = useState([]);
   const [recentAlerts, setRecentAlerts] = useState([]);
   const [filters, setFilters] = useState({status: ["All Status", "Active", "Inactive" , "Pending", "Approved", "Completed","Expired", "Draft", "Under Review"], origins: ["India", "USA" , "China"], destinations: ["India", "USA" , "China"], modes: ["Sea freight", "Air Freight", "Rail Freight", "Road Freight", "Multimodal", "Express"],});
@@ -185,7 +147,6 @@ const [selectedShipment, setSelectedShipment] = useState(null);
 const [showShipmentView, setShowShipmentView] = useState(false);
 const [viewShipmentId, setViewShipmentId] = useState(null);
 const [showQuotation, setShowQuotation] = useState(false);
- const [shipmentTracking, setShipmentTracking] = useState(false)
 const [appliedFilters, setAppliedFilters] = useState({
   search: "",
   status: "",
@@ -196,6 +157,8 @@ const [appliedFilters, setAppliedFilters] = useState({
   endDate: null,
 });
 const [editShipmentId, setEditShipmentId] = useState(null);
+
+
   const fetchShipments = async () => {
   try {
     setLoading(true);
@@ -269,17 +232,80 @@ const fetchRecentAlerts = async () => {
     console.error(error);
   }
 };
-
 const fetchShipmentTracker = async (id) => {
-  try {
-    const res = await getShipmentTracker(id);
-    setShipmentTracker(res.data.data);
-  } catch (error) {
-    console.error(error);
-  }
-};
+  const enteredId = id?.trim();
 
-const fetchFilterOptions = async () => {
+  if (!enteredId) {
+    setShipmentTracker(null);
+    setTrackingShipmentId("");
+    return null;
+  }
+
+  try {
+    setTrackingLoading(true);
+
+    console.log("Entered Reference ID:", enteredId);
+
+    // Reference Number se actual MongoDB _id find karo
+    const matchedShipment = shipments.find((s) => {
+      const referenceNumber =
+        s.referenceNumber ||
+        s.sbNumber ||
+        "";
+
+      return (
+        referenceNumber.toLowerCase() ===
+        enteredId.toLowerCase()
+      );
+    });
+
+    console.log("Matched Shipment:", matchedShipment);
+
+    if (!matchedShipment?._id) {
+      console.log("Shipment not found for reference:", enteredId);
+
+      setShipmentTracker(null);
+      setTrackingShipmentId("");
+
+      return null;
+    }
+
+    // Backend tracker API Mongo _id leta hai
+    const mongoId = matchedShipment._id;
+
+    console.log("Calling tracker API with Mongo ID:", mongoId);
+
+    const res = await getShipmentTracker(mongoId);
+
+    console.log("Tracker API Response:", res.data);
+
+    const trackerData = res.data?.data;
+
+    if (trackerData) {
+      setShipmentTracker(trackerData);
+      setTrackingShipmentId(mongoId);
+      setTrackingId(enteredId);
+
+      return trackerData;
+    }
+
+    setShipmentTracker(null);
+    setTrackingShipmentId("");
+
+    return null;
+
+  } catch (error) {
+    console.error("Tracker Error:", error);
+
+    setShipmentTracker(null);
+    setTrackingShipmentId("");
+
+    return null;
+
+  } finally {
+    setTrackingLoading(false);
+  }
+};const fetchFilterOptions = async () => {
   try {
     const res = await getFilterOptions();
     setFilters(res.data.data || []);
@@ -503,44 +529,55 @@ const TOP_ORIGINS = originCountries.map((item) => ({
       ? `${(item.shipments / dashboard.totalShipments) * 100}%`
       : "0%",
 }));
-/*const RECENT_ALERTS = recentAlerts.map((item) => ({
-  icon: AlertTriangle,
-   color:
-    item.type === "Critical"
-      ? "text-red-500"
-      : item.type === "Warning"
-      ? "text-orange-500"
-      : "text-blue-500",
-   bg:
-    item.type === "Critical"
-      ? "bg-red-50"
-      : item.type === "Warning"
-      ? "bg-orange-50"
-      : "bg-blue-50",
-   text: item.title,
-   sub: item.message,
-   time: new Date(item.createdAt).toLocaleTimeString(),
-}));*/
 
-const TRACKER_STEPS = shipmentTracker?.statusHistory?.map((item) => ({label: item.status, date: item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : "-", done: true,})) || [];
+// ---- Build the step-tracker (the row of dots) from the real API shape ----
+// Backend returns `trackingTimeline: [{ status, createdAt, current, ... }]`
+const trackingTimelineData = shipmentTracker?.trackingTimeline || [];
+const currentTrackIndex = trackingTimelineData.findIndex(
+  (item) => item.current === true
+);
+const TRACKER_STEPS = trackingTimelineData.map((item, idx) => ({
+  label: item.status,
+  date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "-",
+  done: currentTrackIndex === -1 ? true : idx <= currentTrackIndex,
+  current: idx === currentTrackIndex,
+}));
 
+const [currentPage, setCurrentPage] = useState(1);
+
+const ITEMS_PER_PAGE = 10;
+const totalPages = Math.max(
+  1,
+  Math.ceil(filteredShipments.length / ITEMS_PER_PAGE)
+);
 useEffect(() => {
   fetchShipments();
   fetchDashboard();
   fetchStatusOverview();
+
   fetchShipmentModes();
   fetchTopOriginCountries();
   fetchTopDestinationCountries();
   fetchRecentAlerts();
   fetchFilterOptions();
 }, []);
-
 useEffect(() => {
-  if (shipments.length > 0) {
-    fetchShipmentTracker(shipments[0]._id);
+  if (shipments.length > 0 && !trackingId) {
+    const firstShipment = shipments[0];
+
+    const firstReference =
+      firstShipment.referenceNumber ||
+      firstShipment.sbNumber ||
+      firstShipment._id ||
+      "";
+
+    setTrackingId(firstReference);
+
+    if (firstShipment._id) {
+      fetchShipmentTracker(firstShipment._id);
+    }
   }
 }, [shipments]);
-
 useEffect(() => {
   const handleClickOutside = () => setOpenMenu(null);
   document.addEventListener("click", handleClickOutside);
@@ -563,10 +600,6 @@ useEffect(() => {
             </p>
           </div>
           <div className="flex items-center gap-2 w-full md:w-auto flex-wrap">
-            {/* <button className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
-              <CalendarDays size={14} className="text-slate-400" />
-              01 Apr 2025 - 24 Apr 2025
-            </button> */}
             <div className="relative flex-1 md:flex-none">
               <DatePicker
                 selected={shipmentStartDate}
@@ -592,7 +625,6 @@ useEffect(() => {
               Export Report
             </button>
             <button  onClick={() => {
-              //  console.log("heelo")
                 setShipment("shipment")
                   setEditShipmentId(null);
               }} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
@@ -601,23 +633,6 @@ useEffect(() => {
             </button>
           </div>
         </div>
-
-        {/*<div className="border-b border-slate-200 mb-5">
-          <div className="flex gap-5 sm:gap-7 overflow-x-auto scrollbar-none">
-            {TABS.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-2.5 text-xs sm:text-sm font-bold whitespace-nowrap transition-colors relative ${
-                  activeTab === tab ? "text-blue-600" : "text-[#081B6B] hover:text-slate-700"
-                }`}
-              >
-                {tab}
-                {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-blue-600 rounded-full" />}
-              </button>
-            ))}
-          </div>
-        </div>*/}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
           {KPI_STATS.map((stat, idx) => {
@@ -738,10 +753,10 @@ useEffect(() => {
           
         </SectionCard>
 
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-5 mb-5">
-          <SectionCard>
+        <div className="space-y-5 mb-5">
+          <SectionCard className="w-full overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-[11px] min-w-[820px]">
+              <table className="w-full min-w-[1150px] text-[10px]">
                 <thead>
                   <tr className="text-[9px] text-[#081B6B] uppercase font-bold border-b border-slate-100">
                     <th className="text-left py-2 pr-2"><input type="checkbox" className="accent-blue-600" /></th>
@@ -757,7 +772,10 @@ useEffect(() => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {filteredShipments.map((s, i) => (
+                  {filteredShipments.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  ).map((s, i) => (
                     <tr key={i}>
                       <td className="py-3 pr-2"><input type="checkbox" className="accent-blue-600" /></td>
                       <td className="py-3 whitespace-nowrap">
@@ -856,25 +874,90 @@ useEffect(() => {
               </table>
             </div>
             <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 pt-3 border-t border-slate-100">
-              <span className="text-[11px] text-slate-400 font-medium">Showing 1 to{shipments.length} of {shipments.length}  shipments</span>
-              <div className="flex items-center gap-1.5">
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400">
-                  <ChevronLeft size={14} />
-                </button>
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-600 text-white text-[11px] font-bold">1</button>
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 text-[11px] font-bold">2</button>
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 text-[11px] font-bold">3</button>
-                <span className="text-slate-400 text-[11px]">...</span>
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 text-[11px] font-bold">156</button>
-                <button className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400">
-                  <ChevronRight size={14} />
-                </button>
-              </div>
-            </div>
 
+  <span className="text-[11px] text-slate-400 font-medium">
+    Showing{" "}
+    {filteredShipments.length === 0
+      ? 0
+      : (currentPage - 1) * ITEMS_PER_PAGE + 1}{" "}
+    to{" "}
+    {Math.min(
+      currentPage * ITEMS_PER_PAGE,
+      filteredShipments.length
+    )}{" "}
+    of {filteredShipments.length} shipments
+  </span>
+
+  <div className="flex items-center gap-1.5">
+
+    <button
+      onClick={() =>
+        setCurrentPage((prev) => Math.max(prev - 1, 1))
+      }
+      disabled={currentPage === 1}
+      className={`w-7 h-7 flex items-center justify-center rounded-lg border text-slate-400 ${
+        currentPage === 1
+          ? "border-slate-100 cursor-not-allowed opacity-50"
+          : "border-slate-200 hover:bg-slate-50"
+      }`}
+    >
+      <ChevronLeft size={14} />
+    </button>
+
+    {Array.from(
+      { length: totalPages },
+      (_, index) => index + 1
+    )
+      .filter(
+        (page) =>
+          page === 1 ||
+          page === totalPages ||
+          Math.abs(page - currentPage) <= 1
+      )
+      .map((page, index, pages) => (
+        <React.Fragment key={page}>
+
+          {index > 0 && pages[index - 1] !== page - 1 && (
+            <span className="text-slate-400 text-[11px] px-1">
+              ...
+            </span>
+          )}
+
+          <button
+            onClick={() => setCurrentPage(page)}
+            className={`w-7 h-7 flex items-center justify-center rounded-lg text-[11px] font-bold ${
+              currentPage === page
+                ? "bg-blue-600 text-white"
+                : "text-slate-500 hover:bg-slate-50"
+            }`}
+          >
+            {page}
+          </button>
+
+        </React.Fragment>
+      ))}
+
+    <button
+      onClick={() =>
+        setCurrentPage((prev) =>
+          Math.min(prev + 1, totalPages)
+        )
+      }
+      disabled={currentPage === totalPages}
+      className={`w-7 h-7 flex items-center justify-center rounded-lg border text-slate-400 ${
+        currentPage === totalPages
+          ? "border-slate-100 cursor-not-allowed opacity-50"
+          : "border-slate-200 hover:bg-slate-50"
+      }`}
+    >
+      <ChevronRight size={14} />
+    </button>
+
+  </div>
+</div>
                     </SectionCard>
 
-          <div className="flex flex-col gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
              <SectionCard>
             <div className="flex justify-between items-center mb-3">
               <h3 className={`font-bold text-sm ${HEADING}`}>Recent Alerts</h3>
@@ -911,77 +994,296 @@ const bg =
               })}
             </div>
           </SectionCard>
-            <SectionCard>
-              <div className="flex justify-between items-center mb-3">
-                <h3 className={`font-bold text-sm ${HEADING}`}>Shipment Tracker</h3>
-               {/* <button className="text-blue-600 text-[11px] font-bold shrink-0">View All Trackers →</button>*/}
-              </div>
-              <div className="flex justify-between flex-col">
-                <div className="flex justify-end pr-3"> 
-                   <button className="text-xs  font-semibold  hover:underline text-blue-600" onClick={() => setShipmentTracking(true)}> View </button>
-                </div>
-                <div className="flex justify-between items-start mb-2"> 
-                <div>
-                  <div className={`font-bold text-xs ${HEADING}`}>{shipmentTracker?.referenceNumber || shipmentTracker?.sbNumber}</div>
-                  <div className="text-[10px] text-slate-400 flex items-center gap-1">
-                    {shipmentTracker?.route?.originCity},{" "}{shipmentTracker?.route?.originCountry} <Flag country={shipmentTracker?.route?.originCountry} size={11} /> → <Flag country={shipmentTracker?.route?.destinationCountry} size={11} />{shipmentTracker?.route?.destinationCity},{" "}{shipmentTracker?.route?.destinationCountry}
-                  </div>
-                </div>
-               
-                <StatusBadge status={shipmentTracker?.shipmentStatus} />
-                </div>
-              </div>
 
-              <div className="relative h-[150px] rounded-xl overflow-hidden border border-slate-100" style={{ backgroundColor: "#CFE8CF" }}>
-                <svg viewBox="0 0 300 150" className="absolute inset-0 w-full h-full">
-                  <path d="M50,50 C90,30 110,80 150,70 C190,60 200,110 250,100" fill="none" stroke="#60A5FA" strokeWidth="4" strokeLinecap="round" />
-                  <circle cx="50" cy="50" r="6" fill="#4338CA" stroke="white" strokeWidth="2" />
-                  <circle cx="250" cy="100" r="6" fill="#EF4444" stroke="white" strokeWidth="2" />
-                </svg>
-              </div>
+         {/* ---- Shipment Tracker ---- */}
+<SectionCard>
 
-              <div className="grid grid-cols-3 gap-2 mt-3 text-center">
-                <div>
-                  <span className="text-[9px] text-slate-400 font-semibold block">Current Location</span>
-                  <span className={`text-[11px] font-bold ${HEADING}`}>{shipmentTracker?.currentLocation?.city || shipmentTracker?.currentLocation?.country || "-"}</span>
-                </div>
-                <div>
-                  <span className="text-[9px] text-slate-400 font-semibold block">Last Updated</span>
-                  <span className={`text-[11px] font-bold ${HEADING}`}>{shipmentTracker?.lastStatusUpdatedAt? new Date(shipmentTracker.lastStatusUpdatedAt).toLocaleString() : "-"}</span>
-                </div>
-                <div>
-                  <span className="text-[9px] text-slate-400 font-semibold block">ETA</span>
-                  <span className={`text-[11px] font-bold ${HEADING}`}>{shipmentTracker?.eta ? new Date(shipmentTracker.eta).toLocaleDateString() : "-"}{shipmentTracker?.eta && (
-                    <span className="text-blue-500"> {" "} ( {Math.ceil((new Date(shipmentTracker.eta) - new Date()) / (1000 * 60 * 60 * 24) )}{" "} days) </span> )}</span>
-                </div>
-              </div>
+  <div className="flex justify-between items-center mb-3">
+    <h3 className={`font-bold text-sm ${HEADING}`}>
+      Shipment Tracker
+    </h3>
 
-              <div className="flex items-center justify-between mt-4">
-                {TRACKER_STEPS.map((step, i) => (
-                  <div key={i} className="flex-1 flex flex-col items-center relative">
-                    {i !== 0 && (
-                      <div
-                        className={`absolute top-2.5 right-1/2 w-full h-[2px] -z-10 ${
-                          TRACKER_STEPS[i - 1].done ? "bg-purple-500" : "bg-slate-200"
-                        }`}
-                      />
-                    )}
-                    <div
-                      className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                        step.done ? "bg-purple-600" : "bg-slate-200"
-                      }`}
-                    >
-                      {step.done && <Check size={11} className="text-white" />}
-                    </div>
-                    <span className={`text-[8px] font-bold mt-1 text-center leading-tight ${step.current ? "text-purple-600" : "text-slate-400"}`}>
-                      {step.label}
-                    </span>
-                    <span className="text-[8px] text-slate-300">{step.date}</span>
-                  </div>
-                ))}
-              </div>
-            </SectionCard>
+    <button
+      className="text-xs font-semibold hover:underline text-blue-600"
+      onClick={async () => {
+    const enteredId = trackingId?.trim();
 
+    if (!enteredId) return;
+
+    const data = await fetchShipmentTracker(enteredId);
+
+    if (data) {
+      setShowTrackingModal(true);
+    }
+  }}
+    >
+      View
+    </button>
+  </div>
+
+  {/* TRACKING ID INPUT */}
+  <div className="mb-4">
+
+    <label className="text-[9px] text-slate-400 font-semibold block mb-1">
+      Shipment Reference ID
+    </label>
+
+    <div className="flex gap-2">
+
+      <input
+        type="text"
+        value={trackingId}
+        onChange={(e) => {
+          setTrackingId(e.target.value);
+        }}
+        onKeyDown={async (e) => {
+          if (e.key === "Enter") {
+            const id = e.currentTarget.value.trim();
+
+            if (!id) return;
+
+            await fetchShipmentTracker(id);
+          }
+        }}
+        placeholder="Enter Shipment ID"
+        className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-2 text-[10px] text-slate-700 outline-none focus:border-blue-400"
+      />
+
+      <button
+        onClick={() => {
+          fetchShipmentTracker(trackingId);
+        }}
+        disabled={trackingLoading || !trackingId.trim()}
+        className="px-3 py-2 bg-blue-600 text-white rounded-lg text-[10px] font-semibold disabled:opacity-50"
+      >
+        {trackingLoading ? "..." : "Track"}
+      </button>
+
+    </div>
+  </div>
+
+  {/* LOADING */}
+  {trackingLoading && (
+    <div className="text-center py-5 text-[10px] text-slate-400">
+      Loading shipment tracking...
+    </div>
+  )}
+
+  {/* SHIPMENT TRACKING DATA */}
+{!trackingLoading && shipmentTracker && (
+  <>
+    {/* HEADER */}
+    <div className="flex justify-between items-start mb-2">
+
+      <div>
+
+        <div className={`font-bold text-xs ${HEADING}`}>
+          {shipmentTracker.referenceNumber ||
+            shipmentTracker.sbNumber ||
+            trackingId ||
+            "-"}
+        </div>
+
+        <div className="text-[10px] text-slate-400 flex items-center gap-1 mt-1">
+
+          <Flag
+            country={shipmentTracker.route?.originCountry}
+            size={11}
+          />
+
+          <span>
+            {shipmentTracker.route?.originCity || "-"},{" "}
+            {shipmentTracker.route?.originCountry || "-"}
+          </span>
+
+          <span>→</span>
+
+          <Flag
+            country={shipmentTracker.route?.destinationCountry}
+            size={11}
+          />
+
+          <span>
+            {shipmentTracker.route?.destinationCity || "-"},{" "}
+            {shipmentTracker.route?.destinationCountry || "-"}
+          </span>
+
+        </div>
+
+      </div>
+
+      <StatusBadge
+        status={
+          shipmentTracker.shipmentStatus ||
+          shipmentTracker.status ||
+          "Pending"
+        }
+      />
+
+    </div>
+
+
+    {/* SHIPMENT DETAILS */}
+    <div className="grid grid-cols-3 gap-2 mt-3 text-center">
+
+      {/* CURRENT LOCATION */}
+      <div>
+
+        <span className="text-[9px] text-slate-400 font-semibold block">
+          Current Location
+        </span>
+
+        <span className={`text-[11px] font-bold ${HEADING}`}>
+          {shipmentTracker.liveTracking?.location?.city ||
+            shipmentTracker.liveTracking?.location?.country ||
+            shipmentTracker.currentLocation?.city ||
+            shipmentTracker.currentLocation?.country ||
+            shipmentTracker.route?.originCity ||
+            "-"}
+        </span>
+
+      </div>
+
+
+      {/* LAST UPDATED */}
+      <div>
+
+        <span className="text-[9px] text-slate-400 font-semibold block">
+          Last Updated
+        </span>
+
+        <span className={`text-[11px] font-bold ${HEADING}`}>
+          {shipmentTracker.liveTracking?.lastUpdate
+            ? new Date(
+                shipmentTracker.liveTracking.lastUpdate
+              ).toLocaleString()
+            : shipmentTracker.updatedAt
+            ? new Date(
+                shipmentTracker.updatedAt
+              ).toLocaleString()
+            : "-"}
+        </span>
+
+      </div>
+
+
+      {/* ETA */}
+      <div>
+
+        <span className="text-[9px] text-slate-400 font-semibold block">
+          ETA
+        </span>
+
+        <span className={`text-[11px] font-bold ${HEADING}`}>
+          {shipmentTracker.eta
+            ? new Date(
+                shipmentTracker.eta
+              ).toLocaleDateString()
+            : "-"}
+        </span>
+
+      </div>
+
+    </div>
+
+
+    {/* TRACKING TIMELINE */}
+    <div className="flex items-center justify-between mt-4">
+
+      {shipmentTracker.trackingTimeline?.length > 0 ? (
+
+        shipmentTracker.trackingTimeline.map((item, i) => (
+
+          <div
+            key={i}
+            className="flex-1 flex flex-col items-center relative"
+          >
+
+            {i !== 0 && (
+              <div
+                className={`absolute top-2.5 right-1/2 w-full h-[2px] -z-10 ${
+                  item.current
+                    ? "bg-purple-500"
+                    : "bg-slate-200"
+                }`}
+              />
+            )}
+
+            <div
+              className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                item.current
+                  ? "bg-purple-600"
+                  : "bg-slate-200"
+              }`}
+            >
+              {item.current && (
+                <Check
+                  size={11}
+                  className="text-white"
+                />
+              )}
+            </div>
+
+            <span
+              className={`text-[8px] font-bold mt-1 text-center leading-tight ${
+                item.current
+                  ? "text-purple-600"
+                  : "text-slate-400"
+              }`}
+            >
+              {item.status || "-"}
+            </span>
+
+            <span className="text-[8px] text-slate-300">
+              {item.createdAt
+                ? new Date(
+                    item.createdAt
+                  ).toLocaleDateString()
+                : "-"}
+            </span>
+
+          </div>
+
+        ))
+
+      ) : (
+
+        <div className="w-full text-center">
+
+          <div className="flex items-center justify-center gap-2">
+
+            <div className="w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center">
+              <Check
+                size={11}
+                className="text-white"
+              />
+            </div>
+
+          </div>
+
+          <p className="text-[9px] font-bold text-purple-600 mt-1">
+            {shipmentTracker.shipmentStatus ||
+              shipmentTracker.status ||
+              "Pending"}
+          </p>
+
+          <p className="text-[8px] text-slate-300">
+            {shipmentTracker.updatedAt
+              ? new Date(
+                  shipmentTracker.updatedAt
+                ).toLocaleDateString()
+              : "-"}
+          </p>
+
+        </div>
+
+      )}
+
+    </div>
+
+  </>
+)}
+</SectionCard>
             <SectionCard>
               <div className="flex justify-between items-center mb-3">
                 <h3 className={`font-bold text-sm ${HEADING}`}>Shipment Status Overview</h3>
@@ -1017,26 +1319,6 @@ const bg =
               </div>
             </SectionCard>
 
-            {/* <SectionCard>
-              <div className="flex justify-between items-center mb-3">
-                <h3 className={`font-bold text-sm ${HEADING}`}>Top Destination Countries</h3>
-                <DropdownButton text="This Month"  onClick={() => setDateRange(true)} />
-              </div>
-              <div className="space-y-2.5">
-                {TOP_DESTINATIONS.map((c, i) => (
-                  <div key={i} className="text-[11px]">
-                    <div className="flex justify-between mb-1">
-                      <span className="font-semibold text-slate-700 flex items-center gap-1.5"><Flag country={c.country} /> {c.country}</span>
-                      <span className={`font-bold ${HEADING}`}>{c.value} <span className="text-slate-400 font-semibold">({c.percent})</span></span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-blue-500 h-full rounded-full" style={{ width: c.width }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </SectionCard> */}
-            
           <SectionCard>
             <div className="flex justify-between items-center mb-3">
               <h3 className={`font-bold text-sm ${HEADING}`}>Shipments by Mode</h3>
@@ -1072,27 +1354,6 @@ const bg =
             </div>
           </SectionCard>
 
-         {/* <SectionCard>
-            <div className="flex justify-between items-center mb-3">
-              <h3 className={`font-bold text-sm ${HEADING}`}>Top Origin Countries</h3>
-              <DropdownButton text="This Month"   onClick={() => setDateRange(true)}/>
-            </div>
-            <div className="space-y-2.5">
-              {/*TOP_ORIGINS.map((c, i) => (
-                <div key={i} className="text-[11px]">
-                  <div className="flex justify-between mb-1">
-                    <span className="font-semibold text-slate-700 flex items-center gap-1.5"><Flag country={c.country} /> {c.country}</span>
-                    <span className={`font-bold ${HEADING}`}>{c.value} <span className="text-slate-400 font-semibold">({c.percent})</span></span>
-                  </div>
-                  <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-blue-500 h-full rounded-full" style={{ width: c.width }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </SectionCard>*/}
-
-         
         </div>
 
           </div>
@@ -1141,9 +1402,15 @@ const bg =
             <ExportReport onClose={() => setExportReport(false)} />
           )}
 
-          {shipmentTracking && (
-              <ShipmentTrackingModal onClose={() => setShipmentTracking(false)} />
-            )}
+          {/* IMPORTANT: pass `open` explicitly - the modal returns null internally
+              if `open` is falsy, regardless of this conditional wrapper */}
+          {showTrackingModal && (
+            <ShipmentTrackingModal
+              open={showTrackingModal}
+              shipmentId={trackingShipmentId || trackingId}
+              onClose={() => setShowTrackingModal(false)}
+            />
+          )}
       
     </div>
   );
