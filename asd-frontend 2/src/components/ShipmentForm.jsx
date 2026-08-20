@@ -593,6 +593,7 @@ function Header({ setActiveTab, setShipment, handleSaveDraft, handleAnalyze, han
           <button
             type="button"
             onClick={() => {
+              // Cancel never saves anything - it just navigates away.
               setShipment("");
               setActiveTab(currentTab);
             }}
@@ -726,7 +727,17 @@ export default function Shipment({ setActiveTab, setShipment, currentTab, editId
     fetchHsCodes();
   }, []);
 
-  // ---- EDIT MODE: fetch existing shipment and prefill the form ----
+  // ---- Keep shipmentId in sync with the editId prop at all times. ----
+  // This is the critical fix: useState(editId || "") only runs on the very
+  // first render. If editId ever arrives late/changes, shipmentId would be
+  // stuck at "" forever and saveAllSteps() would wrongly create a NEW
+  // shipment instead of updating the one being edited.
+  useEffect(() => {
+    if (editId) {
+      setShipmentId(editId);
+    }
+  }, [editId]);
+
   // ---- EDIT MODE: fetch existing shipment and prefill the form ----
   useEffect(() => {
     if (!editId) return;
@@ -821,10 +832,12 @@ export default function Shipment({ setActiveTab, setShipment, currentTab, editId
           },
         });
 
+        // Belt-and-braces: also set it here (in addition to the sync
+        // effect above) right after prefill succeeds.
         setShipmentId(editId);
       } catch (err) {
         console.error("Failed to load shipment for edit:", err);
-        alert(err.response?.data?.message || "Failed to load shipment data for editing.");
+        alert(err.response?.data?.message || err.message || "Failed to load shipment data for editing.");
       } finally {
         setPrefillLoading(false);
       }
@@ -832,6 +845,7 @@ export default function Shipment({ setActiveTab, setShipment, currentTab, editId
 
     loadExisting();
   }, [editId]);
+
   const handleDirectChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -848,54 +862,62 @@ export default function Shipment({ setActiveTab, setShipment, currentTab, editId
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-const saveAllSteps = async () => {
-  let currentId = shipmentId;
+  const saveAllSteps = async () => {
+    let currentId = shipmentId || editId; // fall back to the prop directly, just in case
 
-  if (!currentId) {
-    // Edit mode me shipmentId missing hona ek bug hai —
-    // isse duplicate/naya shipment ban jaata, isliye yahan explicitly rok rahe hain.
-    if (isEdit) {
-      throw new Error(
-        "Shipment ID nahi mila edit mode me. Page reload karke dobara Edit try karein."
-      );
+    if (!currentId) {
+      // Edit mode me shipmentId missing hona ek bug hai -
+      // isse duplicate/naya shipment ban jaata, isliye yahan explicitly rok rahe hain.
+      if (isEdit) {
+        throw new Error(
+          "Shipment ID nahi mila edit mode me. Page reload karke dobara Edit try karein."
+        );
+      }
+
+      // Sirf tabhi naya shipment banega jab genuinely "+ Shipment" se aaya ho
+      const step1Res = await createShipment({
+        shipmentType: formData.shipmentType,
+        shipmentMode: formData.shipmentMode,
+        shipmentPurpose: formData.shipmentPurpose,
+        customerType: formData.customerType,
+        exporter: formData.exporter,
+      });
+
+      const resData = step1Res.data?.data || step1Res.data;
+      currentId = resData._id;
+      setShipmentId(currentId);
+      if (resData.referenceNumber) {
+        setReferenceNumber(resData.referenceNumber);
+      }
     }
 
-    // Sirf tabhi naya shipment banega jab genuinely "+ Shipment" se aaya ho
-    const step1Res = await createShipment({
-      shipmentType: formData.shipmentType,
-      shipmentMode: formData.shipmentMode,
-      shipmentPurpose: formData.shipmentPurpose,
-      customerType: formData.customerType,
-      exporter: formData.exporter,
+    await updateShipmentStep2(currentId, {
+      route: formData.route,
+      importer: formData.importer,
+      eta: formData.eta,
+      etd: formData.etd,
+      incoterm: formData.incoterm,
     });
 
-    const resData = step1Res.data?.data || step1Res.data;
-    currentId = resData._id;
-    setShipmentId(currentId);
-    if (resData.referenceNumber) {
-      setReferenceNumber(resData.referenceNumber);
-    }
-  }
+    // Clean cargo before sending: an empty hsCode ("") crashes Mongoose
+    // with "Cast to ObjectId failed" - only include it when it has a value.
+    const { hsCode, ...restCargo } = formData.cargo;
+    const cleanCargo = {
+      ...restCargo,
+      ...(hsCode ? { hsCode } : {}),
+    };
 
-  await updateShipmentStep2(currentId, {
-    route: formData.route,
-    importer: formData.importer,
-    eta: formData.eta,
-    etd: formData.etd,
-    incoterm: formData.incoterm,
-  });
+    await updateShipmentStep3(currentId, {
+      cargo: cleanCargo,
+      amount: formData.amount,
+      paymentTerms: formData.paymentTerms,
+      insuranceRequired: formData.insuranceRequired,
+      currency: formData.currency,
+      additionalInformation: formData.additionalInformation,
+    });
 
-  await updateShipmentStep3(currentId, {
-    cargo: formData.cargo,
-    amount: formData.amount,
-    paymentTerms: formData.paymentTerms,
-    insuranceRequired: formData.insuranceRequired,
-    currency: formData.currency,
-    additionalInformation: formData.additionalInformation,
-  });
-
-  return currentId;
-};
+    return currentId;
+  };
 
   const handleSaveDraft = async () => {
     setLoading(true);
@@ -904,9 +926,13 @@ const saveAllSteps = async () => {
       await saveDraft(id);
       setCurrentStatus("Draft");
       alert(isEdit ? "Shipment updated successfully!" : "Draft saved successfully!");
+
+      // Go back to the dashboard list so the updated/new shipment is visible
+      setShipment("");
+      setActiveTab(currentTab);
     } catch (err) {
       console.error("Save Draft Error:", err);
-      alert(err.response?.data?.message || "Failed to save.");
+      alert(err.response?.data?.message || err.message || "Failed to save.");
     } finally {
       setLoading(false);
     }
@@ -921,9 +947,10 @@ const saveAllSteps = async () => {
       setAnalysis(data);
       setCurrentStatus("AI Analyzed");
       alert("Shipment analyzed successfully!");
+      // Intentionally stay on the form so the user can see the AI Output section.
     } catch (err) {
       console.error("Analyze Error:", err);
-      alert(err.response?.data?.message || "Failed to analyze shipment.");
+      alert(err.response?.data?.message || err.message || "Failed to analyze shipment.");
     } finally {
       setLoading(false);
     }
@@ -936,9 +963,12 @@ const saveAllSteps = async () => {
       await submitShipment(id);
       setCurrentStatus("Submitted");
       alert("Shipment submitted to admin successfully!");
+
+      setShipment("");
+      setActiveTab(currentTab);
     } catch (err) {
       console.error("Submit Error:", err);
-      alert(err.response?.data?.message || "Failed to submit shipment.");
+      alert(err.response?.data?.message || err.message || "Failed to submit shipment.");
     } finally {
       setLoading(false);
     }
@@ -964,7 +994,7 @@ const saveAllSteps = async () => {
       alert("Uploaded Successfully");
     } catch (err) {
       console.log(err);
-      alert(err.response?.data?.message || "Upload Failed");
+      alert(err.response?.data?.message || err.message || "Upload Failed");
     }
   };
 

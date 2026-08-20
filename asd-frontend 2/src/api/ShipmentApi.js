@@ -102,3 +102,6 @@ export const assignCarrier = (id, data) => {
 export const addTrackingUpdate = (id, data) => {
   return API.post(`/shipments/${id}/tracking`, data);
 };
+
+export const getShipmentTracking = (id) =>
+  API.get(`/shipments/${id}/tracking`);
