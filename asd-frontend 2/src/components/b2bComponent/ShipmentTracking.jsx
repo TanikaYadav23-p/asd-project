@@ -11,7 +11,10 @@ import {
   Maximize2,
   Plane,
 } from "lucide-react";
-
+import { renderToStaticMarkup } from "react-dom/server";
+import { MapContainer, TileLayer, Marker, Polyline } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 const trackingSteps = [
   {
     title: "Shipment Planned",
@@ -191,62 +194,65 @@ function InfoRow({ label, value }) {
   );
 }
 
+const originPosition = [11.1085, 77.3411];
+const currentPosition = [24.4667, 58.5];
+const destinationPosition = [25.2048, 55.2708];
+
+const currentLocationIcon = L.divIcon({
+  html: renderToStaticMarkup(
+    <div className="flex flex-col items-center -translate-y-2">
+      <div className="bg-gray-900 rounded-full p-1.5 shadow-lg border-2 border-white">
+        <MapPin className="w-3.5 h-3.5 text-white" fill="white" />
+      </div>
+    </div>
+  ),
+  className: "",
+  iconSize: [28, 28],
+  iconAnchor: [14, 28],
+});
+
+const destinationIcon = L.divIcon({
+  html: renderToStaticMarkup(
+    <div className="w-3 h-3 rounded-full bg-red-500 ring-4 ring-red-200 border border-white" />
+  ),
+  className: "",
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+});
+
+const originIcon = L.divIcon({
+  html: renderToStaticMarkup(
+    <div className="w-3 h-3 rounded-full bg-emerald-500 ring-4 ring-emerald-200 border border-white" />
+  ),
+  className: "",
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+});
+
 function TrackingMap() {
   return (
-    <div className="relative w-full h-56 sm:h-72 md:h-80 rounded-lg overflow-hidden bg-[#eef3f7] border border-gray-100">
-      {/* sea */}
-      <div className="absolute inset-0 bg-[#dbeafe]" />
-
-      {/* landmass */}
-      <div className="absolute inset-0">
-        <div className="absolute top-[2%] left-[10%] w-[80%] h-[55%] bg-[#f2f4f6] rounded-[40%] rotate-[6deg]" />
-        <div className="absolute top-[40%] left-[15%] w-[65%] h-[55%] bg-[#f2f4f6] rounded-[35%] -rotate-3" />
-        <div className="absolute top-[55%] left-[55%] w-[45%] h-[45%] bg-[#f2f4f6] rounded-[30%] rotate-6" />
-      </div>
-
-      {/* country labels */}
-      {mapLabels.map((c) => (
-        <span
-          key={c.name}
-          className="hidden sm:inline-block absolute text-[8px] tracking-wide text-gray-400 font-medium select-none"
-          style={{ top: c.top, left: c.left }}
-        >
-          {c.name}
-        </span>
-      ))}
-
-      {/* flight path */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <line
-          x1="58"
-          y1="60"
-          x2="88"
-          y2="78"
-          stroke="#f97316"
-          strokeWidth="0.6"
-          strokeDasharray="2 2"
+    <div className="relative w-full h-56 sm:h-72 md:h-80 rounded-lg overflow-hidden border border-gray-100">
+      <MapContainer
+        center={currentPosition}
+        zoom={4}
+        scrollWheelZoom={false}
+        zoomControl={false}
+        className="w-full h-full"
+      >
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; OpenStreetMap contributors'
         />
-      </svg>
+        <Polyline
+          positions={[originPosition, currentPosition, destinationPosition]}
+          pathOptions={{ color: "#f97316", weight: 2, dashArray: "6 6" }}
+        />
+        <Marker position={originPosition} icon={originIcon} />
+        <Marker position={currentPosition} icon={currentLocationIcon} />
+        <Marker position={destinationPosition} icon={destinationIcon} />
+      </MapContainer>
 
-      {/* current location marker (Dubai) */}
-      <div className="absolute" style={{ top: "58%", left: "56%" }}>
-        <div className="relative flex flex-col items-center -translate-x-1/2 -translate-y-full">
-          <div className="bg-gray-900 text-white rounded-full p-1.5 shadow-lg">
-            <MapPin className="w-3.5 h-3.5" fill="white" />
-          </div>
-          <span className="mt-1 text-[9px] bg-white px-1.5 py-0.5 rounded shadow text-gray-700 whitespace-nowrap">
-            Dubai, UAE
-          </span>
-        </div>
-      </div>
-
-      {/* destination marker (India) */}
-      <div className="absolute" style={{ top: "76%", left: "88%" }}>
-        <div className="w-2.5 h-2.5 rounded-full bg-red-500 ring-4 ring-red-100" />
-        <span className="mt-1 text-[9px] text-gray-500 whitespace-nowrap block">Tirupur, India</span>
-      </div>
-
-      <button className="absolute top-3 right-3 bg-white rounded-md px-2 py-1.5 shadow text-gray-600 hover:bg-gray-50">
+      <button className="absolute top-3 right-3 z-[1000] bg-white rounded-md px-2 py-1.5 shadow text-gray-600 hover:bg-gray-50">
         <Maximize2 className="w-3.5 h-3.5" />
       </button>
     </div>
