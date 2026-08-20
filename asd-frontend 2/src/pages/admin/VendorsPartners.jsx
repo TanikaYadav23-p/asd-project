@@ -6,6 +6,11 @@ import {
 import {
   MoreVertical,
 } from "lucide-react";
+  
+  import {
+    FiEdit,
+  
+  } from "react-icons/fi";
 const typeOptions = ["All Types", "Shipping Partner", "Freight Forwarder", "Custom Broker", "Warehouse Partner"];
 const statusOptions = ["All Status", "Active", "Inactive"];
 
@@ -61,6 +66,20 @@ const initialVendors = Array.from({ length: 6 }, (_, i) => ({
   shipmentStatus: "In Transit",
   status: "Active",
   kyc: "Verified",
+  
+  gstNumber: "",
+  registrationNumber: "",
+  businessType: "",
+  yearOfEstablishment: "",
+  associatedWith: "",
+  verifiedOn: "",
+  verifiedBy: "",
+  nextReviewDate: "",
+  bankName: "",
+  accountHolder: "",
+  accountNumber: "",
+  ifscCode: "",
+  swiftCode: "",
 }));
 
 function AddVendorModal({ onClose, onAdd }) {
@@ -255,7 +274,8 @@ export default function VendorsPartners() {
   const [openMenu, setOpenMenu] = useState(null);
   const [kycVerify, setKycVerify] = useState(false)
   const [rejectKyc, setRejectKyc] = useState(false)
-
+  const [showDetail, setShowDetail] = useState(false)
+  const [showEdit, setShowEdit] = useState(false);
   const handleAdd = (vendor) => setVendors(prev => [vendor, ...prev]);
 
   const handleStatusChange = (id, newStatus) => {
@@ -279,9 +299,82 @@ export default function VendorsPartners() {
   }, []);
 
     // const [search, setSearch] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
+    const [editForm, setEditForm] = useState({});
 const [selectedVendor, setSelectedVendor] = useState(vendors[0]);
   // const filter = vendors.filter((v) => v.name.toLowerCase().includes(search.toLowerCase()));
 
+  const handleEditVendor = (vendor) => {
+  setSelectedVendor(vendor);
+
+  setEditForm({
+    companyName: vendor.companyName || "",
+    email: vendor.email || "",
+    phone: vendor.phone || "",
+    gstNumber: vendor.gstNumber || "",
+    registrationNumber: vendor.registrationNumber || "",
+    businessType: vendor.businessType || "",
+    yearOfEstablishment: vendor.yearOfEstablishment || "",
+    associatedWith: vendor.associatedWith || "",
+    kyc: vendor.kyc || "",
+    verifiedOn: vendor.verifiedOn || "",
+    verifiedBy: vendor.verifiedBy || "",
+    nextReviewDate: vendor.nextReviewDate || "",
+    bankName: vendor.bankName || "",
+    accountHolder: vendor.accountHolder || "",
+    accountNumber: vendor.accountNumber || "",
+    ifscCode: vendor.ifscCode || "",
+    swiftCode: vendor.swiftCode || "",
+  });
+
+  setShowDetail(true);
+};
+
+const handleSaveVendor = () => {
+  if (!selectedVendor) return;
+
+  const updatedVendor = {
+    ...selectedVendor,
+    ...editForm,
+  };
+
+  // Update vendors table data
+  setVendors((prevVendors) =>
+    prevVendors.map((vendor) =>
+      vendor.id === selectedVendor.id
+        ? updatedVendor
+        : vendor
+    )
+  );
+
+  // Update currently selected vendor
+  setSelectedVendor(updatedVendor);
+
+  // Close detail/edit section
+  setShowDetail(false);
+
+  console.log("Vendor updated:", updatedVendor);
+};
+
+const handleEditChange = (e) => {
+  const { name, value } = e.target;
+
+  setEditForm((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+
+useEffect(() => {
+  if (showDetail && selectedVendor) {
+    requestAnimationFrame(() => {
+      document.getElementById("users-section")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+  }
+}, [showDetail, selectedVendor]);
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
       {showModal && <AddVendorModal onClose={() => setShowModal(false)} onAdd={handleAdd} />}
@@ -418,8 +511,8 @@ const [selectedVendor, setSelectedVendor] = useState(vendors[0]);
                 <th className="text-left py-2 font-bold">Email</th>
                 <th className="text-left py-2 font-bold">Phone</th>
                 <th className="text-left py-2 font-bold">Location</th>
-                <th className="text-left py-2 font-bold">Subscription Plan</th>
-                <th className="text-left py-2 font-bold">Shipment Status</th>
+                <th className="text-left py-2 font-bold">Plan</th>
+                <th className="text-left py-2 font-bold">Shipment</th>
                 <th className="text-left py-2 font-bold">Status</th>
                 <th className="text-left py-2 font-bold">KYC</th>
                 <th className="text-right py-2 font-bold">Actions</th>
@@ -429,12 +522,10 @@ const [selectedVendor, setSelectedVendor] = useState(vendors[0]);
               {filtered.map((v, i) => (
                 <tr key={v.id} className="text-xs">
                   <td  onClick={() => {
-                     setSelectedVendor(v);
-                        document.getElementById("users-section")?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
-                      }} className="py-3 whitespace-nowrap cursor-pointer">
+                       setSelectedVendor(v);
+                       setShowDetail(true);
+                        setIsEditing(false);
+                      }} className="py-3 whitespace-nowrap cursor-pointer hover:underline">
                     <div className={`font-bold ${HEADING}`}>{v.companyName}</div>
                   </td>
                   <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.email}</td>
@@ -447,15 +538,28 @@ const [selectedVendor, setSelectedVendor] = useState(vendors[0]);
                   </td>
                   <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.kyc}</td>
                   <td className="py-3 text-right relative">
+                    <div className="flex items-center justify-end gap-2">
+                       <button  onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedVendor(v);
+                               handleEditVendor(v);
+                               setIsEditing(true);
+                            setShowEdit(true);
+                            setShowDetail(true);
+                            setOpenMenu(null);
+                          }} className="text-slate-600">
+                      <FiEdit />
+                     </button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setOpenMenu(openMenu === i ? null : i);
                       }}
-                      className="text-slate-400 hover:text-slate-600"
-                    >
+                      className="text-slate-600 "
+                    > 
                       <MoreVertical size={15} />
                     </button>
+                     </div>
                     {openMenu === i && (
                       <div
                         onClick={(e) => e.stopPropagation()}
@@ -511,13 +615,13 @@ const [selectedVendor, setSelectedVendor] = useState(vendors[0]);
       </div>
 
 
-      <div className="w-full max-w-7xl bg-white rounded-2xl border border-gray-200 p-5 sm:p-6"  id="users-section">
+     {/* {showDetail && ( <div className="w-full max-w-7xl bg-white rounded-2xl border border-gray-200 p-5 sm:p-6"  id="users-section">
         <div className="flex items-center justify-between mb-5">
           <div className="flex items-center gap-3">
             <p className="font-semibold text-gray-900">{selectedVendor.companyName}</p>
             <span className="text-xs font-medium text-green-600">Active</span>
           </div>
-          {/* <span className="text-sm font-medium text-green-600">Overview</span> */}
+          
           <div className="flex items-start justify-around gap-3">
             <button className="w-full whitespace-nowrap  py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-center  hover:bg-blue-100 transition-colors">Plan Change</button>
             <button className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-center hover:bg-blue-100 transition-colors">Actions</button>
@@ -529,12 +633,10 @@ const [selectedVendor, setSelectedVendor] = useState(vendors[0]);
             <p className="font-semibold text-gray-900 mb-2">Basic Information</p>
             <div className="space-y-1.5 text-gray-500">
               <p>Company Name <span className="block text-gray-900">{selectedVendor.companyName}</span></p>
-              {/* <p>Type <span className="block text-gray-900">{selectedVendor.type}</span></p> */}
+       
               <p>Email <span className="block text-blue-500 underline">{selectedVendor.email}</span></p>
               <p>Phone <span className="block text-gray-900">{selectedVendor.phone}</span></p>
-              {/* <p>Website <span className="block text-gray-900">1234567890</span></p> */}
-              {/* <p>Country <span className="block text-gray-900">{selectedVendor.location}</span></p> */}
-              {/* <p>Address <span className="block text-gray-900">123 Logistics Way, Los Angeles, CA 90001</span></p> */}
+            
             </div>
           </div>
           <div>
@@ -569,10 +671,559 @@ const [selectedVendor, setSelectedVendor] = useState(vendors[0]);
         </div>
 
       
-    </div>
+    </div>)} */}
+
+      
+    {showDetail && selectedVendor && (
+          <div
+            className="w-full max-w-7xl bg-white rounded-2xl border border-gray-200 p-5 sm:p-6"
+            id="users-section"
+          >
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div className="flex items-center gap-3">
+                <p className="font-semibold text-gray-900">
+                  {selectedVendor.companyName}
+                </p>
+
+                <span
+                  className={`text-xs font-medium ${
+                    selectedVendor.suspend
+                      ? "text-red-600"
+                      : "text-green-600"
+                  }`}
+                >
+                  {selectedVendor.suspend ? "Suspended" : "Active"}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {/* Edit button */}
+                {!isEditing && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="whitespace-nowrap py-1.5 px-3 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs hover:bg-blue-100 transition-colors"
+                  >
+                    Edit
+                  </button>
+                )}
+
+                {/* Save button */}
+                {/* {isEditing && (
+                  <button
+                    onClick={handleSaveVendor}
+                    className="whitespace-nowrap py-1.5 px-3 rounded-lg bg-blue-600 text-white font-medium text-xs hover:bg-blue-700 transition-colors"
+                  >
+                    Save Changes
+                  </button>
+                )} */}
+
+                {/* Cancel / Close */}
+                <button
+                  onClick={() => {
+                    setShowDetail(false);
+                    setIsEditing(false);
+                  }}
+                  className="whitespace-nowrap py-1.5 px-3 rounded-lg bg-gray-100 text-gray-600 font-medium text-xs hover:bg-gray-200 transition-colors"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+
+            {/* Main Details */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm mb-6">
+
+              {/* ================= BASIC INFORMATION ================= */}
+              <div>
+                <p className="font-semibold text-gray-900 mb-3">
+                  Basic Information
+                </p>
+
+                <div className="space-y-3">
+
+                  {/* Company Name */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Company Name
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.companyName || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            companyName: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.companyName || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Email - NEVER EDITABLE */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Email
+                    </label>
+
+                    <p className="text-blue-500 underline break-all">
+                      {selectedVendor.email || "-"}
+                    </p>
+                  </div>
+
+                  {/* Phone */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Phone
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.phone || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            phone: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.phone || "-"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* ================= BUSINESS INFORMATION ================= */}
+              <div>
+                <p className="font-semibold text-gray-900 mb-3">
+                  Business Information
+                </p>
+
+                <div className="space-y-3">
+
+                  {/* GST/VAT */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      GST/VAT Number
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.gstNumber || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            gstNumber: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.gstNumber || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Registration Number */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Registration Number
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.registrationNumber || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            registrationNumber: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.registrationNumber || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Business Type */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Business Type
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.businessType || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            businessType: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.businessType || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Year */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Year of Establishment
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="number"
+                        value={selectedVendor.yearOfEstablishment || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            yearOfEstablishment: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.yearOfEstablishment || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Associated With */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Associated With
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.associatedWith || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            associatedWith: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.associatedWith || "-"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* ================= KYC INFORMATION ================= */}
+              <div>
+                <p className="font-semibold text-gray-900 mb-3">
+                  KYC Status
+                </p>
+
+                <div className="space-y-3">
+
+                  {/* KYC */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      KYC Status
+                    </label>
+
+                    {isEditing ? (
+                      <select
+                        value={selectedVendor.kyc || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            kyc: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Verified">Verified</option>
+                        <option value="Rejected">Rejected</option>
+                      </select>
+                    ) : (
+                      <p
+                        className={
+                          selectedVendor.kyc === "Verified"
+                            ? "text-green-600"
+                            : "text-gray-900"
+                        }
+                      >
+                        {selectedVendor.kyc || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Verified On */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Verified On
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="date"
+                        value={selectedVendor.verifiedOn || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            verifiedOn: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.verifiedOn || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Verified By */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Verified By
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.verifiedBy || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            verifiedBy: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.verifiedBy || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Next Review */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Next Review Date
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="date"
+                        value={selectedVendor.nextReviewDate || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            nextReviewDate: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.nextReviewDate || "-"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* ================= BANK DETAILS ================= */}
+              <div>
+                <p className="font-semibold text-gray-900 mb-3">
+                  Bank Details
+                </p>
+
+                <div className="space-y-3">
+
+                  {/* Bank Name */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Bank Name
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.bankName || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            bankName: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.bankName || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Account Holder */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Account Holder
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.accountHolder || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            accountHolder: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.accountHolder || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Account Number */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      Account Number
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.accountNumber || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            accountNumber: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.accountNumber || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* IFSC */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      IFSC Code
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.ifscCode || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            ifscCode: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.ifscCode || "-"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* SWIFT */}
+                  <div>
+                    <label className="block text-gray-500 mb-1">
+                      SWIFT Code
+                    </label>
+
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        value={selectedVendor.swiftCode || ""}
+                        onChange={(e) =>
+                          setSelectedVendor({
+                            ...selectedVendor,
+                            swiftCode: e.target.value,
+                          })
+                        }
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    ) : (
+                      <p className="text-gray-900">
+                        {selectedVendor.swiftCode || "-"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Actions */}
+            {isEditing && (
+              <div className="flex justify-end gap-3 border-t pt-4">
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                  }}
+                  className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  onClick={handleSaveVendor}
+                  className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+
 
         {kycVerify && (<KYCVerificationModal onClose={() => setKycVerify(false)}/>)}
         {rejectKyc && (<RejectKYCModal onClose={() =>  setRejectKyc(false)}/>)}
+          
     </div>
   );
 }
