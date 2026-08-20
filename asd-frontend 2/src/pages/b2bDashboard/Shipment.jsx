@@ -193,6 +193,7 @@ const [appliedFilters, setAppliedFilters] = useState({
   startDate: null,
   endDate: null,
 });
+const [editShipmentId, setEditShipmentId] = useState(null);
   const fetchShipments = async () => {
   try {
     setLoading(true);
@@ -591,7 +592,7 @@ useEffect(() => {
             <button  onClick={() => {
               //  console.log("heelo")
                 setShipment("shipment")
-                  
+                  setEditShipmentId(null);
               }} className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl text-white shadow-xs transition whitespace-nowrap">
               <Plus size={14} />
               Shipment
@@ -806,16 +807,19 @@ useEffect(() => {
                       onClick={(e) => e.stopPropagation()}
                       className="absolute right-0 top-7 z-20 w-36 bg-white border border-gray-200 rounded-xl shadow-lg p-1.5 flex flex-col gap-1 text-left"
                     >
-                      <button
-  onClick={() => {
-    setViewShipmentId(s._id);
-    setShowShipmentView(true);
-    setOpenMenu(null);
-  }}
-  className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
->
-  View
-</button>
+                      {s.shipmentStatus === "Draft" && (
+      <button
+        onClick={() => {
+          setViewShipmentId(s._id);
+          setShowShipmentView(true);
+          setOpenMenu(null);
+        }}
+        className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
+      >
+        View
+      </button>
+    )}
+
 
 <button
   onClick={(e) => {
@@ -1060,13 +1064,13 @@ const bg =
             </div>
           </SectionCard>
 
-          <SectionCard>
+         {/* <SectionCard>
             <div className="flex justify-between items-center mb-3">
               <h3 className={`font-bold text-sm ${HEADING}`}>Top Origin Countries</h3>
               <DropdownButton text="This Month"   onClick={() => setDateRange(true)}/>
             </div>
             <div className="space-y-2.5">
-              {TOP_ORIGINS.map((c, i) => (
+              {/*TOP_ORIGINS.map((c, i) => (
                 <div key={i} className="text-[11px]">
                   <div className="flex justify-between mb-1">
                     <span className="font-semibold text-slate-700 flex items-center gap-1.5"><Flag country={c.country} /> {c.country}</span>
@@ -1078,7 +1082,7 @@ const bg =
                 </div>
               ))}
             </div>
-          </SectionCard>
+          </SectionCard>*/}
 
          
         </div>
@@ -1091,7 +1095,7 @@ const bg =
  
  
         {shipment === "shipment" && (
-            <ShipmentForm setActiveTab={setActiveTab} setShipment={setShipment} currentTab={"Shipments"} />
+            <ShipmentForm setActiveTab={setActiveTab} setShipment={setShipment} currentTab={"Shipments"} editId={editShipmentId} />
           )}
       
       {showQuotation && selectedShipment && (
@@ -1110,8 +1114,11 @@ const bg =
       setShowShipmentView(false);
       setViewShipmentId(null);
     }}
-    onEdit={(shipment) => {
-      console.log("Edit shipment:", shipment);
+    onEdit={() => {
+      setEditShipmentId(viewShipmentId);
+      setShowShipmentView(false);
+      setViewShipmentId(null);
+      setShipment("shipment");
     }}
   />
 )}

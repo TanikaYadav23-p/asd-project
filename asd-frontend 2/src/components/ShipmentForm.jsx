@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FiChevronDown,
   FiFileText,
@@ -25,9 +25,9 @@ import {
   analyzeShipment,
   submitShipment,
   getHSCodes,
-  uploadShipmentDocument
+  uploadShipmentDocument,
+  getShipmentDetails,
 } from "../services/shipmentApi";
-import { CloudCog } from "lucide-react";
 
 function Label({ children, required = true }) {
   return (
@@ -158,11 +158,7 @@ function SectionCard({ number, title, subtitle, children }) {
         </span>
         <h3 className="text-[15px] font-bold text-slate-900 tracking-tight">{title}</h3>
       </div>
-      {subtitle && (
-        <p className="text-xs text-slate-500 mt-1 ml-9">
-          {subtitle}
-        </p>
-      )}
+      {subtitle && <p className="text-xs text-slate-500 mt-1 ml-9">{subtitle}</p>}
       <div className="mt-5 space-y-4">{children}</div>
     </section>
   );
@@ -179,11 +175,7 @@ const docTypes = [
   { label: "Other Documents", icon: FiFolder, color: "text-gray-500 bg-gray-100" },
 ];
 
-function DocumentsUpload({
-  uploadedDocs,
-  handleDocumentUpload,
-  fileInputRef
-  }){
+function DocumentsUpload({ uploadedDocs, handleDocumentUpload, fileInputRef }) {
   return (
     <SectionCard number={5} title="Documents Upload" subtitle="Upload all relevant documents">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -194,9 +186,7 @@ function DocumentsUpload({
               key={d.label}
               className="border border-slate-200 bg-slate-50/50 items-center rounded-xl p-2.5 text-center hover:bg-white hover:border-blue-200 transition-colors"
             >
-              <div
-                className={`w-9 h-9 rounded-xl mx-auto flex items-center justify-center ${d.color}`}
-              >
+              <div className={`w-9 h-9 rounded-xl mx-auto flex items-center justify-center ${d.color}`}>
                 <Icon size={14} />
               </div>
               <div>
@@ -204,34 +194,25 @@ function DocumentsUpload({
                   {d.label}
                 </p>
                 <>
-<input
-  type="file"
-  hidden
-  ref={(el)=>fileInputRef.current[d.label]=el}
-  onChange={(e)=>{
-      if(e.target.files.length){
-          handleDocumentUpload(
-             d.label,
-             e.target.files[0]
-          );
-      }
-  }}
-/>
+                  <input
+                    type="file"
+                    hidden
+                    ref={(el) => (fileInputRef.current[d.label] = el)}
+                    onChange={(e) => {
+                      if (e.target.files.length) {
+                        handleDocumentUpload(d.label, e.target.files[0]);
+                      }
+                    }}
+                  />
 
-<button
-type="button"
-onClick={()=>
-fileInputRef.current[d.label].click()
-}
-className="text-[10px] text-blue-600 font-semibold mt-1"
->
-
-{uploadedDocs[d.label]
-? "Uploaded ✔"
-: "Upload"}
-
-</button>
-</>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current[d.label].click()}
+                    className="text-[10px] text-blue-600 font-semibold mt-1"
+                  >
+                    {uploadedDocs[d.label] ? "Uploaded ✔" : "Upload"}
+                  </button>
+                </>
               </div>
             </div>
           );
@@ -273,11 +254,7 @@ function AIOutputAnalysis({ analysis }) {
         {aiBottomStats.map((s) => (
           <div key={s.label} className="rounded-xl p-3 bg-slate-50 border border-slate-100">
             <p className="text-sm xl:text-[10px] text-gray-500">{s.label}</p>
-            <p
-              className={`text-sm xl:text-[10px] font-bold mt-0.5 ${
-                s.green ? "text-green-600" : "text-gray-900"
-              }`}
-            >
+            <p className={`text-sm xl:text-[10px] font-bold mt-0.5 ${s.green ? "text-green-600" : "text-gray-900"}`}>
               {s.value}
             </p>
             {s.sub && <p className="text-xs xl:text-[10px] text-gray-400">{s.sub}</p>}
@@ -296,36 +273,18 @@ function BasicShipmentDetails({ formData, handleDirectChange, handleNestedChange
   return (
     <SectionCard number={1} title="Basic Shipment Details">
       <Grid2>
-        <Select
-          label="Shipment Type"
-          placeholder="Select Type"
-          name="shipmentType"
-          value={formData.shipmentType}
-          onChange={handleDirectChange}
-        >
+        <Select label="Shipment Type" placeholder="Select Type" name="shipmentType" value={formData.shipmentType} onChange={handleDirectChange}>
           <option value="Export">Export</option>
           <option value="Import">Import</option>
         </Select>
-        <Select
-          label="Shipment Mode"
-          placeholder="Select Mode"
-          name="shipmentMode"
-          value={formData.shipmentMode}
-          onChange={handleDirectChange}
-        >
+        <Select label="Shipment Mode" placeholder="Select Mode" name="shipmentMode" value={formData.shipmentMode} onChange={handleDirectChange}>
           <option value="Air">Air</option>
           <option value="Sea">Sea</option>
           <option value="Road">Road</option>
         </Select>
       </Grid2>
       <Grid2>
-        <Select
-          label="Shipment Purpose"
-          placeholder="Select Purpose"
-          name="shipmentPurpose"
-          value={formData.shipmentPurpose}
-          onChange={handleDirectChange}
-        >
+        <Select label="Shipment Purpose" placeholder="Select Purpose" name="shipmentPurpose" value={formData.shipmentPurpose} onChange={handleDirectChange}>
           <option value="Commercial">Commercial</option>
           <option value="Sample">Sample</option>
           <option value="Personal">Personal</option>
@@ -416,12 +375,7 @@ function OriginDestination({ formData, handleDirectChange, handleNestedChange })
           <option value="CIF">CIF</option>
           <option value="EXW">EXW</option>
         </Select>
-        <DateInput
-          label="Expected Shipment Date"
-          name="etd"
-          value={formData.etd}
-          onChange={handleDirectChange}
-        />
+        <DateInput label="Expected Shipment Date" name="etd" value={formData.etd} onChange={handleDirectChange} />
       </Grid2>
     </SectionCard>
   );
@@ -431,103 +385,43 @@ function InvoiceValue({ formData, handleDirectChange, handleRadioChange }) {
   return (
     <SectionCard number={3} title="Invoice & Value">
       <Grid2>
-        <Input
-          label="Invoice Value"
-          placeholder="Enter invoice value"
-          name="amount"
-          value={formData.amount}
-          onChange={handleDirectChange}
-        />
-        <Select
-          label="Currency"
-          placeholder="Select currency"
-          name="currency"
-          value={formData.currency}
-          onChange={handleDirectChange}
-        >
+        <Input label="Invoice Value" placeholder="Enter invoice value" name="amount" value={formData.amount} onChange={handleDirectChange} />
+        <Select label="Currency" placeholder="Select currency" name="currency" value={formData.currency} onChange={handleDirectChange}>
           <option value="USD">USD</option>
           <option value="INR">INR</option>
           <option value="EUR">EUR</option>
         </Select>
       </Grid2>
-      <Select
-        label="Payment Terms"
-        placeholder="Select payment terms"
-        name="paymentTerms"
-        value={formData.paymentTerms}
-        onChange={handleDirectChange}
-      >
+      <Select label="Payment Terms" placeholder="Select payment terms" name="paymentTerms" value={formData.paymentTerms} onChange={handleDirectChange}>
         <option value="Advance">Advance</option>
         <option value="LC">Letter of Credit (LC)</option>
         <option value="Net 30">Net 30</option>
       </Select>
-      <RadioGroup
-        label="Insurance Required"
-        name="insuranceRequired"
-        value={formData.insuranceRequired}
-        onChange={handleRadioChange}
-      />
-      <RadioGroup
-        label="Export Incentive"
-        name="exportIncentive"
-        value={formData.exportIncentive}
-        onChange={handleRadioChange}
-      />
+      <RadioGroup label="Insurance Required" name="insuranceRequired" value={formData.insuranceRequired} onChange={handleRadioChange} />
+      <RadioGroup label="Export Incentive" name="exportIncentive" value={formData.exportIncentive} onChange={handleRadioChange} />
     </SectionCard>
   );
 }
 
-function ProductDetails({
-  formData,
-  handleNestedChange,
-  handleRadioChange,
-  hsCodes,
-}) {
+function ProductDetails({ formData, handleNestedChange, handleRadioChange, hsCodes }) {
   const cargo = formData.cargo;
 
   const updateDimension = (key, value) => {
-    handleNestedChange("cargo", "dimensions", {
-      ...cargo.dimensions,
-      [key]: value,
-    });
+    handleNestedChange("cargo", "dimensions", { ...cargo.dimensions, [key]: value });
   };
 
   return (
     <SectionCard number={4} title="Product Details">
       <div className="space-y-5">
-        {/* Row 1 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div className="min-w-0">
-            <Input
-              label="Product Details"
-              placeholder="Enter product name"
-              value={cargo.productName}
-              onChange={(e) =>
-                handleNestedChange("cargo", "productName", e.target.value)
-              }
-            />
+            <Input label="Product Details" placeholder="Enter product name" value={cargo.productName} onChange={(e) => handleNestedChange("cargo", "productName", e.target.value)} />
           </div>
-
           <div className="min-w-0">
-            <Input
-              label="Product Description"
-              placeholder="Enter product description"
-              value={cargo.productDescription}
-              onChange={(e) =>
-                handleNestedChange("cargo", "productDescription", e.target.value)
-              }
-            />
+            <Input label="Product Description" placeholder="Enter product description" value={cargo.productDescription} onChange={(e) => handleNestedChange("cargo", "productDescription", e.target.value)} />
           </div>
-
           <div className="min-w-0">
-            <Select
-              label="HS Code"
-              placeholder="Select HS Code"
-              value={cargo.hsCode}
-              onChange={(e) =>
-                handleNestedChange("cargo", "hsCode", e.target.value)
-              }
-            >
+            <Select label="HS Code" placeholder="Select HS Code" value={cargo.hsCode} onChange={(e) => handleNestedChange("cargo", "hsCode", e.target.value)}>
               {hsCodes.map((item) => (
                 <option key={item._id} value={item._id}>
                   {item.hsCode}
@@ -535,16 +429,8 @@ function ProductDetails({
               ))}
             </Select>
           </div>
-
           <div className="min-w-0">
-            <Select
-              label="Product Category"
-              placeholder="Select category"
-              value={cargo.category}
-              onChange={(e) =>
-                handleNestedChange("cargo", "category", e.target.value)
-              }
-            >
+            <Select label="Product Category" placeholder="Select category" value={cargo.category} onChange={(e) => handleNestedChange("cargo", "category", e.target.value)}>
               <option value="Electronics">Electronics</option>
               <option value="Textiles">Textiles</option>
               <option value="General">General Cargo</option>
@@ -552,291 +438,89 @@ function ProductDetails({
           </div>
         </div>
 
-        {/* Row 2 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div className="min-w-0">
-            <Input
-              label="Quantity"
-              placeholder="Enter quantity"
-              value={cargo.quantity}
-              onChange={(e) =>
-                handleNestedChange("cargo", "quantity", e.target.value)
-              }
-            />
+            <Input label="Quantity" placeholder="Enter quantity" value={cargo.quantity} onChange={(e) => handleNestedChange("cargo", "quantity", e.target.value)} />
           </div>
-
           <div className="min-w-0">
-            <Select
-              label="Unit"
-              placeholder="Select unit"
-              value={cargo.unit}
-              onChange={(e) =>
-                handleNestedChange("cargo", "unit", e.target.value)
-              }
-            >
+            <Select label="Unit" placeholder="Select unit" value={cargo.unit} onChange={(e) => handleNestedChange("cargo", "unit", e.target.value)}>
               <option value="PCS">PCS</option>
               <option value="KG">KG</option>
               <option value="BOX">BOX</option>
             </Select>
           </div>
-
           <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
-            <RadioGroup
-              label="Dangerous Goods (DG)"
-              name="isDangerous"
-              value={cargo.isDangerous}
-              onChange={(name, val) => handleNestedChange("cargo", name, val)}
-            />
+            <RadioGroup label="Dangerous Goods (DG)" name="isDangerous" value={cargo.isDangerous} onChange={(name, val) => handleNestedChange("cargo", name, val)} />
           </div>
-
           <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
-            <RadioGroup
-              label="Temperature Controlled"
-              name="isTemperatureControlled"
-              value={cargo.isTemperatureControlled}
-              onChange={(name, val) => handleNestedChange("cargo", name, val)}
-            />
+            <RadioGroup label="Temperature Controlled" name="isTemperatureControlled" value={cargo.isTemperatureControlled} onChange={(name, val) => handleNestedChange("cargo", name, val)} />
           </div>
         </div>
 
-        {/* Row 3 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div className="min-w-0">
-            <Input
-              label="Net Weight (Kg)"
-              placeholder="Enter net weight"
-              value={cargo.weight}
-              onChange={(e) =>
-                handleNestedChange("cargo", "weight", e.target.value)
-              }
-            />
+            <Input label="Net Weight (Kg)" placeholder="Enter net weight" value={cargo.weight} onChange={(e) => handleNestedChange("cargo", "weight", e.target.value)} />
           </div>
-
           <div className="min-w-0">
-            <Input
-              label="Gross Weight (Kg)"
-              placeholder="Enter gross weight"
-              value={cargo.grossWeight}
-              onChange={(e) =>
-                handleNestedChange("cargo", "grossWeight", e.target.value)
-              }
-            />
+            <Input label="Gross Weight (Kg)" placeholder="Enter gross weight" value={cargo.grossWeight} onChange={(e) => handleNestedChange("cargo", "grossWeight", e.target.value)} />
           </div>
-
           <div className="xl:col-span-2 min-w-0">
             <Label>Dimensions (L × W × H)</Label>
             <div className="grid grid-cols-[1fr_1fr_1fr_82px] gap-2 mt-1.5">
-              <input
-                type="text"
-                placeholder="Length"
-                value={cargo.dimensions?.length || ""}
-                onChange={(e) => updateDimension("length", e.target.value)}
-                className="min-w-0 w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 placeholder-slate-400 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-              />
-              <input
-                type="text"
-                placeholder="Width"
-                value={cargo.dimensions?.width || ""}
-                onChange={(e) => updateDimension("width", e.target.value)}
-                className="min-w-0 w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 placeholder-slate-400 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-              />
-              <input
-                type="text"
-                placeholder="Height"
-                value={cargo.dimensions?.height || ""}
-                onChange={(e) => updateDimension("height", e.target.value)}
-                className="min-w-0 w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 placeholder-slate-400 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-              />
+              <input type="text" placeholder="Length" value={cargo.dimensions?.length || ""} onChange={(e) => updateDimension("length", e.target.value)} className="min-w-0 w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 placeholder-slate-400 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" />
+              <input type="text" placeholder="Width" value={cargo.dimensions?.width || ""} onChange={(e) => updateDimension("width", e.target.value)} className="min-w-0 w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 placeholder-slate-400 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" />
+              <input type="text" placeholder="Height" value={cargo.dimensions?.height || ""} onChange={(e) => updateDimension("height", e.target.value)} className="min-w-0 w-full h-10 border border-slate-200 rounded-xl px-3 text-sm text-slate-700 placeholder-slate-400 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10" />
               <div className="relative min-w-0">
-                <select
-                  value={cargo.dimensions?.unit || "CM"}
-                  onChange={(e) => updateDimension("unit", e.target.value)}
-                  className="w-full h-10 appearance-none border border-slate-200 rounded-xl px-3 pr-7 text-sm text-slate-700 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10"
-                >
+                <select value={cargo.dimensions?.unit || "CM"} onChange={(e) => updateDimension("unit", e.target.value)} className="w-full h-10 appearance-none border border-slate-200 rounded-xl px-3 pr-7 text-sm text-slate-700 bg-white shadow-sm focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
                   <option value="CM">CM</option>
                   <option value="INCH">INCH</option>
                 </select>
-                <FiChevronDown
-                  size={13}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-                />
+                <FiChevronDown size={13} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Row 4 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div className="min-w-0">
-            <Input
-              label="Volumetric Weight"
-              placeholder="Auto Calculate"
-              value={cargo.volumetricWeight}
-              onChange={(e) =>
-                handleNestedChange("cargo", "volumetricWeight", e.target.value)
-              }
-            />
+            <Input label="Volumetric Weight" placeholder="Auto Calculate" value={cargo.volumetricWeight} onChange={(e) => handleNestedChange("cargo", "volumetricWeight", e.target.value)} />
           </div>
-
           <div className="min-w-0">
-            <Input
-              label="No. of Packages"
-              placeholder="Enter number"
-              value={cargo.packages}
-              onChange={(e) =>
-                handleNestedChange("cargo", "packages", e.target.value)
-              }
-            />
+            <Input label="No. of Packages" placeholder="Enter number" value={cargo.packages} onChange={(e) => handleNestedChange("cargo", "packages", e.target.value)} />
           </div>
-
           <div className="min-w-0">
-            <Select
-              label="Packing Type"
-              placeholder="Select type"
-              value={cargo.packingType}
-              onChange={(e) =>
-                handleNestedChange("cargo", "packingType", e.target.value)
-              }
-            >
+            <Select label="Packing Type" placeholder="Select type" value={cargo.packingType} onChange={(e) => handleNestedChange("cargo", "packingType", e.target.value)}>
               <option value="Carton">Carton</option>
               <option value="Pallet">Pallet</option>
               <option value="Wooden Crate">Wooden Crate</option>
             </Select>
           </div>
-
           <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
-            <RadioGroup
-              label="Stackable"
-              name="isStackable"
-              value={cargo.isStackable}
-              onChange={(name, val) => handleNestedChange("cargo", name, val)}
-            />
+            <RadioGroup label="Stackable" name="isStackable" value={cargo.isStackable} onChange={(name, val) => handleNestedChange("cargo", name, val)} />
           </div>
         </div>
 
-        {/* Row 5 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
-            <RadioGroup
-              label="Fragile"
-              name="isFragile"
-              value={cargo.isFragile}
-              onChange={(name, val) => handleNestedChange("cargo", name, val)}
-            />
+            <RadioGroup label="Fragile" name="isFragile" value={cargo.isFragile} onChange={(name, val) => handleNestedChange("cargo", name, val)} />
           </div>
-
           <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
-            <RadioGroup
-              label="Battery Included"
-              name="hasBattery"
-              value={cargo.hasBattery}
-              onChange={(name, val) => handleNestedChange("cargo", name, val)}
-            />
+            <RadioGroup label="Battery Included" name="hasBattery" value={cargo.hasBattery} onChange={(name, val) => handleNestedChange("cargo", name, val)} />
           </div>
-
           <div className="min-w-0 rounded-xl bg-slate-50/70 border border-slate-100 px-3 py-2.5">
-            <RadioGroup
-              label="Lithium Battery"
-              name="isLithium"
-              value={cargo.isLithium}
-              onChange={(name, val) => handleNestedChange("cargo", name, val)}
-            />
+            <RadioGroup label="Lithium Battery" name="isLithium" value={cargo.isLithium} onChange={(name, val) => handleNestedChange("cargo", name, val)} />
           </div>
-
           <div className="min-w-0" />
         </div>
 
-        {/* Optional fields */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 pt-1 border-t border-slate-100">
-          <Input
-            label="UN Number (if DG)"
-            placeholder="Enter UN number"
-            required={false}
-            value={cargo.unNumber}
-            onChange={(e) =>
-              handleNestedChange("cargo", "unNumber", e.target.value)
-            }
-          />
-          <Input
-            label="Package Marks & Numbers"
-            placeholder="Enter marks & numbers"
-            required={false}
-            value={cargo.packageMarks}
-            onChange={(e) =>
-              handleNestedChange("cargo", "packageMarks", e.target.value)
-            }
-          />
+          <Input label="UN Number (if DG)" placeholder="Enter UN number" required={false} value={cargo.unNumber} onChange={(e) => handleNestedChange("cargo", "unNumber", e.target.value)} />
+          <Input label="Package Marks & Numbers" placeholder="Enter marks & numbers" required={false} value={cargo.packageMarks} onChange={(e) => handleNestedChange("cargo", "packageMarks", e.target.value)} />
         </div>
       </div>
     </SectionCard>
   );
 }
-{/*
-function DimensionsCard({ calculatedMetrics }) {
-  const dimensionRows = [
-    { label: "Volume (CBM)", value: calculatedMetrics?.cbm ? `${calculatedMetrics.cbm} CBM` : "--" },
-    { label: "Volumetric Weight (Air)", value: calculatedMetrics?.volumetricWeight ? `${calculatedMetrics.volumetricWeight} Kg` : "--" },
-    { label: "CBM (Sea)", value: calculatedMetrics?.cbm ? `${calculatedMetrics.cbm} CBM` : "--" },
-    { label: "Chargeable Weight", value: calculatedMetrics?.chargeableWeight ? `${calculatedMetrics.chargeableWeight} Kg` : "--" },
-  ];
-
-  return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-      <p className="text-xs text-gray-400 mb-3">Based on dimensions & packages</p>
-      <div className="space-y-2.5">
-        {dimensionRows.map((r) => (
-          <div key={r.label} className="flex items-center justify-between">
-            <span className="text-xs text-slate-400">{r.label}</span>
-            <span className="text-xs font-bold text-gray-900">{r.value}</span>
-          </div>
-        ))}
-        <div className="flex items-center justify-between border-t border-gray-100 pt-2.5">
-          <span className="text-xs text-gray-500">Estimated Freight Cost</span>
-          <span className="text-xs font-bold text-teal-600">
-            {calculatedMetrics?.estimatedFreight ? `₹ ${calculatedMetrics.estimatedFreight}` : "--"}
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatusFlowCard({ currentStatus = "Draft" }) {
-  const statusFlow = [
-    { label: "Draft", sub: "Saved as draft", icon: FiFileText, color: currentStatus === "Draft" ? "text-blue-600 bg-blue-50" : "text-gray-500 bg-gray-100" },
-    { label: "AI Analyzed", sub: "Pending analysis", icon: FiZap, color: currentStatus === "AI Analyzed" ? "text-blue-600 bg-blue-50" : "text-gray-500 bg-gray-100" },
-    { label: "Submitted", sub: "Pending submission", icon: FiUploadCloud, color: currentStatus === "Submitted" ? "text-blue-600 bg-blue-50" : "text-gray-500 bg-gray-100" },
-    { label: "Admin Review", sub: "Pending review", icon: FiEye, color: "text-gray-500 bg-gray-100" },
-    { label: "Quotation Sent", sub: "Pending", icon: FiSend, color: "text-gray-500 bg-gray-100" },
-    { label: "Accepted", sub: "Pending", icon: FiCheckCircle, color: "text-gray-500 bg-gray-100" },
-    { label: "Shipment Active", sub: "Pending", icon: FiTruck, color: "text-gray-500 bg-gray-100" },
-    { label: "Completed", sub: "Completed", icon: FiCheckCircle, color: "text-gray-500 bg-gray-100" },
-  ];
-
-  return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-      <h3 className="text-sm font-bold text-gray-900 mb-3">Status Flow</h3>
-      <div className="space-y-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-1">
-        {statusFlow.map((s) => {
-          const Icon = s.icon;
-          return (
-            <div key={s.label} className="flex items-center gap-2.5">
-              <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${s.color}`}
-              >
-                <Icon size={13} />
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-gray-900">{s.label}</p>
-                <p className="text-xs text-gray-400">{s.sub}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}*/}
 
 const quickTips = [
   "Fill all mandatory fields marked with *",
@@ -861,32 +545,24 @@ function QuickTipsCard() {
   );
 }
 
-function Header({
-  setActiveTab,
-  setShipment,
-  handleSaveDraft,
-  handleAnalyze,
-  handleSubmit,
-  loading,
-  currentTab
-}) {
-      // console.log("he", currentTab)
+function Header({ setActiveTab, setShipment, handleSaveDraft, handleAnalyze, handleSubmit, loading, currentTab, isEdit }) {
   return (
     <div>
       <p className="text-xs text-gray-500">
         Dashboard <span className="mx-1 text-gray-300">›</span> Shipment Operations{" "}
         <span className="mx-1 text-gray-300">›</span> My Shipments{" "}
         <span className="mx-1 text-gray-300">›</span>
-        <span className="text-slate-600 font-semibold">New Shipment</span>
+        <span className="text-slate-600 font-semibold">{isEdit ? "Edit Shipment" : "New Shipment"}</span>
       </p>
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 mt-2">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            New Shipment Form
+            {isEdit ? "Edit Shipment" : "New Shipment Form"}
           </h1>
           <p className="text-sm text-slate-500 mt-1.5">
-            Enter shipment details to generate HS code, freight estimate,
-            document checklist and risk score.
+            {isEdit
+              ? "Update shipment details below and save your changes."
+              : "Enter shipment details to generate HS code, freight estimate, document checklist and risk score."}
           </p>
         </div>
         <div className="flex flex-wrap gap-2 shrink-0">
@@ -896,7 +572,7 @@ function Header({
             disabled={loading}
             className="h-10 border border-slate-200 bg-white text-slate-700 text-sm font-semibold px-4 rounded-xl shadow-sm hover:bg-slate-50 hover:border-slate-300 transition disabled:opacity-50"
           >
-            Save Draft
+            {isEdit ? "Save Changes" : "Save Draft"}
           </button>
           <button
             type="button"
@@ -917,7 +593,7 @@ function Header({
           <button
             type="button"
             onClick={() => {
-           setShipment("");
+              setShipment("");
               setActiveTab(currentTab);
             }}
             className="h-10 border border-red-200 text-red-600 bg-white text-sm font-semibold px-4 rounded-xl hover:bg-red-50 transition"
@@ -943,17 +619,100 @@ function Footer() {
   );
 }
 
-export default function Shipment({ setActiveTab, setShipment, currentTab }) {
-  const [shipmentId, setShipmentId] = useState("");
+// -------- helpers for prefilling from an unpredictable API shape --------
+const pickVal = (...candidates) => {
+  for (const c of candidates) {
+    if (c !== undefined && c !== null && c !== "") return c;
+  }
+  return undefined;
+};
+
+const formatDateForInput = (value) => {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toISOString().split("T")[0];
+};
+
+const emptyFormData = {
+  shipmentType: "",
+  shipmentMode: "",
+  shipmentPurpose: "",
+  customerType: "Individual",
+  exporter: {
+    companyName: "",
+    contactPerson: "",
+  },
+  route: {
+    originCountry: "",
+    originCity: "",
+    destinationCountry: "",
+    destinationCity: "",
+  },
+  importer: {
+    companyName: "",
+    address: "",
+  },
+  incoterm: "",
+  etd: "",
+  eta: "",
+  cargo: {
+    productName: "",
+    productDescription: "",
+    hsCode: "",
+    category: "",
+    quantity: "",
+    unit: "",
+    weight: "",
+    grossWeight: "",
+    volumetricWeight: "",
+    packages: "",
+    packingType: "",
+    unNumber: "",
+    packageMarks: "",
+    isDangerous: false,
+    isTemperatureControlled: false,
+    isStackable: false,
+    isFragile: false,
+    hasBattery: false,
+    isLithium: false,
+    dimensions: {
+      length: "",
+      width: "",
+      height: "",
+      unit: "CM",
+    },
+  },
+  amount: "",
+  currency: "",
+  paymentTerms: "",
+  insuranceRequired: false,
+  exportIncentive: false,
+  additionalInformation: {
+    packagingType: "",
+    packages: 0,
+    marksNumbers: "",
+    dangerousGoods: false,
+    specialHandling: false,
+    temperatureControl: false,
+  },
+};
+
+export default function Shipment({ setActiveTab, setShipment, currentTab, editId }) {
+  const isEdit = Boolean(editId);
+
+  const [shipmentId, setShipmentId] = useState(editId || "");
   const [referenceNumber, setReferenceNumber] = useState("");
   const [currentStatus, setCurrentStatus] = useState("Draft");
   const [loading, setLoading] = useState(false);
+  const [prefillLoading, setPrefillLoading] = useState(isEdit);
   const [hsCodes, setHsCodes] = useState([]);
   const [analysis, setAnalysis] = useState(null);
   const [uploadedDocs, setUploadedDocs] = useState({});
   const fileInputRef = useRef({});
 
- console.log("dd", currentTab)
+  const [formData, setFormData] = useState(emptyFormData);
+
   const fetchHsCodes = async () => {
     try {
       const res = await getHSCodes();
@@ -963,144 +722,180 @@ export default function Shipment({ setActiveTab, setShipment, currentTab }) {
     }
   };
 
-
   useEffect(() => {
     fetchHsCodes();
   }, []);
 
-  const [formData, setFormData] = useState({
-    // Step 1
-    shipmentType: "",
-    shipmentMode: "",
-    shipmentPurpose: "",
-    customerType: "Individual",
-    exporter: {
-      companyName: "",
-      contactPerson: "",
-    },
+  // ---- EDIT MODE: fetch existing shipment and prefill the form ----
+  // ---- EDIT MODE: fetch existing shipment and prefill the form ----
+  useEffect(() => {
+    if (!editId) return;
 
-    // Step 2
-    route: {
-      originCountry: "",
-      originCity: "",
-      destinationCountry: "",
-      destinationCity: "",
-    },
-    importer: {
-      companyName: "",
-      address: "",
-    },
-    incoterm: "",
-    etd: "",
-    eta: "",
+    const loadExisting = async () => {
+      try {
+        setPrefillLoading(true);
+        const res = await getShipmentDetails(editId);
+        const data = res.data?.data || res.data;
 
-    // Step 3
-    cargo: {
-      productName: "",
-      productDescription: "",
-      hsCode: "",
-      category: "",
-      quantity: "",
-      unit: "",
-      weight: "",
-      grossWeight: "",
-      volumetricWeight: "",
-      packages: "",
-      packingType: "",
-      unNumber: "",
-      packageMarks: "",
-      isDangerous: false,
-      isTemperatureControlled: false,
-      isStackable: false,
-      isFragile: false,
-      hasBattery: false,
-      isLithium: false,
-      dimensions: {
-        length: "",
-        width: "",
-        height: "",
-        unit: "CM",
-      },
-    },
-    amount: "",
-    currency: "",
-    paymentTerms: "",
-    insuranceRequired: false,
-    exportIncentive: false,
-    additionalInformation: {
-        packagingType: "",
-        packages: 0,
-        marksNumbers: "",
-        dangerousGoods: false,
-        specialHandling: false,
-        temperatureControl: false,
-      },
-  });
+        console.log("Edit mode - fetched shipment data:", data);
 
+        // `raw` is the exact shipment document from the DB (added by the
+        // backend patch) - it matches 1:1 what step1/step2/step3 write,
+        // so prefill is reliable. header is used only as a fallback.
+        const raw = data.raw || {};
+        const header = data.header || {};
+        const info = data.shipmentInfo || {};
+
+        const route = raw.route || header.route || {};
+        const cargo = raw.cargo || {};
+        const exporter = raw.exporter || {};
+        const importer = raw.importer || {};
+
+        setReferenceNumber(
+          pickVal(raw.referenceNumber, header.referenceNumber, raw.sbNumber, header.shipmentId) || ""
+        );
+
+        const hsCodeId =
+          (cargo.hsCode && typeof cargo.hsCode === "object" && cargo.hsCode._id) ||
+          (typeof cargo.hsCode === "string" ? cargo.hsCode : "") ||
+          (info.hsCode && typeof info.hsCode === "object" && info.hsCode._id) ||
+          "";
+
+        setFormData({
+          shipmentType: pickVal(raw.shipmentType) || "",
+          shipmentMode: pickVal(raw.shipmentMode, route.mode, info.mode) || "",
+          shipmentPurpose: pickVal(raw.shipmentPurpose) || "",
+          customerType: pickVal(raw.customerType) || "Individual",
+          exporter: {
+            companyName: pickVal(exporter.companyName) || "",
+            contactPerson: pickVal(exporter.contactPerson) || "",
+          },
+          route: {
+            originCountry: pickVal(route.originCountry) || "",
+            originCity: pickVal(route.originCity) || "",
+            destinationCountry: pickVal(route.destinationCountry) || "",
+            destinationCity: pickVal(route.destinationCity) || "",
+          },
+          importer: {
+            companyName: pickVal(importer.companyName) || "",
+            address: pickVal(importer.address) || "",
+          },
+          incoterm: pickVal(raw.incoterm) || "",
+          etd: formatDateForInput(pickVal(raw.etd, header.etd)),
+          eta: formatDateForInput(pickVal(raw.eta, header.eta)),
+          cargo: {
+            productName: pickVal(cargo.productName, info.goods) || "",
+            productDescription: pickVal(cargo.productDescription) || "",
+            hsCode: hsCodeId || "",
+            category: pickVal(cargo.category) || "",
+            quantity: pickVal(cargo.quantity, info.quantity) || "",
+            unit: pickVal(cargo.unit) || "",
+            weight: pickVal(cargo.weight, info.weight) || "",
+            grossWeight: pickVal(cargo.grossWeight) || "",
+            volumetricWeight: pickVal(cargo.volumetricWeight) || "",
+            packages: pickVal(cargo.packages) || "",
+            packingType: pickVal(cargo.packingType) || "",
+            unNumber: pickVal(cargo.unNumber) || "",
+            packageMarks: pickVal(cargo.packageMarks) || "",
+            isDangerous: cargo.isDangerous ?? false,
+            isTemperatureControlled: cargo.isTemperatureControlled ?? false,
+            isStackable: cargo.isStackable ?? false,
+            isFragile: cargo.isFragile ?? false,
+            hasBattery: cargo.hasBattery ?? false,
+            isLithium: cargo.isLithium ?? false,
+            dimensions: {
+              length: cargo.dimensions?.length || "",
+              width: cargo.dimensions?.width || "",
+              height: cargo.dimensions?.height || "",
+              unit: cargo.dimensions?.unit || "CM",
+            },
+          },
+          amount: pickVal(raw.amount, header.estimatedCost) || "",
+          currency: pickVal(raw.currency) || "",
+          paymentTerms: pickVal(raw.paymentTerms) || "",
+          insuranceRequired: raw.insuranceRequired ?? false,
+          exportIncentive: raw.exportIncentive ?? false,
+          additionalInformation: {
+            ...emptyFormData.additionalInformation,
+            ...(raw.additionalInformation || {}),
+          },
+        });
+
+        setShipmentId(editId);
+      } catch (err) {
+        console.error("Failed to load shipment for edit:", err);
+        alert(err.response?.data?.message || "Failed to load shipment data for editing.");
+      } finally {
+        setPrefillLoading(false);
+      }
+    };
+
+    loadExisting();
+  }, [editId]);
   const handleDirectChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleNestedChange = (parentKey, childKey, value) => {
     setFormData((prev) => ({
       ...prev,
-      [parentKey]: {
-        ...prev[parentKey],
-        [childKey]: value,
-      },
+      [parentKey]: { ...prev[parentKey], [childKey]: value },
     }));
   };
 
   const handleRadioChange = (name, value) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const saveAllSteps = async () => {
-    let currentId = shipmentId;
+const saveAllSteps = async () => {
+  let currentId = shipmentId;
 
-    if (!currentId) {
-      const step1Res = await createShipment({
-        shipmentType: formData.shipmentType,
-        shipmentMode: formData.shipmentMode,
-        shipmentPurpose: formData.shipmentPurpose,
-        customerType: formData.customerType,
-        exporter: formData.exporter,
-      });
-
-      const resData = step1Res.data?.data || step1Res.data;
-      currentId = resData._id;
-      setShipmentId(currentId);
-      if (resData.referenceNumber) {
-        setReferenceNumber(resData.referenceNumber);
-      }
+  if (!currentId) {
+    // Edit mode me shipmentId missing hona ek bug hai —
+    // isse duplicate/naya shipment ban jaata, isliye yahan explicitly rok rahe hain.
+    if (isEdit) {
+      throw new Error(
+        "Shipment ID nahi mila edit mode me. Page reload karke dobara Edit try karein."
+      );
     }
 
-    await updateShipmentStep2(currentId, {
-      route: formData.route,
-      importer: formData.importer,
-      eta: formData.eta,
-      etd: formData.etd,
-      incoterm: formData.incoterm,
+    // Sirf tabhi naya shipment banega jab genuinely "+ Shipment" se aaya ho
+    const step1Res = await createShipment({
+      shipmentType: formData.shipmentType,
+      shipmentMode: formData.shipmentMode,
+      shipmentPurpose: formData.shipmentPurpose,
+      customerType: formData.customerType,
+      exporter: formData.exporter,
     });
 
-    await updateShipmentStep3(currentId, {
-      cargo: formData.cargo,
-      amount: formData.amount,
-      paymentTerms: formData.paymentTerms,
-      insuranceRequired: formData.insuranceRequired,
-      currency: formData.currency,
-      additionalInformation: formData.additionalInformation,
-    });
+    const resData = step1Res.data?.data || step1Res.data;
+    currentId = resData._id;
+    setShipmentId(currentId);
+    if (resData.referenceNumber) {
+      setReferenceNumber(resData.referenceNumber);
+    }
+  }
 
-    return currentId;
-  };
+  await updateShipmentStep2(currentId, {
+    route: formData.route,
+    importer: formData.importer,
+    eta: formData.eta,
+    etd: formData.etd,
+    incoterm: formData.incoterm,
+  });
+
+  await updateShipmentStep3(currentId, {
+    cargo: formData.cargo,
+    amount: formData.amount,
+    paymentTerms: formData.paymentTerms,
+    insuranceRequired: formData.insuranceRequired,
+    currency: formData.currency,
+    additionalInformation: formData.additionalInformation,
+  });
+
+  return currentId;
+};
 
   const handleSaveDraft = async () => {
     setLoading(true);
@@ -1108,10 +903,10 @@ export default function Shipment({ setActiveTab, setShipment, currentTab }) {
       const id = await saveAllSteps();
       await saveDraft(id);
       setCurrentStatus("Draft");
-      alert("Draft saved successfully!");
+      alert(isEdit ? "Shipment updated successfully!" : "Draft saved successfully!");
     } catch (err) {
       console.error("Save Draft Error:", err);
-      alert(err.response?.data?.message || "Failed to save draft.");
+      alert(err.response?.data?.message || "Failed to save.");
     } finally {
       setLoading(false);
     }
@@ -1151,36 +946,38 @@ export default function Shipment({ setActiveTab, setShipment, currentTab }) {
 
   const handleDocumentUpload = async (documentName, file) => {
     try {
-  
       const id = await saveAllSteps();
-  
+
       const form = new FormData();
-  
       form.append("shipmentId", id);
       form.append("documentType", documentName);
       form.append("required", true);
       form.append("file", file);
-  
+
       const res = await uploadShipmentDocument(form);
-  
+
       setUploadedDocs((prev) => ({
         ...prev,
-        [documentName]: res.data.data
+        [documentName]: res.data.data,
       }));
-  
+
       alert("Uploaded Successfully");
-  
     } catch (err) {
-  
       console.log(err);
-  
-      alert(
-        err.response?.data?.message ||
-        "Upload Failed"
-      );
-  
+      alert(err.response?.data?.message || "Upload Failed");
     }
   };
+
+  if (prefillLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-9 h-9 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-3" />
+          <p className="text-sm text-slate-500">Loading shipment for editing...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 sm:p-6 lg:p-8">
@@ -1193,12 +990,11 @@ export default function Shipment({ setActiveTab, setShipment, currentTab }) {
           handleSubmit={handleSubmit}
           loading={loading}
           currentTab={currentTab}
+          isEdit={isEdit}
         />
 
         <div className="mt-7 grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
-          {/* MAIN CONTENT - 9 columns */}
           <div className="xl:col-span-9 grid grid-cols-1 xl:grid-cols-9 gap-5 items-start">
-            {/* Basic Shipment Details */}
             <div className="xl:col-span-3">
               <BasicShipmentDetails
                 formData={formData}
@@ -1208,43 +1004,21 @@ export default function Shipment({ setActiveTab, setShipment, currentTab }) {
               />
             </div>
 
-            {/* Origin, Destination + Invoice */}
             <div className="xl:col-span-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                <OriginDestination
-                  formData={formData}
-                  handleDirectChange={handleDirectChange}
-                  handleNestedChange={handleNestedChange}
-                />
-                <InvoiceValue
-                  formData={formData}
-                  handleDirectChange={handleDirectChange}
-                  handleRadioChange={handleRadioChange}
-                />
+                <OriginDestination formData={formData} handleDirectChange={handleDirectChange} handleNestedChange={handleNestedChange} />
+                <InvoiceValue formData={formData} handleDirectChange={handleDirectChange} handleRadioChange={handleRadioChange} />
               </div>
             </div>
 
-            {/* Product Details - full width of main content */}
             <div className="xl:col-span-9">
-              <ProductDetails
-                formData={formData}
-                handleNestedChange={handleNestedChange}
-                handleRadioChange={handleRadioChange}
-                hsCodes={hsCodes}
-              />
+              <ProductDetails formData={formData} handleNestedChange={handleNestedChange} handleRadioChange={handleRadioChange} hsCodes={hsCodes} />
             </div>
           </div>
 
-          {/* RIGHT SIDEBAR - 3 columns */}
           <div className="xl:col-span-3 flex flex-col gap-5">
             <QuickTipsCard />
-
-            <DocumentsUpload
-              uploadedDocs={uploadedDocs}
-              handleDocumentUpload={handleDocumentUpload}
-              fileInputRef={fileInputRef}
-            />
-
+            <DocumentsUpload uploadedDocs={uploadedDocs} handleDocumentUpload={handleDocumentUpload} fileInputRef={fileInputRef} />
             <AIOutputAnalysis analysis={analysis} />
           </div>
         </div>
