@@ -63,7 +63,7 @@ const initialVendors = Array.from({ length: 6 }, (_, i) => ({
   phone: "999999998",
   location: "United States",
   subscriptionPlan: "Premium",
-  shipmentStatus: "In Transit",
+  shipmentStatus: "4",
   status: "Active",
   kyc: "Verified",
   
@@ -512,7 +512,7 @@ useEffect(() => {
                 <th className="text-left py-2 font-bold">Phone</th>
                 <th className="text-left py-2 font-bold">Location</th>
                 <th className="text-left py-2 font-bold">Plan</th>
-                <th className="text-left py-2 font-bold">Shipment</th>
+                <th className="text-center py-2 font-bold">Shipment</th>
                 <th className="text-left py-2 font-bold">Status</th>
                 <th className="text-left py-2 font-bold">KYC</th>
                 <th className="text-right py-2 font-bold">Actions</th>
@@ -532,7 +532,7 @@ useEffect(() => {
                   <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.phone}</td>
                   <td className="py-3 whitespace-nowrap font-medium text-slate-600">{v.location}</td>
                   <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.subscriptionPlan}</td>
-                  <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.shipmentStatus}</td>
+                  <td className="py-3 whitespace-nowrap text-center font-medium text-slate-500">{v.shipmentStatus}</td>
                   <td className="py-3">
                     <StatusBadge status={v.status} />
                   </td>
@@ -550,7 +550,7 @@ useEffect(() => {
                           }} className="text-slate-600">
                       <FiEdit />
                      </button>
-                    <button
+                    {/* <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setOpenMenu(openMenu === i ? null : i);
@@ -558,7 +558,7 @@ useEffect(() => {
                       className="text-slate-600 "
                     > 
                       <MoreVertical size={15} />
-                    </button>
+                    </button> */}
                      </div>
                     {openMenu === i && (
                       <div
@@ -719,6 +719,7 @@ useEffect(() => {
                 )} */}
 
                 {/* Cancel / Close */}
+                <button className="text-green-600 font-semibold text-sm">Verified</button>
                 <button
                   onClick={() => {
                     setShowDetail(false);
@@ -1198,7 +1199,32 @@ useEffect(() => {
 
             {/* Bottom Actions */}
             {isEditing && (
+              
+              <div className="flex items-center  justify-between "> 
+              <div className="pt-4">
+                {/* <button >Suspend</button> */}
+                 <button 
+                          onClick={() => {
+                            // handleStatusChange(v.id, "Suspended");
+                            setOpenMenu(null);
+                            setRejectKyc(true)
+                          }}
+                          className="w-full  py-1.5 px-2.5 rounded-lg bg-red-50 text-red-600 font-medium text-xs text-left hover:bg-red-100 transition-colors"
+                        >
+                          Suspend
+                        </button>
+                 </div>
               <div className="flex justify-end gap-3 border-t pt-4">
+                 <button
+                          onClick={() => {
+                          
+                            setOpenMenu(null);
+                            setKycVerify(true)
+                          }}
+                          className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
+                        >
+                          KYC
+                        </button>
                 <button
                   onClick={() => {
                     setIsEditing(false);
@@ -1212,13 +1238,16 @@ useEffect(() => {
                   onClick={handleSaveVendor}
                   className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
                 >
-                  Save Changes
+                  Verify
                 </button>
               </div>
+              </div>
+               
             )}
           </div>
         )}
-
+ 
+          
 
 
         {kycVerify && (<KYCVerificationModal onClose={() => setKycVerify(false)}/>)}

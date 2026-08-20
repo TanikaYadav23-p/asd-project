@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import logo from "../../assets/Images/logo.png";
 import axios from "axios";
 // import { FiAlertCircle } from "react-icons/fi";
+// import Chatbot from '../../components/Chatbot'
 
 import { FaRupeeSign } from "react-icons/fa";
 
@@ -811,6 +812,8 @@ export default function UserDashboard() {
         <nav className="flex-1 overflow-y-auto py-3  bg-gray-900 pr-2">
           {sidebarSections.map((section) => (
             <div key={section.title} className="  " >
+               <button className="w-full hover:bg-teal-500 hover:text-white px-4 py-2 flex items-center gap-2 text-[#8aa0bc] rounded-r-lg text-xs text-left transition-colors" onClick={() => navigate("/chatbot")}>
+                 Chatbot</button>
               <p
                 onClick={() => {
                   if (section.items.length === 0) {
@@ -886,7 +889,7 @@ export default function UserDashboard() {
       </aside>
 
       <main className=" w-full overflow-auto ">
-
+       
         {activeTab === "AI CargoMate Assistant" && <AiCargoMateAssistant />}
 
         {activeTab === "HS Code Lookup" && <HSCodeLookup />}
