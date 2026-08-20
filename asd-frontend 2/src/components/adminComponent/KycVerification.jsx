@@ -17,6 +17,7 @@ import {
   Download,
   CheckCheck,
 } from "lucide-react";
+import RejectKYCModal from "./RejectKycVerification";
 
 const defaultApplicant = {
   name: "Arjun Soni",
@@ -69,7 +70,7 @@ export default function KYCVerificationModal({
 }) {
   const [activeDocId, setActiveDocId] = useState(documents[0]?.id);
   const [submitting, setSubmitting] = useState(false);
-
+  const [rejectKyc, setRejectKyc] = useState(false)
   const activeDoc = documents.find((doc) => doc.id === activeDocId) || documents[0];
 
   const handleApprove = async (e) => {
@@ -299,6 +300,9 @@ export default function KYCVerificationModal({
 
         <div className="border-t border-gray-100 p-4 sm:p-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <button
+           onClick={() => {
+            setRejectKyc(true)
+           }}
             type="button"
             className="order-2 sm:order-1 border border-red-200 text-red-600 font-medium rounded-lg px-4 py-2.5 hover:bg-red-50 text-sm"
           >
@@ -323,6 +327,8 @@ export default function KYCVerificationModal({
           </div>
         </div>
       </form>
+
+      {rejectKyc && (<RejectKYCModal onClose={() =>  setRejectKyc(false)}/>)}
     </div>
   );
 }

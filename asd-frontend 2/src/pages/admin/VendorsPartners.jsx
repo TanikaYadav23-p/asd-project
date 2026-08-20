@@ -3,10 +3,11 @@ import {
   FaPlus, FaMagnifyingGlass, FaXmark, FaChevronDown,
   FaStar, FaTruck, FaBoxOpen, FaWarehouse, FaFileContract
 } from "react-icons/fa6";
+import { ChevronDown,  CircleCheckBig }   from "lucide-react";
 import {
   MoreVertical,
 } from "lucide-react";
-  
+  import crown from "../../assets/Images/webp/crown.webp"
   import {
     FiEdit,
   
@@ -82,6 +83,14 @@ const initialVendors = Array.from({ length: 6 }, (_, i) => ({
   swiftCode: "",
 }));
 
+ function InfoRow({ title, value }) {
+        return (
+            <div className="flex justify-between">
+                <span className="font-semibold text-xs ">{title}</span>
+                <span className="font-medium text-xs">{value}</span>
+            </div>
+        );
+    }
 function AddVendorModal({ onClose, onAdd }) {
   const [form, setForm] = useState({ name: "", email: "", type: "Shipping Partner", location: "", rating: "", activeShipment: "", status: "Active" });
   const [errors, setErrors] = useState({});
@@ -273,9 +282,13 @@ export default function VendorsPartners() {
   const [showModal, setShowModal] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const [kycVerify, setKycVerify] = useState(false)
-  const [rejectKyc, setRejectKyc] = useState(false)
+ 
   const [showDetail, setShowDetail] = useState(false)
   const [showEdit, setShowEdit] = useState(false);
+   const [date, setDate] = useState({
+      startDate: "",
+     endDate: "",
+  });
   const handleAdd = (vendor) => setVendors(prev => [vendor, ...prev]);
 
   const handleStatusChange = (id, newStatus) => {
@@ -584,11 +597,6 @@ useEffect(() => {
                           Active
                         </button>
                         <button
-                          onClick={() => {
-                            handleStatusChange(v.id, "Suspended");
-                            setOpenMenu(null);
-                            setRejectKyc(true)
-                          }}
                           className="w-full py-1.5 px-2.5 rounded-lg bg-red-50 text-red-600 font-medium text-xs text-left hover:bg-red-100 transition-colors"
                         >
                           Suspend
@@ -1034,30 +1042,7 @@ useEffect(() => {
                     )}
                   </div>
 
-                  {/* Next Review */}
-                  <div>
-                    <label className="block text-gray-500 mb-1">
-                      Next Review Date
-                    </label>
-
-                    {isEditing ? (
-                      <input
-                        type="date"
-                        value={selectedVendor.nextReviewDate || ""}
-                        onChange={(e) =>
-                          setSelectedVendor({
-                            ...selectedVendor,
-                            nextReviewDate: e.target.value,
-                          })
-                        }
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    ) : (
-                      <p className="text-gray-900">
-                        {selectedVendor.nextReviewDate || "-"}
-                      </p>
-                    )}
-                  </div>
+              
                 </div>
               </div>
 
@@ -1221,9 +1206,9 @@ useEffect(() => {
                             setOpenMenu(null);
                             setKycVerify(true)
                           }}
-                          className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
+                          className="px-4 py-2 rounded-lg flex items-center gap-2  bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
                         >
-                          KYC
+                       <CircleCheckBig size={16} className="text-green-500 "/> Verify  KYC
                         </button>
                 <button
                   onClick={() => {
@@ -1238,7 +1223,7 @@ useEffect(() => {
                   onClick={handleSaveVendor}
                   className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors"
                 >
-                  Verify
+                Save Changes
                 </button>
               </div>
               </div>
@@ -1247,11 +1232,105 @@ useEffect(() => {
           </div>
         )}
  
+             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
+                          
+                          <div className="bg-white rounded-2xl p-6 shadow-sm border-b-gray-800">
+                              <p className="font-bold font-sm">Current Plan</p>
+                              <span className="bg-green-100 text-[#166534] px-3 py-1 rounded text-xs inline-block mt-3">
+                                  Pro Plan
+                              </span>
           
+                              <div className="flex justify-between items-center mt-6">
+                                  <div>
+                                      <h2 className="text-3xl font-bold">₹24,860 <span className="text-gray-400 text-sm font-medium">/ year</span></h2>
+          
+                                  </div>
+          
+                                  <div className="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
+                                      <img src={crown} className="text-blue-500 text-4xl" />
+                                  </div>
+                              </div>
+          
+                              <p className="mt-4 text-gray-400 text-sm">Renews on</p>
+                              <p className="font-semibold">25 Apr 2026</p>
+          
+                             <div className="relative mt-5">
+                                <select
+                                  className="w-full text-sm bg-[#007d88] text-white py-3 px-4 pr-10 rounded-lg appearance-none cursor-pointer outline-none"
+                                  defaultValue=""
+                                >
+                                   
+
+                                  <option value="basic" className="text-gray-900 bg-white">
+                                    Basic Plan
+                                  </option>
+
+                                  <option value="starter" className="text-gray-900 bg-white">
+                                    Starter Plan
+                                  </option>
+
+                                  <option value="pro" className="text-gray-900 bg-white">
+                                    Pro Plan
+                                  </option>
+                                </select>
+
+                                <ChevronDown
+                                  size={18}
+                                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white pointer-events-none"
+                                />
+                              </div>
+                          </div>
+          
+                          <div className="k flex flex-col gap-3"> 
+                              <div className="bg-white rounded-2xl p-6 shadow-sm border-b-gray-800 ">
+                                  <div className="flex justify-between">
+                                      <h3 className="font-bold font-sm">Billing Information</h3>
+                                      <span className="bg-green-100 text-green-600 px-3 rounded-full text-sm">
+                                          Active
+                                      </span>
+                                  </div>
+              
+                                  <div className="space-y-4 mt-6 text-black-700">
+                                      <InfoRow title="Billing Cycle" value="Yearly" />
+                                      <InfoRow title="Plan Amount" value="₹24,860.00" />
+                                      <InfoRow title="Next Billing Date" value="25 Apr 2026" />
+                                      <InfoRow title="Payment Method" value="VISA ****4242" />
+                                  </div> 
+                              </div>
+                              <div className="flex bg-white px-3 py-3 rounded-2xl shadow justify-around"> <div>
+                              <label className="block text-sm font-medium mb-1">
+                                Start Date
+                              </label>
+                              <input
+                                type="date"
+                                value={date.startDate}
+                                onChange={(e) =>
+                                  setForm({ ...date, startDate: e.target.value })
+                                }
+                                className="border px-3 py-2 rounded w-full"
+                              />
+                            </div>
+
+                                {/* End Date */}
+                                <div>   <label className="block text-sm font-medium mb-1">
+                                End Date
+                              </label>
+                              <input
+                                  type="date"
+                                  value={date.endDate}
+                                  onChange={(e) =>
+                                    setForm({ ...date, endDate: e.target.value })
+                                  }
+                                  className="border px-3 py-2 rounded"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                      </div>
 
 
         {kycVerify && (<KYCVerificationModal onClose={() => setKycVerify(false)}/>)}
-        {rejectKyc && (<RejectKYCModal onClose={() =>  setRejectKyc(false)}/>)}
+        
           
     </div>
   );

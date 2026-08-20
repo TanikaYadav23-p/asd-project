@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X, XCircle, AlertTriangle, Briefcase, Ban } from "lucide-react";
-
+ 
 const defaultApplicant = {
   name: "Arjun Soni",
   userId: "CRG-USR-10482",
@@ -27,6 +27,7 @@ export default function RejectKYCModal({
   const [selectedReasons, setSelectedReasons] = useState([]);
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
+ 
 
   const toggleReason = (reason) => {
     setSelectedReasons((prev) =>
