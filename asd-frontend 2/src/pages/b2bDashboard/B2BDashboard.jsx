@@ -44,6 +44,7 @@ import {
   FiXCircle,
   FiHome,
   FiCamera,
+  FiUpload,
   FiLock,
   FiSend,
 } from "react-icons/fi";
@@ -132,7 +133,7 @@ import {
   Clock3,Lightbulb ,ChartNoAxesCombined  , SquareChartGantt ,Binoculars 
 } from "lucide-react";
 import { TbChartBar } from "react-icons/tb";
-
+import API from "../../api/axios";
 import { LuChartNoAxesCombined, LuLightbulb ,  } from "react-icons/lu";
   import { MapContainer, TileLayer, CircleMarker } from "react-leaflet";
 
@@ -408,6 +409,7 @@ export default function B2BDashboard() {
   const [notifications, setNotifications] = useState(false)
 
 const [accountSummary, setAccountSummary] = useState({});
+const [profileOpen, setProfileOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const riskColor = {
     Low: "bg-teal-100 text-teal-600",
@@ -479,23 +481,28 @@ const [accountSummary, setAccountSummary] = useState({});
                {/* <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
                  <FiSun size={16} />
                </button> */}
-               <div className="flex items-center gap-2 ml-1 pl-2 py-2 border-l border-gray-200">
-                 <div className="hidden sm:block leading-tight">
-                   <p className="text-xs sm:text-sm font-semibold text-gray-800">
-                     {accountSummary?.user?.name}
-                   </p>
-                   <p className="text-gray-400 text-xs sm:text-sm">
-                     {accountSummary?.user?.roleId?.name}
-                   </p>
-                 </div>
-                 <div className=" h-8 w-8 sm:w-10 sm:h-10 bg-teal-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                    {accountSummary?.user?.name
-        ?.split(" ")
-        .map(word => word[0])
-        .join("")
-        .toUpperCase()}
-                 </div>
-               </div>
+               <div
+  onClick={() => setProfileOpen(true)}
+  className="flex items-center gap-2 ml-1 pl-2 py-2 border-l border-gray-200 cursor-pointer hover:bg-gray-50 rounded-lg transition"
+>
+  <div className="hidden sm:block leading-tight text-right">
+    <p className="text-xs sm:text-sm font-semibold text-gray-800">
+      {accountSummary?.user?.name}
+    </p>
+
+    <p className="text-gray-400 text-xs sm:text-sm">
+      {accountSummary?.user?.roleId?.name}
+    </p>
+  </div>
+
+  <div className="h-8 w-8 sm:w-10 sm:h-10 bg-teal-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+    {accountSummary?.user?.name
+      ?.split(" ")
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase()}
+  </div>
+</div>
              </div>
            </header>
      
@@ -648,6 +655,12 @@ const [accountSummary, setAccountSummary] = useState({});
 
        {messages && (<MessagesModal onClose={() => setMessage(false)} />)}
         {notifications && (<NotificationsModal onClose={() => setNotifications(false)} />)}
+          {profileOpen && (
+  <B2BProfileModal
+    accountSummary={accountSummary}
+    onClose={() => setProfileOpen(false)}
+  />
+)}
       {/* <SelectRangeModal /> */}
       {/* <MarketIntelligencePopup /> */}
     </div>
@@ -881,6 +894,7 @@ const regionMarkers = {
     const [topExportDestinations, setTopExportDestinations] = useState([]);
     const [recentShipments, setRecentShipments] = useState([]);
     const [accountSummary, setAccountSummary] = useState({});
+    
 const fetchDashboardMetrics = async () => {
   try {
     const res = await getDashboardMetrics();
@@ -1412,4 +1426,604 @@ const regionMarkers = {
             </div>
         </div>
     );
+    
+}
+const REQUIRED_KYC_DOCUMENTS = [
+  {
+    type: "GST Certificate",
+    title: "GST Certificate",
+    required: true,
+  },
+  {
+    type: "IEC Certificate",
+    title: "Import Export Code (IEC) Certificate",
+    required: true,
+  },
+  {
+    type: "PAN Card",
+    title: "PAN Card",
+    required: true,
+  },
+  {
+    type: "Company Registration",
+    title: "Company Registration Certificate",
+    required: true,
+  },
+  {
+    type: "Address Proof",
+    title: "Business Address Proof",
+    required: true,
+  },
+  {
+    type: "Authorized Signatory ID",
+    title: "Authorized Signatory ID Proof",
+    required: false,
+  },
+];
+function B2BProfileModal({ accountSummary, onClose }) {
+  const user = accountSummary?.user || {};
+   const [selectedDocuments, setSelectedDocuments] = useState({});
+  const [uploading, setUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState("");
+
+  const handleFileChange = (documentType, file) => {
+  if (!file) return;
+
+  setSelectedDocuments((prev) => ({
+    ...prev,
+    [documentType]: file,
+  }));
+};
+
+  const getStatusStyle = () => {
+    switch (user?.kycStatus) {
+      case "Verified":
+        return "bg-green-100 text-green-700 border-green-200";
+
+      case "Rejected":
+        return "bg-red-100 text-red-700 border-red-200";
+
+      case "Re-upload Required":
+        return "bg-orange-100 text-orange-700 border-orange-200";
+
+      case "Under Review":
+        return "bg-blue-100 text-blue-700 border-blue-200";
+
+      case "Submitted":
+        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-200";
+    }
+  };
+
+  const profileDetails = [
+    {
+      label: "Full Name",
+      value: user?.name,
+    },
+    {
+      label: "Email",
+      value: user?.email,
+    },
+    {
+      label: "Phone",
+      value: user?.phone,
+    },
+    {
+      label: "Company Name",
+      value: user?.companyName,
+    },
+    {
+      label: "Business Type",
+      value: user?.businessType,
+    },
+    {
+      label: "Account Type",
+      value: user?.accountType,
+    },
+    {
+      label: "GST Number",
+      value: user?.gstNumber,
+    },
+    {
+      label: "IEC Number",
+      value: user?.importExportId,
+    },
+    {
+      label: "Designation",
+      value: user?.designation,
+    },
+    {
+      label: "Country",
+      value: user?.country,
+    },
+    {
+      label: "City",
+      value: user?.city,
+    },
+    {
+      label: "Address",
+      value: user?.address,
+    },
+  ];
+const handleUploadDocuments = async () => {
+  const files = Object.values(selectedDocuments);
+
+  if (!files.length) {
+    setUploadMessage("Please select at least one document.");
+    return;
+  }
+
+  try {
+    setUploading(true);
+    setUploadMessage("");
+
+    const formData = new FormData();
+
+    Object.entries(selectedDocuments).forEach(
+      ([documentType, file]) => {
+        formData.append("documents", file);
+        formData.append("documentTypes", documentType);
+
+        const document = REQUIRED_KYC_DOCUMENTS.find(
+          (item) => item.type === documentType
+        );
+
+        formData.append(
+          "documentTitles",
+          document?.title || documentType
+        );
+      }
+    );
+
+    const response = await API.post(
+      "/settings/kyc-documents",
+      formData
+    );
+
+    if (response.data?.status === 1) {
+      setUploadMessage(
+        response.data.message ||
+          "Documents uploaded successfully."
+      );
+
+      setSelectedDocuments({});
+
+      window.location.reload();
+    } else {
+      setUploadMessage(
+        response.data?.message ||
+          "Failed to upload documents."
+      );
+    }
+  } catch (error) {
+    console.error("KYC upload failed:", error);
+
+    setUploadMessage(
+      error?.response?.data?.message ||
+        "Failed to upload documents."
+    );
+  } finally {
+    setUploading(false);
+  }
+};
+const handleSubmitKYC = async () => {
+  try {
+    setUploadMessage("");
+
+    const requiredDocuments = REQUIRED_KYC_DOCUMENTS.filter(
+      (document) => document.required
+    );
+
+    const uploadedDocuments = user?.kycDocuments || [];
+
+    const missingDocuments = requiredDocuments.filter(
+      (requiredDocument) =>
+        !uploadedDocuments.some(
+          (uploadedDocument) =>
+            uploadedDocument.type === requiredDocument.type
+        )
+    );
+
+    if (missingDocuments.length > 0) {
+      setUploadMessage(
+        `Please upload: ${missingDocuments
+          .map((document) => document.title)
+          .join(", ")}`
+      );
+      return;
+    }
+
+    const response = await API.post("/settings/kyc-submit");
+
+    console.log("KYC submit response:", response.data);
+
+    if (response.data?.status === 1) {
+      setUploadMessage(
+        response.data?.message ||
+          "KYC submitted successfully."
+      );
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+
+      return;
+    }
+
+    setUploadMessage(
+      response.data?.message ||
+        "Failed to submit KYC."
+    );
+
+  } catch (error) {
+    console.error("KYC submit failed:", error);
+
+    console.log("Error response:", error?.response?.data);
+
+    setUploadMessage(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Failed to submit KYC."
+    );
+  }
+};
+  return (
+    <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl">
+
+        {/* HEADER */}
+
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">
+              My Profile
+            </h2>
+
+            <p className="text-sm text-gray-500">
+              Company and KYC details
+            </p>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="h-9 w-9 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500"
+          >
+            <FiX size={20} />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-6">
+
+          {/* KYC STATUS */}
+
+          <div className="border border-gray-200 rounded-xl p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+              <div>
+                <h3 className="font-bold text-gray-900">
+                  KYC Verification Status
+                </h3>
+
+                <p className="text-sm text-gray-500 mt-1">
+                  Your business verification status
+                </p>
+              </div>
+
+              <span
+                className={`px-4 py-2 rounded-full border text-sm font-semibold ${getStatusStyle()}`}
+              >
+                {user?.kycStatus || "Not Submitted"}
+              </span>
+            </div>
+
+            {/* VERIFIED */}
+
+            {user?.kycStatus === "Verified" && (
+              <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-green-700 font-semibold">
+                  ✓ Your KYC has been successfully verified.
+                </p>
+
+                {user?.kycVerifiedAt && (
+                  <p className="text-sm text-green-600 mt-1">
+                    Verified on:{" "}
+                    {new Date(
+                      user.kycVerifiedAt
+                    ).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* REJECTED */}
+
+            {user?.kycStatus === "Rejected" && (
+              <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+
+                <p className="text-red-700 font-semibold">
+                  Your KYC has been rejected.
+                </p>
+
+                {user?.kycRejectionReasons?.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-sm font-semibold text-gray-700">
+                      Rejection Reasons:
+                    </p>
+
+                    <ul className="list-disc pl-5 mt-2 space-y-1">
+                      {user.kycRejectionReasons.map(
+                        (reason, index) => (
+                          <li
+                            key={index}
+                            className="text-sm text-red-600"
+                          >
+                            {reason}
+                          </li>
+                        )
+                      )}
+                    </ul>
+                  </div>
+                )}
+
+                {user?.kycRejectionNote && (
+                  <div className="mt-3">
+                    <p className="text-sm font-semibold text-gray-700">
+                      Admin Note:
+                    </p>
+
+                    <p className="text-sm text-red-600 mt-1">
+                      {user.kycRejectionNote}
+                    </p>
+                  </div>
+                )}
+
+                {user?.kycRejectedAt && (
+                  <p className="text-xs text-gray-500 mt-3">
+                    Rejected on:{" "}
+                    {new Date(
+                      user.kycRejectedAt
+                    ).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* RE-UPLOAD */}
+
+            {user?.kycStatus === "Re-upload Required" && (
+              <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <p className="text-orange-700 font-semibold">
+                  Some KYC documents require re-upload.
+                </p>
+
+                {user?.kycRejectionReasons?.length > 0 && (
+                  <ul className="list-disc pl-5 mt-2">
+                    {user.kycRejectionReasons.map(
+                      (reason, index) => (
+                        <li
+                          key={index}
+                          className="text-sm text-orange-600"
+                        >
+                          {reason}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                )}
+
+                <button
+                  className="mt-4 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+                >
+                  Re-upload Documents
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* PROFILE DETAILS */}
+
+          <div>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">
+              Profile Details
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {profileDetails.map((item) => (
+                <div
+                  key={item.label}
+                  className="border border-gray-200 rounded-xl p-4"
+                >
+                  <p className="text-xs text-gray-500 mb-1">
+                    {item.label}
+                  </p>
+
+                  <p className="text-sm font-semibold text-gray-800 break-words">
+                    {item.value || "-"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* KYC DOCUMENTS */}
+
+
+<div>
+  <div className="flex items-center justify-between mb-4">
+    <div>
+      <h3 className="text-lg font-bold text-gray-900">
+        KYC Documents
+      </h3>
+
+      <p className="text-sm text-gray-500 mt-1">
+        Upload the documents required for business verification.
+      </p>
+    </div>
+
+    <span className="text-sm text-gray-500">
+      {user?.kycDocuments?.length || 0} uploaded
+    </span>
+  </div>
+
+  <div className="space-y-3">
+    {REQUIRED_KYC_DOCUMENTS.map((requiredDocument) => {
+      const uploadedDocument = user?.kycDocuments?.find(
+        (document) =>
+          document.type === requiredDocument.type
+      );
+
+      return (
+        <div
+          key={requiredDocument.type}
+          className="border border-gray-200 rounded-xl p-4"
+        >
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <FiFileText className="text-gray-500" />
+
+                <p className="font-semibold text-sm text-gray-800">
+                  {requiredDocument.title}
+                </p>
+
+                {requiredDocument.required && (
+                  <span className="text-xs text-red-500">
+                    Required
+                  </span>
+                )}
+              </div>
+
+              <p className="text-xs text-gray-500 mt-2">
+                {uploadedDocument
+                  ? "Document uploaded"
+                  : "Not uploaded"}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {uploadedDocument?.url && (
+                <a
+                  href={uploadedDocument.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-3 py-2 text-xs font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50"
+                >
+                  View
+                </a>
+              )}
+
+              <label className="cursor-pointer px-3 py-2 text-xs font-semibold text-white bg-teal-500 hover:bg-teal-600 rounded-lg">
+                <FiUpload className="inline mr-1" />
+
+                {uploadedDocument
+                  ? "Replace"
+                  : "Choose File"}
+
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+                  className="hidden"
+                  onChange={(event) =>
+                    handleFileChange(
+                      requiredDocument.type,
+                      event.target.files?.[0]
+                    )
+                  }
+                />
+              </label>
+            </div>
+          </div>
+
+          {selectedDocuments[requiredDocument.type] && (
+            <div className="mt-3 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
+              <p className="text-xs text-blue-700">
+                Selected:{" "}
+                <span className="font-semibold">
+                  {
+                    selectedDocuments[
+                      requiredDocument.type
+                    ].name
+                  }
+                </span>
+              </p>
+            </div>
+          )}
+        </div>
+      );
+    })}
+  </div>
+
+  {Object.keys(selectedDocuments).length > 0 && (
+    <div className="mt-5">
+      <button
+        type="button"
+        onClick={handleUploadDocuments}
+        disabled={uploading}
+        className="w-full bg-teal-500 hover:bg-teal-600 disabled:opacity-60 text-white px-4 py-3 rounded-xl text-sm font-semibold"
+      >
+        {uploading
+          ? "Uploading Documents..."
+          : "Upload Selected Documents"}
+      </button>
+    </div>
+  )}
+
+  {uploadMessage && (
+    <p className="text-sm text-center mt-3 text-gray-600">
+      {uploadMessage}
+    </p>
+  )}
+  {/* SUBMIT KYC */}
+
+{(() => {
+  const requiredDocuments = REQUIRED_KYC_DOCUMENTS.filter(
+    (document) => document.required
+  );
+
+  const uploadedDocuments = user?.kycDocuments || [];
+
+  const allRequiredUploaded = requiredDocuments.every(
+    (requiredDocument) =>
+      uploadedDocuments.some(
+        (uploadedDocument) =>
+          uploadedDocument.type === requiredDocument.type
+      )
+  );
+
+  return (
+    user?.kycStatus !== "Verified" &&
+    user?.kycStatus !== "Submitted" && (
+      <div className="mt-5">
+        <button
+          type="button"
+          onClick={handleSubmitKYC}
+          disabled={!allRequiredUploaded}
+          className={`w-full px-4 py-3 rounded-xl text-sm font-semibold text-white ${
+            allRequiredUploaded
+              ? "bg-blue-600 hover:bg-blue-700"
+              : "bg-gray-300 cursor-not-allowed"
+          }`}
+        >
+          {allRequiredUploaded
+            ? "Submit KYC for Verification"
+            : "Upload All Required Documents First"}
+        </button>
+
+        {!allRequiredUploaded && (
+          <p className="text-xs text-gray-500 text-center mt-2">
+            Please upload all required documents before submitting your KYC.
+          </p>
+        )}
+      </div>
+    )
+  );
+})()}
+</div>
+
+        </div>
+      </div>
+    </div>
+  );
 }

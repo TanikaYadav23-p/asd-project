@@ -1,39 +1,32 @@
 const express = require("express");
+
 const router = express.Router();
 
 const {
-  createVendor,
-  getVendors,
-  getVendorById,
-  updateVendor,
-  deleteVendor,
-  getVendorStats,
-  getVendorDashboard,
-  getVendorComparison,
-  getVendorInsights,
-  getRecommendedVendors
+  getB2BUsers,
+  getB2BUserById,
+  getB2BUserStats,
+  approveKYC,
+  rejectKYC,
+  suspendB2BUser,
 } = require("../controllers/vendorController");
 
 const { protect } = require("../middleware/authMiddleware");
 
-router.post("/", protect, createVendor);
+// B2B Users
 
-router.get("/", protect, getVendors);
+router.get("/", protect, getB2BUsers);
 
-router.get("/dashboard", protect, getVendorDashboard);
+router.get("/stats/all", protect, getB2BUserStats);
 
-router.get("/stats/all", protect, getVendorStats);
+router.get("/:id", protect, getB2BUserById);
 
-router.get("/comparison", protect, getVendorComparison);
+router.patch("/:id/suspend", protect, suspendB2BUser);
 
-router.get("/insights", protect, getVendorInsights);
+// KYC
 
-router.get("/recommendation/:shipmentId", protect, getRecommendedVendors);
+router.patch("/:userId/kyc/approve", protect, approveKYC);
 
-router.get("/:id", protect, getVendorById);
-
-router.put("/:id", protect, updateVendor);
-
-router.delete("/:id", protect, deleteVendor);
+router.patch("/:userId/kyc/reject", protect, rejectKYC);
 
 module.exports = router;
