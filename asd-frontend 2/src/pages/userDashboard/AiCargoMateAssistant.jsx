@@ -45,7 +45,7 @@ import SaveReportModal from '../../components/userComponent/SaveReport';
 import SaveReportPopup from '../../components/userComponent/SaveReportPopup';
 import ShareReportModal from '../../components/userComponent/ShareReport';
 import DataSourceModal from '../../components/userComponent/DataSource';
-
+import poster from "../../assets/Images/webp/poster3.webp"
 
 
 const recCards = [
@@ -60,7 +60,7 @@ const recCards = [
     link: "View HS Code Details",
   },
   {
-    label: "Incentive (India)",
+    label: "Incentive",
     main: "₹8,420",
     mainColor: "text-emerald-600",
     sub: "Total Incentive Value",
@@ -72,7 +72,7 @@ const recCards = [
     link: "View Incentive Details",
   },
   {
-    label: "Freight (Air)",
+    label: "Freight",
     routeLabel: "Route",
     route: "Tirupur → Dubai",
     rows: [
@@ -83,7 +83,7 @@ const recCards = [
     link: "View Freight Breakdown",
   },
   {
-    label: "Landed Cost (Est.)",
+    label: "Landed Cost",
     main: "₹1,24,680",
     sub: "Total Landed Cost",
     rows: [
@@ -186,7 +186,7 @@ const tabContent = {
       "Product is 100% cotton, knitted. Shipment weight is 500kg. Prices and duties are based on current available data and may change.",
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
-    tariffLink: "View Official Tariff Page",
+    
     buttonText: "Create Shipment from this Result",
   },
   "Incentive Analysis": {
@@ -202,7 +202,7 @@ const tabContent = {
       "Product is 100% cotton, knitted. Shipment weight is 500kg. Prices and duties are based on current available data and may change.",
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
-    tariffLink: "View Official Tariff Page",
+    
     buttonText: "Create Shipment from this Result",
   },
   "Freight Analysis": {
@@ -218,7 +218,7 @@ const tabContent = {
       "Product is 100% cotton, knitted. Shipment weight is 500kg. Prices and duties are based on current available data and may change.",
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
-    tariffLink: "View Official Tariff Page",
+    
     buttonText: "Create Shipment from this Result",
   },
   "Landed Cost Breakdown": {
@@ -235,7 +235,7 @@ const tabContent = {
       "Product is 100% cotton, knitted. Shipment weight is 500kg. Prices and duties are based on current available data and may change.",
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
-    tariffLink: "View Official Tariff Page",
+    
     buttonText: "Create Shipment from this Result",
   },
   "Compliance & Documents": {
@@ -252,7 +252,6 @@ const tabContent = {
       "Product is 100% cotton, knitted. Shipment weight is 500kg. Prices and duties are based on current available data and may change.",
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
-    tariffLink: "View Official Tariff Page",
     buttonText: "Create Shipment from this Result",
   },
   "Market Insights": {
@@ -268,7 +267,7 @@ const tabContent = {
       "Product is 100% cotton, knitted. Shipment weight is 500kg. Prices and duties are based on current available data and may change.",
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
-    tariffLink: "View Official Tariff Page",
+    
     buttonText: "Create Shipment from this Result",
   },
 };
@@ -442,7 +441,24 @@ const AiCargoMateAssistant = () => {
                           </p>
                         )}
                       </div>
-                      <button className="text-teal-500 text-xs  font-medium text-left mt-2 hover:underline">
+                      <button    onClick={() => {
+                        if(card.label === "HS Code"){
+                              setAnalysisTab("HS Code Analysis")
+                        }else  if(card.label === "Incentive"){
+                             setAnalysisTab("Incentive Analysis")
+                        }else  if(card.label === "Freight"){
+                             setAnalysisTab("Freight Analysis")
+                        }else {
+                             setAnalysisTab("Landed Cost Breakdown")
+                        }
+
+                        setTimeout(() => {
+                          document.getElementById("sectionId")?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
+                        }, 100);
+                      }} className="text-teal-500 text-xs  font-medium text-left mt-2 hover:underline">
                         {card.link}
                       </button>
                       <button onClick={() => {
@@ -456,7 +472,7 @@ const AiCargoMateAssistant = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <div  id="sectionId" className="bg-white rounded-xl border border-gray-200 p-4">
                 <p className="text-sm  font-bold text-gray-900 mb-3 flex items-center gap-2">
                   <FiClipboard className="text-teal-500 text-base" /> Detailed AI Analysis
                 </p>
@@ -500,9 +516,7 @@ const AiCargoMateAssistant = () => {
                       </div>
                     ))}
 
-                    <button className="mt-3 xl:mb-16 text-xs font-semibold text-blue-600 hover:text-blue-700">
-                      {content.tariffLink}
-                    </button>
+ 
 
 
                   </div>
@@ -631,10 +645,10 @@ const AiCargoMateAssistant = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
+              {/* <div className="bg-white rounded-xl border border-gray-200 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-sm  font-bold text-gray-900">
-                    Audit Log (This Query)
+                    Audit Log  
                   </p>
                   <button className="text-teal-500 text-xs font-medium hover:underline">
                     View All
@@ -657,6 +671,9 @@ const AiCargoMateAssistant = () => {
                     </span>
                   </div>
                 ))}
+              </div> */}
+              <div>
+                <img src={poster} className='w-full max-h-48'/>
               </div>
             </div>
           </div>

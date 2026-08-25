@@ -554,19 +554,19 @@ export default function CargoMateChat() {
           </div>
         </div>
 
-        <div className="flex-1 hidden justify-center lg:flex items-center gap-2 overflow-x-auto no-scrollbar">
+        {/* <div className="flex-1 hidden justify-center lg:flex items-center gap-2 overflow-x-auto no-scrollbar">
           {badges.map((b) => (
             <Badge key={b.label} {...b} />
           ))}
-        </div>
+        </div> */}
 
         <div className="flex sm:hidden md:flex items-center gap-2 sm:gap-4 shrink-0">
-          <button className="relative">
+          {/* <button className="relative">
             <Bell size={19} className="text-gray-500" />
             <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
               3
             </span>
-          </button>
+          </button> */}
           <button className="flex items-center gap-1 text-sm text-gray-600">
             English <ChevronDown size={14} />
           </button>

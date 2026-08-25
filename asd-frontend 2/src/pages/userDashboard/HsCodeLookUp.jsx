@@ -9,14 +9,14 @@ import { BsShieldCheck } from "react-icons/bs";
 import { MdOutlineVerified } from "react-icons/md";
 import NeedHelp from "../../components/core/NeedHelp";
 import Shipment from "../../components/ShipmentForm";
-
+import poster2 from "../../assets/Images/webp/poster2.webp"
 const otherMatches = [
   { code: "6109.90.00", desc: "Other T-shirts, singlets and other vests, of cotton", score: 78, type: "8 Digit", duty: "5%" },
   { code: "6109.20.00", desc: "T-shirts, singlets and other vests, of synthetic fibers", score: 45, type: "8 Digit", duty: "5%" },
   { code: "6105.00.00", desc: "Shirts of cotton, knitted or crocheted", score: 35, type: "8 Digit", duty: "5%" },
 ];
 
-const detailTabs = ["HS Code Details", "Description & Notes", "Legal Text", "Explanatory Notes", "Related Products", "History"];
+const detailTabs = ["HS Code Details", "Description & Notes", "RBI Policy", "Country Rule", "Related Products", "History"];
 
 const hsDetails = [
   ["HS Code", "6109.10.00"],
@@ -35,6 +35,36 @@ const assumptions = [
   "Product is for men (general usage).",
   "Not specially designed for infants.",
 ];
+
+const auditLog = [
+  {
+    color: "bg-teal-500",
+    time: "09:25 AM",
+    text: "Query Submitted by Arjun Soni",
+  },
+  { color: "bg-blue-500", time: "09:25 AM", text: "AI Processing Started" },
+  {
+    color: "bg-yellow-500",
+    time: "09:25 AM",
+    text: "HS Code Identified: 6109.10.00",
+  },
+  {
+    color: "bg-teal-500",
+    time: "09:26 AM",
+    text: "Incentives Calculated Successfully",
+  },
+  {
+    color: "bg-teal-500",
+    time: "09:26 AM",
+    text: "Freight Rates Fetched (Air)",
+  },
+  {
+    color: "bg-emerald-500",
+    time: "09:26 AM",
+    text: "Report Generated Successfully",
+  },
+];
+
 
 const docReqs = [
   "Commercial Invoice",
@@ -148,7 +178,7 @@ export default function HSCodeLookup() {
                 </div>
                 <div className="flex items-end">
                   <button className="w-full flex items-center justify-center gap-1.5 border border-gray-200 rounded-lg px-2 py-2 text-sm font-bold text-[#008B7D] hover:bg-gray-50">
-                    <FiFilter size={12} /> Advanced Filters <FiChevronDown size={11} />
+                   Search 
                   </button>
                 </div>
               </div>
@@ -186,9 +216,9 @@ export default function HSCodeLookup() {
                     <MdOutlineVerified size={16} />
                     <span className="text-sm font-semibold">High</span>
                   </div>
-                  <button className="mt-2 flex items-center gap-1 border border-teal-500 text-teal-500 text-[10px] font-medium px-2.5 py-1 rounded-lg hover:bg-teal-50">
+                  {/* <button className="mt-2 flex items-center gap-1 border border-teal-500 text-teal-500 text-[10px] font-medium px-2.5 py-1 rounded-lg hover:bg-teal-50">
                     <FiEye size={11} /> View Details
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>
@@ -221,7 +251,14 @@ export default function HSCodeLookup() {
                       <td className="px-3 py-3 text-xs text-gray-600">{row.type}</td>
                       <td className="px-3 py-3 text-xs text-gray-600">{row.duty}</td>
                       <td className="px-3 py-3">
-                        <button className="border border-gray-200 text-[#155DFC] text-[11px] font-medium px-3 py-1 rounded-lg hover:bg-gray-50">
+                        <button  onClick={() => {
+                        setTimeout(() => {
+                          document.getElementById("sectionId")?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
+                        }, 100);
+                      }} className="border border-gray-200 text-[#155DFC] text-[11px] font-medium px-3 py-1 rounded-lg hover:bg-gray-50">
                           View Details
                         </button>
                       </td>
@@ -238,18 +275,19 @@ export default function HSCodeLookup() {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <div className="bg-white border border-gray-200 rounded-xl p-4" id="sectionId">
             <div className="flex overflow-x-auto border-b border-gray-200 mb-4 gap-0">
               {detailTabs.map((tab) => (
                 <button
                   key={tab}
-                  onClick={() => setActiveTab(tab)}
+                  // onClick={() => setActiveTab(tab)}
                   className={`px-3 py-2 text-xs  font-medium whitespace-nowrap border-b-2 -mb-px transition-colors
                     ${activeTab === tab ? "border-teal-500 text-[#0D9488]" : "border-transparent text-gray-700"}`}
                 >
-                  {tab}
+                  {tab} 
                 </button>
               ))}
+              
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4">
@@ -260,9 +298,8 @@ export default function HSCodeLookup() {
                     <span className="text-gray-800 font-medium">{v}</span>
                   </div>
                 ))}
-                 <button className="mt-3 xl:mb-16 text-xs font-semibold text-blue-600 hover:text-blue-700">
-                         View Official Tariff Page  
-                  </button>
+               
+               <img src={poster2}  className='w-full max-h-36' />
               </div>
 
               <div className="flex flex-col gap-3">
@@ -372,9 +409,7 @@ export default function HSCodeLookup() {
               <span className="text-gray-700 font-semibold">Total Duty & Tax</span>
               <span className="text-emerald-600 font-bold text-sm">10%</span>
             </div>
-            <button className="text-[#008B7D] text-xs font-medium hover:underline flex items-center gap-1 mt-1">
-              View Duty Calculation <FiChevronRight size={12} />
-            </button>
+           
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -390,22 +425,47 @@ export default function HSCodeLookup() {
                 <span className={`font-medium ${color}`}>{v}</span>
               </div>
             ))}
-            <button className="text-[#008B7D] text-xs font-medium hover:underline flex items-center gap-1 mt-2">
+            {/* <button className="text-[#008B7D] text-xs font-medium hover:underline flex items-center gap-1 mt-2">
               View Trade Regulations <FiChevronRight size={12} />
-            </button>
+            </button> */}
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
+          {/* <div className="bg-white border border-gray-200 rounded-xl p-4">
             <p className="text-sm font-semibold text-[#1E293B] mb-3">Document Requirements</p>
             {docReqs.map((doc) => (
               <div key={doc} className="flex items-center gap-2 py-1.5 border-b border-gray-100 last:border-0 text-xs text-gray-700">
                 <FiCheckCircle size={13} className="text-emerald-500 flex-shrink-0" /> {doc}
               </div>
             ))}
-            <button className="text-[#008B7D] text-xs font-medium hover:underline flex items-center gap-1 mt-2">
-              View All Documents <FiChevronRight size={12} />
-            </button>
-          </div>
+          </div> */}
+
+           <div className="bg-white rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-sm font-semibold text-gray-800">
+                    Audit Log  
+                  </p>
+                  <button className="text-teal-500 text-xs font-medium hover:underline">
+                    View All
+                  </button>
+                </div>
+                {auditLog.map((entry, i) => (
+                  <div
+                    key={i}
+                    className="flex  gap-2 py-1.5 border-b border-gray-100 last:border-0"
+                  >
+                    <span
+                      className={`w-2 h-2 rounded-full bg-green-500 flex-shrink-0 mt-1`}
+                    />
+
+                    <span className=" flex-1 text-xs font-medium   text-gray-600">
+                      {entry.text}
+                    </span>
+                    <span className="text-xs text-left text-gray-400 whitespace-nowrap">
+                      {entry.time}
+                    </span>
+                  </div>
+                ))}
+              </div>
         </div>
 
       </div>
@@ -416,9 +476,9 @@ export default function HSCodeLookup() {
                        <h3 className="text-xs  font-bold text-gray-900 ">
                       Data Sources Used
                     </h3>
-                      <button className=" text-teal-500 text-xs  font-medium hover:underline">
+                      {/* <button className=" text-teal-500 text-xs  font-medium hover:underline">
                       View All Sources
-                    </button>
+                    </button> */}
                    </div>
                    
     

@@ -759,20 +759,6 @@ export default function UserDashboard() {
           <img src={logo} className="h-10" onClick={() => navigate("/")} />
         </div>
 
-        <div className="flex-1 w-full sm:max-w-sm md:max-w-md">
-          <div className="relative sm:w-full w-20">
-            <FiSearch
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
-              size={14}
-            />
-            <input
-              type="text"
-              placeholder="Search"
-              className="sm:w-full w-14 pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-teal-400"
-            />
-          </div>
-        </div>
-
         <div className="flex items-center gap-1.5 ml-auto">
           <button    onClick={() => setShowNotifications(true)} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600 relative">
             <FiBell size={16} />
@@ -781,9 +767,7 @@ export default function UserDashboard() {
           <button   onClick={() => setShowMessages(true)} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
             <FiMail size={16} />
           </button>
-          {/* <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
-            <FiSun size={16} />
-          </button> */}
+         
           <div className="flex items-center gap-2 ml-1 pl-2 py-2 border-l border-gray-200">
             <div className="hidden sm:block leading-tight">
               <p className="text-xs sm:text-sm font-semibold text-gray-800">
@@ -811,7 +795,7 @@ export default function UserDashboard() {
       >
         <nav className="flex-1 overflow-y-auto py-3  bg-gray-900 pr-2">
            <button className="w-full hover:bg-teal-500 hover:text-white px-4 py-2 flex items-center gap-2 text-[#8aa0bc] rounded-r-lg text-xs text-left transition-colors" onClick={() => navigate("/chatbot")}>
-                 Chatbot</button>
+              AI CargoMate   Chatbot</button>
           {sidebarSections.map((section) => (
             <div key={section.title} className="  " >
               
@@ -863,14 +847,6 @@ export default function UserDashboard() {
           ))}
           <div className="bg-[##152A4E] rounded-xl p-4 text-white flex flex-col">
             <h3 className="text-sm font-semibold mb-4">AI Queries Left</h3>
-
-            {/* <div className="flex-1 flex items-center justify-center rounded-lg bg-[#15253d] min-h-[100px]">
-              <img
-                src={"/ai-query-placeholder.png"}
-                alt="AI Queries"
-                className=" object-contain"
-              />
-            </div> */}
 
             <div className="text-center mt-4">
               <p className="text-lg font-bold">42 / 100</p>

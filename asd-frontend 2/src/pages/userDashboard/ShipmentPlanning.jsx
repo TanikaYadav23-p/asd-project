@@ -6,6 +6,8 @@ import {
   FiAlertTriangle, FiBookOpen, FiTruck, FiUpload, FiRadio,
   FiShare2, FiExternalLink, FiBell
 } from "react-icons/fi";
+import poster from "../../assets/Images/webp/poster4.webp"
+
 import { BsAirplane } from "react-icons/bs";
 import { MdOutlineRocketLaunch } from "react-icons/md";
 import plane from "../../assets/Images/webp/aeroplane.webp"
@@ -817,6 +819,9 @@ const handleCancelParties = () => {
  
         
       </div> 
+        <div className="min-w-0  mt-4"> 
+                      <img src={poster}  className='w-full max-h-60 ' />
+                  </div>
        </div>)}
       
        {shipment === "shipment" && (

@@ -1,491 +1,921 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import API from "../../api/axios";
+
+import { FaMagnifyingGlass } from "react-icons/fa6";
+import { CircleCheckBig } from "lucide-react";
+import { FiEdit } from "react-icons/fi";
+
 import {
-  FaPlus, FaMagnifyingGlass, FaXmark, FaChevronDown,
-  FaStar, FaTruck, FaBoxOpen, FaWarehouse, FaFileContract
-} from "react-icons/fa6";
-import { ChevronDown, CircleCheckBig } from "lucide-react";
-import {
-  MoreVertical,
-} from "lucide-react";
-import crown from "../../assets/Images/webp/crown.webp"
-import {
-  FiEdit,
-} from "react-icons/fi";
-const typeOptions = ["All Types", "Shipping Partner", "Freight Forwarder", "Custom Broker", "Warehouse Partner"];
-const statusOptions = ["All Status", "Active", "Inactive"];
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  Tooltip,
+} from "recharts";
 
 import KYCVerificationModal from "../../components/adminComponent/KycVerification";
 import RejectKYCModal from "../../components/adminComponent/RejectKycVerification";
 
 const HEADING = "text-[#07156B]";
-const typeIcon = (type) => {
-  if (type === "Shipping Partner") return <FaTruck className="text-blue-400 text-xs" />;
-  if (type === "Freight Forwarder") return <FaBoxOpen className="text-orange-400 text-xs" />;
-  if (type === "Custom Broker") return <FaFileContract className="text-purple-400 text-xs" />;
-  if (type === "Warehouse Partner") return <FaWarehouse className="text-teal-400 text-xs" />;
-  return <FaTruck className="text-blue-400 text-xs" />;
-};
 
-const stats = [
-  { label: "Total Vendors", value: "1,248", sub: "All vendors", subColor: "text-green-600", iconColor: "text-green-400" },
-  { label: "Active Vendors", value: "1,048", sub: "Active vendors", subColor: "text-green-600", iconColor: "text-green-400" },
-  { label: "Total Shipments", value: "200", sub: "This month", subColor: "text-red-500", iconColor: "text-red-400" },
-  { label: "Verified Vendor", value: "00", sub: "", subColor: "text-purple-500", iconColor: "text-purple-400" },
-];
 function StatusBadge({ status }) {
+  const normalized =
+    status?.toLowerCase() === "active"
+      ? "Active"
+      : status?.toLowerCase() === "inactive"
+      ? "Inactive"
+      : status || "Active";
+
   const styles = {
-    "In Transit": "bg-blue-100 text-blue-600",
-    Pending: "bg-amber-100 text-amber-600",
-    Delayed: "bg-rose-100 text-rose-600",
-    Exception: "bg-purple-100 text-purple-600",
-    Delivered: "bg-green-100 text-green-600",
-  };
-  return <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg whitespace-nowrap ${styles[status]}`}>{status}</span>;
-}
-
-function StatCard({ stat }) {
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
-      <div>
-        <p className="text-sm text-gray-500">{stat.label}</p>
-        <p className="text-2xl font-semibold text-gray-900 mt-1">{stat.value}</p>
-        <p className={`text-xs mt-1 ${stat.subColor}`}>{stat.sub}</p>
-      </div>
-    </div>
-  );
-}
-
-const initialVendors = Array.from({ length: 6 }, (_, i) => ({
-  id: i + 1,
-  companyName: "Global Logistic Inc.",
-  email: "contact@globallog.com",
-  phone: "999999998",
-  location: "United States",
-  subscriptionPlan: "Premium",
-  shipmentStatus: "4",
-  status: "Active",
-  kyc: "Verified",
-
-  gstNumber: "",
-  registrationNumber: "",
-  businessType: "",
-  yearOfEstablishment: "",
-  associatedWith: "",
-  verifiedOn: "",
-  verifiedBy: "",
-  nextReviewDate: "",
-  bankName: "",
-  accountHolder: "",
-  accountNumber: "",
-  ifscCode: "",
-  swiftCode: "",
-}));
-
-function InfoRow({ title, value }) {
-  return (
-    <div className="flex justify-between">
-      <span className="font-semibold text-xs ">{title}</span>
-      <span className="font-medium text-xs">{value}</span>
-    </div>
-  );
-}
-function AddVendorModal({ onClose, onAdd }) {
-  const [form, setForm] = useState({ name: "", email: "", type: "Shipping Partner", location: "", rating: "", activeShipment: "", status: "Active" });
-  const [errors, setErrors] = useState({});
-  const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: "" })); };
-
-  const validate = () => {
-    const e = {};
-    if (!form.name.trim()) e.name = "Name is required";
-    if (!form.email.trim()) e.email = "Email is required";
-    if (!form.location.trim()) e.location = "Location is required";
-    return e;
+    Active: "bg-green-100 text-green-600",
+    Inactive: "bg-red-100 text-red-600",
   };
 
-  const handleAdd = () => {
-    const e = validate();
-    if (Object.keys(e).length) { setErrors(e); return; }
-    onAdd({ ...form, id: Date.now(), rating: parseFloat(form.rating) || 0, activeShipment: parseInt(form.activeShipment) || 0 });
-    onClose();
-  };
-
-  const inp = (k) => `w-full border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all ${errors[k] ? "border-red-400" : "border-gray-200"}`;
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-semibold text-gray-800">Add New Vendor</h3>
-          <button onClick={onClose} className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-            <FaXmark />
-          </button>
-        </div>
-        <div className="flex flex-col gap-4 mb-6">
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Company Name</label>
-            <input className={inp("name")} placeholder="Enter company name" value={form.name} onChange={e => set("name", e.target.value)} />
-            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Email</label>
-            <input type="email" className={inp("email")} placeholder="Enter email address" value={form.email} onChange={e => set("email", e.target.value)} />
-            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Type</label>
-            <select className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 bg-white transition-all"
-              value={form.type} onChange={e => set("type", e.target.value)}>
-              {typeOptions.slice(1).map(t => <option key={t}>{t}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Location</label>
-            <input className={inp("location")} placeholder="Enter location" value={form.location} onChange={e => set("location", e.target.value)} />
-            {errors.location && <p className="text-xs text-red-500 mt-1">{errors.location}</p>}
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">Rating</label>
-              <input type="number" step="0.1" min="0" max="5" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all"
-                placeholder="4.8" value={form.rating} onChange={e => set("rating", e.target.value)} />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">Active Shipment</label>
-              <input type="number" className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all"
-                placeholder="32" value={form.activeShipment} onChange={e => set("activeShipment", e.target.value)} />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
-            <select className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 bg-white transition-all"
-              value={form.status} onChange={e => set("status", e.target.value)}>
-              <option>Active</option>
-              <option>Inactive</option>
-            </select>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={onClose} className="flex-1 px-4 py-2.5 text-sm text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 font-medium transition-colors">Cancel</button>
-          <button onClick={handleAdd} className="flex-1 px-4 py-2.5 text-sm text-white bg-teal-500 rounded-xl hover:bg-teal-600 font-medium transition-colors">Add Vendor</button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const userByType = [
-  { label: "Basic Plan", value: "2499", percent: "52.2%", color: "bg-purple-500" },
-  { label: "Starter Plan", value: "4999", percent: "52.2%", color: "bg-blue-500" },
-];
-
-const registrationData = [
-  { month: "May", value: 55 },
-  { month: "june", value: 40 },
-  { month: "july", value: 68 },
-  { month: "Aug", value: 30 },
-  { month: "Sep", value: 62 },
-  { month: "Oct", value: 45 },
-];
-
-const maxReg = Math.max(...registrationData.map((r) => r.value));
-
-function DonutRing({ segments, centerValue, centerLabel, onClick }) {
-  let cumulative = 0;
-
-  const gradientParts = segments.map((s) => {
-    const start = cumulative;
-    cumulative += s.percent;
-    return `${s.hex} ${start}% ${cumulative}%`;
-  });
-
-  const gradient = `conic-gradient(${gradientParts.join(",")})`;
-
-  return (
-    <div
-      onClick={onClick}
-      className="relative w-32 h-32 min-w-32 min-h-32 aspect-square shrink-0 rounded-full flex items-center justify-center cursor-pointer"
-      style={{ background: gradient }}
+    <span
+      className={`text-[10px] font-bold px-2.5 py-1 rounded-lg whitespace-nowrap ${
+        styles[normalized] || "bg-gray-100 text-gray-600"
+      }`}
     >
-      <div className="absolute w-10 h-10 min-w-24 min-h-24 aspect-square bg-white rounded-full flex flex-col items-center justify-center">
-        <span className="text-lg font-semibold text-gray-900">{centerValue}</span>
-        <span className="text-xs text-gray-500">{centerLabel}</span>
-      </div>
+      {normalized}
+    </span>
+  );
+}
+
+function KycBadge({ status }) {
+  const normalized =
+    status?.toLowerCase() === "verified"
+      ? "Verified"
+      : status?.toLowerCase() === "rejected"
+      ? "Rejected"
+      : "Pending";
+
+  const styles = {
+    Verified: "bg-green-100 text-green-700",
+    Rejected: "bg-red-100 text-red-700",
+    Pending: "bg-amber-100 text-amber-700",
+  };
+
+  return (
+    <span
+      className={`text-[10px] font-bold px-2.5 py-1 rounded-lg whitespace-nowrap ${
+        styles[normalized] || "bg-amber-100 text-amber-700"
+      }`}
+    >
+      {normalized}
+    </span>
+  );
+}
+
+function StatCard({ label, value, sub }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <p className="text-sm text-gray-500">{label}</p>
+
+      <p className="text-2xl font-semibold text-gray-900 mt-1">
+        {value || 0}
+      </p>
+
+      <p className="text-xs mt-1 text-gray-400">{sub}</p>
     </div>
   );
 }
 
-/* Small read-only row used inside the vendor detail panel.
-   NOTE: intentionally no <input>/<select> here — this is view-only. */
-function DetailField({ label, value, valueClass = "text-gray-900" }) {
+function DetailField({
+  label,
+  value,
+  valueClass = "text-gray-900",
+}) {
   return (
     <div>
-      <label className="block text-gray-500 mb-1">{label}</label>
-      <p className={`${valueClass} break-all`}>{value || "-"}</p>
+      <label className="block text-gray-500 mb-1">
+        {label}
+      </label>
+
+      <p className={`${valueClass} break-all`}>
+        {value || "-"}
+      </p>
     </div>
   );
 }
 
 export default function VendorsPartners() {
-  const [vendors, setVendors] = useState(initialVendors);
-  const [search, setSearch] = useState("");
-  const [typeFilter, setTypeFilter] = useState("All Types");
-  const [statusFilter, setStatusFilter] = useState("All Status");
-  const [showModal, setShowModal] = useState(false);
-  const [openMenu, setOpenMenu] = useState(null);
-  const [kycVerify, setKycVerify] = useState(false)
-  const [rejectKyc, setRejectKyc] = useState(false)
+  const [vendors, setVendors] = useState([]);
 
-  const [showDetail, setShowDetail] = useState(false)
-  const [date, setDate] = useState({
-    startDate: "",
-    endDate: "",
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    activeUsers: 0,
+    totalShipments: 0,
+    verifiedUsers: 0,
   });
-  const handleAdd = (vendor) => setVendors(prev => [vendor, ...prev]);
 
-  const handleStatusChange = (id, newStatus) => {
-    setVendors(prev => prev.map(v => v.id === id ? { ...v, status: newStatus } : v));
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] =
+    useState("All Status");
+
+  const [typeFilter, setTypeFilter] =
+    useState("All Types");
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [selectedVendor, setSelectedVendor] =
+    useState(null);
+
+  const [showDetail, setShowDetail] =
+    useState(false);
+
+  const [kycVerify, setKycVerify] =
+    useState(false);
+
+  const [rejectKyc, setRejectKyc] =
+    useState(false);
+
+  const fetchB2BUsers = async () => {
+    try {
+      setLoading(true);
+      setError("");
+
+      const response = await API.get("/vendors");
+
+      setVendors(response.data?.data || []);
+    } catch (err) {
+      console.error(
+        "Failed to fetch B2B users:",
+        err
+      );
+
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to fetch B2B users"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filtered = vendors.filter(v => {
-    const q = search.toLowerCase();
-    const matchSearch = search.length >= 2
-      ? v.name.toLowerCase().includes(q) || v.email.toLowerCase().includes(q) || v.location.toLowerCase().includes(q)
-      : true;
-    const matchType = typeFilter === "All Types" || v.type === typeFilter;
-    const matchStatus = statusFilter === "All Status" || v.status === statusFilter;
-    return matchSearch && matchType && matchStatus;
-  });
+  const fetchStats = async () => {
+    try {
+      const response = await API.get(
+        "/vendors/stats/all"
+      );
+
+      if (response.data?.data) {
+        setStats(response.data.data);
+      }
+    } catch (err) {
+      console.error(
+        "Failed to fetch B2B stats:",
+        err
+      );
+    }
+  };
 
   useEffect(() => {
-    const handleClickOutside = () => setOpenMenu(null);
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
+    fetchB2BUsers();
+    fetchStats();
   }, []);
 
-  const [selectedVendor, setSelectedVendor] = useState(vendors[0]);
+  const basicPlanCount = vendors.filter(
+    (vendor) =>
+      !vendor.plan ||
+      vendor.plan.toLowerCase() === "basic"
+  ).length;
 
-  // Action button (FiEdit) -> sirf detail dikhana hai, editing nahi.
-  const handleViewVendor = (vendor) => {
-    setSelectedVendor(vendor);
-    setShowDetail(true);
+  const starterPlanCount = vendors.filter(
+    (vendor) =>
+      vendor.plan?.toLowerCase() === "starter"
+  ).length;
+
+  const otherPlanCount = vendors.filter(
+    (vendor) =>
+      vendor.plan &&
+      !["basic", "starter"].includes(
+        vendor.plan.toLowerCase()
+      )
+  ).length;
+
+  const totalPlanVendors =
+    basicPlanCount +
+    starterPlanCount +
+    otherPlanCount;
+
+  const planData = [
+    {
+      name: "Basic Plan",
+      value: basicPlanCount,
+      color: "#7C4DFF",
+    },
+    {
+      name: "Starter Plan",
+      value: starterPlanCount,
+      color: "#4A78C2",
+    },
+    {
+      name: "Other Plan",
+      value: otherPlanCount,
+      color: "#1FA45B",
+    },
+  ].filter((item) => item.value > 0);
+
+  const activeVendorCount = vendors.filter(
+    (vendor) =>
+      vendor.status?.toLowerCase() === "active"
+  ).length;
+
+  const inactiveVendorCount = vendors.filter(
+    (vendor) =>
+      vendor.status?.toLowerCase() === "inactive" ||
+      vendor.status?.toLowerCase() === "suspended"
+  ).length;
+
+  const totalStatusVendors =
+    activeVendorCount + inactiveVendorCount;
+
+  const activePercentage =
+    totalStatusVendors > 0
+      ? Math.round(
+          (activeVendorCount /
+            totalStatusVendors) *
+            100
+        )
+      : 0;
+
+  const inactivePercentage =
+    totalStatusVendors > 0
+      ? Math.round(
+          (inactiveVendorCount /
+            totalStatusVendors) *
+            100
+        )
+      : 0;
+
+  const statusData = [
+    {
+      name: "Active",
+      value: activeVendorCount,
+      color: "#1FA45B",
+    },
+    {
+      name: "Inactive",
+      value: inactiveVendorCount,
+      color: "#EF4444",
+    },
+  ].filter((item) => item.value > 0);
+
+  const registrationData = Array.from(
+    { length: 6 },
+    (_, index) => {
+      const date = new Date();
+
+      date.setMonth(
+        date.getMonth() - (5 - index)
+      );
+
+      const month = date.toLocaleString(
+        "en-US",
+        {
+          month: "short",
+        }
+      );
+
+      const monthIndex = date.getMonth();
+      const year = date.getFullYear();
+
+      return {
+        month,
+        count: vendors.filter((vendor) => {
+          if (!vendor.createdAt) return false;
+
+          const vendorDate = new Date(
+            vendor.createdAt
+          );
+
+          return (
+            vendorDate.getMonth() ===
+              monthIndex &&
+            vendorDate.getFullYear() === year
+          );
+        }).length,
+      };
+    }
+  );
+
+  const filtered = vendors.filter((v) => {
+    const query = search.toLowerCase().trim();
+
+    const matchSearch =
+      !query ||
+      v.name?.toLowerCase().includes(query) ||
+      v.companyName
+        ?.toLowerCase()
+        .includes(query) ||
+      v.email?.toLowerCase().includes(query) ||
+      v.phone?.toLowerCase().includes(query);
+
+    const normalizedStatus =
+      v.status?.toLowerCase() === "active"
+        ? "Active"
+        : v.status?.toLowerCase() ===
+          "inactive"
+        ? "Inactive"
+        : v.status;
+
+    const matchStatus =
+      statusFilter === "All Status" ||
+      normalizedStatus === statusFilter;
+
+    const normalizedPlan =
+      !v.plan ||
+      v.plan.toLowerCase() === "basic"
+        ? "Basic"
+        : v.plan.toLowerCase() === "starter"
+        ? "Starter"
+        : v.plan;
+
+    const matchType =
+      typeFilter === "All Types" ||
+      normalizedPlan === typeFilter;
+
+    return (
+      matchSearch &&
+      matchStatus &&
+      matchType
+    );
+  });
+
+  const handleViewVendor = async (user) => {
+    try {
+      setSelectedVendor(user);
+      setShowDetail(true);
+
+      const response = await API.get(
+        `/vendors/${user._id}`
+      );
+
+      if (response.data?.data) {
+        setSelectedVendor(
+          response.data.data
+        );
+      }
+    } catch (err) {
+      console.error(
+        "Failed to fetch B2B user details:",
+        err
+      );
+    }
   };
 
-  useEffect(() => {
-    if (showDetail && selectedVendor) {
-      requestAnimationFrame(() => {
-        document.getElementById("users-section")?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      });
+  const updateUserInState = (updatedUser) => {
+    if (!updatedUser?._id) return;
+
+    setVendors((prev) =>
+      prev.map((user) =>
+        user._id === updatedUser._id
+          ? {
+              ...user,
+              ...updatedUser,
+            }
+          : user
+      )
+    );
+
+    setSelectedVendor((prev) =>
+      prev?._id === updatedUser._id
+        ? {
+            ...prev,
+            ...updatedUser,
+          }
+        : prev
+    );
+
+    fetchStats();
+  };
+
+  const handleSuspend = async () => {
+    if (!selectedVendor?._id) return;
+
+    try {
+      const response = await API.patch(
+        `/vendors/${selectedVendor._id}/suspend`
+      );
+
+      const updatedUser =
+        response.data?.data ||
+        response.data;
+
+      if (updatedUser?._id) {
+        updateUserInState(updatedUser);
+      }
+    } catch (err) {
+      console.error(
+        "Failed to suspend user:",
+        err
+      );
+
+      alert(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to suspend user"
+      );
     }
-  }, [showDetail, selectedVendor]);
+  };
+
+  const submittedDate = selectedVendor?.createdAt
+    ? new Date(
+        selectedVendor.createdAt
+      ).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "-";
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
-      {showModal && <AddVendorModal onClose={() => setShowModal(false)} onAdd={handleAdd} />}
-
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div className="flex items-start justify-between mb-6 gap-3">
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Vendors/Partners</h1>
-            <p className="text-xs sm:text-sm text-gray-400 mt-1">Manage vendors relationship and partnership</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">
+              Vendors/Partners
+            </h1>
+
+            <p className="text-xs sm:text-sm text-gray-400 mt-1">
+              Manage B2B users and KYC verification
+            </p>
           </div>
         </div>
+
+        {/* TOP STATS */}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {stats.map((s) => (
-            <StatCard key={s.label} stat={s} />
-          ))}
+          <StatCard
+            label="Total B2B Users"
+            value={stats.totalUsers}
+            sub="All registered B2B users"
+          />
+
+          <StatCard
+            label="Active Users"
+            value={stats.activeUsers}
+            sub="Active B2B accounts"
+          />
+
+          <StatCard
+            label="Total Shipments"
+            value={stats.totalShipments}
+            sub="Created by B2B users"
+          />
+
+          <StatCard
+            label="Verified KYC"
+            value={stats.verifiedUsers}
+            sub="KYC approved users"
+          />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <p className="text-sm font-medium text-gray-700 mb-4">Plan type vendor</p>
+        {/* ANALYTICS CARDS */}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
+
+          {/* PLAN TYPE VENDOR */}
+
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 min-h-[300px]">
+            <h3 className="text-lg font-medium text-gray-700 mb-4">
+              Plan type vendor
+            </h3>
+
             <div className="flex flex-col sm:flex-row items-center gap-6">
-              <DonutRing
-                segments={[
-                  { hex: "#a855f7", percent: 25 },
-                  { hex: "#3b82f6", percent: 25 },
-                  { hex: "#22c55e", percent: 25 },
-                  { hex: "#e5e7eb", percent: 25 },
-                ]}
-                centerValue="1,248"
-                centerLabel="Total"
-              />
-              <div className="space-y-2 w-full">
-                {userByType.map((t) => (
-                  <div key={t.label} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <span className={`w-2 h-2 rounded-full ${t.color}`} />
-                      {t.label}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900">{t.value}</span>
-                      <span className="text-gray-400">({t.percent})</span>
-                    </div>
+              
+              <div className="relative w-[180px] h-[180px] flex-shrink-0">
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                >
+                  <PieChart>
+                    <Pie
+                      data={
+                        planData.length > 0
+                          ? planData
+                          : [
+                              {
+                                name: "No Data",
+                                value: 1,
+                                color: "#E5E7EB",
+                              },
+                            ]
+                      }
+                      dataKey="value"
+                      nameKey="name"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={58}
+                      outerRadius={82}
+                      startAngle={90}
+                      endAngle={-270}
+                      paddingAngle={2}
+                      stroke="none"
+                    >
+                      {(planData.length > 0
+                        ? planData
+                        : [
+                            {
+                              name: "No Data",
+                              value: 1,
+                              color: "#E5E7EB",
+                            },
+                          ]
+                      ).map((entry) => (
+                        <Cell
+                          key={entry.name}
+                          fill={entry.color}
+                        />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+
+                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-xs text-gray-400">
+                    Total
+                  </span>
+
+                  <span className="text-2xl font-bold text-gray-800 leading-tight">
+                    {totalPlanVendors}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-3 w-full">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#7C4DFF]" />
+
+                    <span className="text-sm text-gray-600">
+                      Basic Plan
+                    </span>
                   </div>
-                ))}
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {basicPlanCount}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#4A78C2]" />
+
+                    <span className="text-sm text-gray-600">
+                      Starter Plan
+                    </span>
+                  </div>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {starterPlanCount}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#1FA45B]" />
+
+                    <span className="text-sm text-gray-600">
+                      Other Plan
+                    </span>
+                  </div>
+
+                  <span className="text-sm font-semibold text-gray-700">
+                    {otherPlanCount}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <p className="text-sm font-medium text-gray-700 mb-4">Vendor Registration</p>
-            <div className="flex items-end justify-between h-40 gap-2">
-              {registrationData.map((r) => (
-                <div key={r.month} className="flex flex-col items-center flex-1 h-full justify-end gap-2">
-                  <div
-                    className="w-full max-w-6 bg-green-400 rounded-sm"
-                    style={{ height: `${(r.value / maxReg) * 100}%` }}
+          {/* VENDOR REGISTRATION */}
+
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 min-h-[300px]">
+            <h3 className="text-lg font-medium text-gray-700 mb-4">
+              Vendor Registration
+            </h3>
+
+            <div className="h-[220px]">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+                <BarChart
+                  data={registrationData}
+                  margin={{
+                    top: 10,
+                    right: 5,
+                    left: 5,
+                    bottom: 0,
+                  }}
+                >
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 12,
+                      fill: "#94A3B8",
+                    }}
                   />
-                  <span className="text-[10px] text-gray-400">{r.month}</span>
-                </div>
-              ))}
+
+                  <Tooltip
+                    cursor={false}
+                    contentStyle={{
+                      borderRadius: "8px",
+                      border:
+                        "1px solid #E5E7EB",
+                      fontSize: "12px",
+                    }}
+                  />
+
+                  <Bar
+                    dataKey="count"
+                    radius={[3, 3, 0, 0]}
+                    fill="#50C878"
+                    maxBarSize={32}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <p className="text-sm font-medium text-gray-700 mb-4">Vendor by Status</p>
-            <div className="flex flex-col items-center gap-4">
-              <DonutRing
-                segments={[
-                  { hex: "#22c55e", percent: 84 },
-                  { hex: "#ef4444", percent: 16 },
-                ]}
-                centerValue="84%"
-                centerLabel="Active"
-              />
-              <div className="w-full space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <span className="w-2 h-2 rounded-full bg-green-500" /> Active
-                  </div>
-                  <span className="text-gray-900">1,048 <span className="text-gray-400">84%</span></span>
+          {/* VENDOR BY STATUS */}
+
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 min-h-[300px]">
+            <h3 className="text-lg font-medium text-gray-700 mb-2">
+              Vendor by Status
+            </h3>
+
+            <div className="relative h-[190px]">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+                <PieChart>
+                  <Pie
+                    data={
+                      statusData.length > 0
+                        ? statusData
+                        : [
+                            {
+                              name: "No Data",
+                              value: 1,
+                              color: "#E5E7EB",
+                            },
+                          ]
+                    }
+                    dataKey="value"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={58}
+                    outerRadius={80}
+                    startAngle={90}
+                    endAngle={-270}
+                    paddingAngle={2}
+                    stroke="none"
+                  >
+                    {(statusData.length > 0
+                      ? statusData
+                      : [
+                          {
+                            name: "No Data",
+                            value: 1,
+                            color: "#E5E7EB",
+                          },
+                        ]
+                    ).map((entry) => (
+                      <Cell
+                        key={entry.name}
+                        fill={entry.color}
+                      />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-2xl font-bold text-gray-800">
+                  {activePercentage}%
+                </span>
+
+                <span className="text-sm text-gray-400">
+                  Active
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-4 mt-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#1FA45B]" />
+
+                  <span className="text-sm text-gray-600">
+                    Active
+                  </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <span className="w-2 h-2 rounded-full bg-red-500" /> Inactive
-                  </div>
-                  <span className="text-gray-900">200 <span className="text-gray-400">16%</span></span>
+
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-gray-800">
+                    {activeVendorCount}
+                  </span>
+
+                  <span className="text-gray-400">
+                    {activePercentage}%
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
+
+                  <span className="text-sm text-gray-600">
+                    Inactive
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-gray-800">
+                    {inactiveVendorCount}
+                  </span>
+
+                  <span className="text-gray-400">
+                    {inactivePercentage}%
+                  </span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="flex items-center border border-gray-200 rounded-xl px-3 py-2.5 gap-2 bg-white focus-within:border-teal-500 transition-all flex-1">
+        {/* SEARCH AND FILTER */}
+
+        <div className="flex flex-col lg:flex-row gap-3 mb-6">
+          <div className="flex items-center border border-gray-200 rounded-xl px-4 py-3 gap-3 bg-white focus-within:border-teal-500 transition-all flex-1">
             <FaMagnifyingGlass className="text-gray-400 text-sm flex-shrink-0" />
+
             <input
               className="flex-1 text-sm outline-none bg-transparent"
               placeholder="Search Vendors"
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
             />
           </div>
-          <div className="flex gap-2">
-            <select
-              className="flex-1 sm:flex-none border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 bg-white transition-all"
-              value={typeFilter}
-              onChange={e => setTypeFilter(e.target.value)}
-            >
-              {typeOptions.map(t => <option key={t}>{t}</option>)}
-            </select>
-            <select
-              className="flex-1 sm:flex-none border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 bg-white transition-all"
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-            >
-              {statusOptions.map(s => <option key={s}>{s}</option>)}
-            </select>
-          </div>
+
+          <select
+            className="border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-teal-500 bg-white min-w-[160px]"
+            value={typeFilter}
+            onChange={(e) =>
+              setTypeFilter(e.target.value)
+            }
+          >
+            <option>All Types</option>
+            <option>Basic</option>
+            <option>Starter</option>
+          </select>
+
+          <select
+            className="border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-teal-500 bg-white min-w-[160px]"
+            value={statusFilter}
+            onChange={(e) =>
+              setStatusFilter(e.target.value)
+            }
+          >
+            <option>All Status</option>
+            <option>Active</option>
+            <option>Inactive</option>
+          </select>
         </div>
 
-        {filtered.length === 0 ? (
-          <div className="text-center py-16 text-gray-400 text-sm">No vendors found</div>
+        {/* TABLE */}
+
+        {loading ? (
+          <div className="text-center py-16 text-gray-400 text-sm">
+            Loading B2B users...
+          </div>
+        ) : error ? (
+          <div className="text-center py-16 text-red-500 text-sm">
+            {error}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 text-gray-400 text-sm">
+            No B2B users found
+          </div>
         ) : (
-          <div className="w-full overflow-x-auto rounded-xl border border-gray-100 bg-white px-6 py-4 [-webkit-overflow-scrolling:touch]">
+          <div className="w-full overflow-x-auto rounded-xl border border-gray-100 bg-white px-6 py-4">
             <table className="w-full text-[11px] min-w-[900px]">
               <thead>
                 <tr className="text-sm text-[#081B6B] uppercase font-bold border-b border-slate-100">
-                  <th className="text-left py-2 font-bold">Company</th>
-                  <th className="text-left py-2 font-bold">Email</th>
-                  <th className="text-left py-2 font-bold">Phone</th>
-                  <th className="text-left py-2 font-bold">Plan</th>
-                  <th className="text-center py-2 font-bold">Shipment</th>
-                  <th className="text-left py-2 font-bold">Status</th>
-                  <th className="text-left py-2 font-bold">KYC</th>
-                  <th className="text-right py-2 font-bold">Actions</th>
+                  <th className="text-left py-3">
+                    Company
+                  </th>
+
+                  <th className="text-left py-3">
+                    Contact Person
+                  </th>
+
+                  <th className="text-left py-3">
+                    Email
+                  </th>
+
+                  <th className="text-left py-3">
+                    Phone
+                  </th>
+
+                  <th className="text-left py-3">
+                    Plan
+                  </th>
+
+                  <th className="text-center py-3">
+                    Shipments
+                  </th>
+
+                  <th className="text-left py-3">
+                    Status
+                  </th>
+
+                  <th className="text-left py-3">
+                    KYC
+                  </th>
+
+                  <th className="text-right py-3">
+                    Actions
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50 ">
-                {filtered.map((v, i) => (
-                  <tr key={v.id} className="text-xs">
-                    <td onClick={() => handleViewVendor(v)} className="py-3 whitespace-nowrap cursor-pointer hover:underline">
-                      <div className={`font-bold ${HEADING}`}>{v.companyName}</div>
-                    </td>
-                    <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.email}</td>
-                    <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.phone}</td>
-                    <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.subscriptionPlan}</td>
-                    <td className="py-3 whitespace-nowrap text-center font-medium text-slate-500">{v.shipmentStatus}</td>
-                    <td className="py-3">
-                      <StatusBadge status={v.status} />
-                    </td>
-                    <td className="py-3 whitespace-nowrap font-medium text-slate-500">{v.kyc}</td>
-                    <td className="py-3 text-right relative">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleViewVendor(v);
-                            setOpenMenu(null);
-                          }}
-                          className="text-slate-600"
-                        >
-                          <FiEdit />
-                        </button>
+
+              <tbody className="divide-y divide-slate-50">
+                {filtered.map((user) => (
+                  <tr
+                    key={user._id}
+                    className="text-xs"
+                  >
+                    <td
+                      onClick={() =>
+                        handleViewVendor(user)
+                      }
+                      className="py-3 whitespace-nowrap cursor-pointer hover:underline"
+                    >
+                      <div
+                        className={`font-bold ${HEADING}`}
+                      >
+                        {user.companyName || "-"}
                       </div>
-                      {openMenu === i && (
-                        <div
-                          onClick={(e) => e.stopPropagation()}
-                          className="absolute right-0 top-7 z-20 w-36 bg-white border border-gray-200 rounded-xl shadow-lg p-1.5 flex flex-col gap-1 text-left"
-                        >
-                          <button
-                            onClick={() => {
-                              setSelectedVendor(v);
-                              setOpenMenu(null);
-                            }}
-                            className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-blue-600 font-medium text-xs text-left hover:bg-blue-100 transition-colors"
-                          >
-                            View
-                          </button>
-                          <button
-                            onClick={() => {
-                              handleStatusChange(v.id, "Active");
-                              setOpenMenu(null);
-                            }}
-                            className="w-full py-1.5 px-2.5 rounded-lg bg-green-50 text-green-700 font-medium text-xs text-left hover:bg-green-100 transition-colors"
-                          >
-                            Active
-                          </button>
-                          <button
-                            className="w-full py-1.5 px-2.5 rounded-lg bg-red-50 text-red-600 font-medium text-xs text-left hover:bg-red-100 transition-colors"
-                          >
-                            Suspend
-                          </button>
-                          <button
-                            onClick={() => {
-                              setSelectedVendor(v);
-                              setOpenMenu(null);
-                              setKycVerify(true)
-                            }}
-                            className="w-full py-1.5 px-2.5 rounded-lg bg-amber-50 text-amber-700 font-medium text-xs text-left hover:bg-amber-100 transition-colors"
-                          >
-                            KYC
-                          </button>
-                        </div>
-                      )}
+                    </td>
+
+                    <td className="py-3 whitespace-nowrap font-medium text-slate-500">
+                      {user.name || "-"}
+                    </td>
+
+                    <td className="py-3 whitespace-nowrap font-medium text-slate-500">
+                      {user.email || "-"}
+                    </td>
+
+                    <td className="py-3 whitespace-nowrap font-medium text-slate-500">
+                      {user.phone || "-"}
+                    </td>
+
+                    <td className="py-3 whitespace-nowrap font-medium text-slate-500">
+                      {user.plan || "Basic"}
+                    </td>
+
+                    <td className="py-3 whitespace-nowrap text-center font-medium text-slate-500">
+                      {user.shipmentCount || 0}
+                    </td>
+
+                    <td className="py-3">
+                      <StatusBadge
+                        status={user.status}
+                      />
+                    </td>
+
+                    <td className="py-3">
+                      <KycBadge
+                        status={user.kycStatus}
+                      />
+                    </td>
+
+                    <td className="py-3 text-right">
+                      <button
+                        onClick={() =>
+                          handleViewVendor(user)
+                        }
+                        className="text-slate-600 hover:text-[#07156B]"
+                        title="View Details"
+                      >
+                        <FiEdit />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -495,113 +925,228 @@ export default function VendorsPartners() {
         )}
       </div>
 
-      {/* ================= VENDOR DETAIL (READ-ONLY) ================= */}
+      {/* DETAILS MODAL */}
+
       {showDetail && selectedVendor && (
         <div
-          className="w-full max-w-7xl bg-white rounded-2xl border border-gray-200 p-5 sm:p-6"
-          id="users-section"
+          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-3 sm:p-6"
+          onClick={() =>
+            setShowDetail(false)
+          }
         >
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <div className="flex items-center gap-3">
-              <p className="font-semibold text-gray-900">{selectedVendor.companyName}</p>
-              <span className={`text-xs font-medium ${selectedVendor.suspend ? "text-red-600" : "text-green-600"}`}>
-                {selectedVendor.suspend ? "Suspended" : "Active"}
-              </span>
+          <div
+            className="w-full max-w-6xl bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 max-h-[90vh] overflow-y-auto"
+            onClick={(e) =>
+              e.stopPropagation()
+            }
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <div>
+                <p className="font-semibold text-gray-900">
+                  {selectedVendor.companyName ||
+                    selectedVendor.name}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <KycBadge
+                  status={
+                    selectedVendor.kycStatus
+                  }
+                />
+
+                <button
+                  onClick={() =>
+                    setShowDetail(false)
+                  }
+                  className="whitespace-nowrap py-1.5 px-3 rounded-lg bg-gray-100 text-gray-600 font-medium text-xs hover:bg-gray-200"
+                >
+                  Close
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button className="text-green-600 font-semibold text-sm">Verified</button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm mb-6">
+              <div>
+                <p className="font-semibold text-gray-900 mb-3">
+                  Basic Information
+                </p>
+
+                <div className="space-y-3">
+                  <DetailField
+                    label="Contact Person"
+                    value={selectedVendor.name}
+                  />
+
+                  <DetailField
+                    label="Company Name"
+                    value={
+                      selectedVendor.companyName
+                    }
+                  />
+
+                  <DetailField
+                    label="Email"
+                    value={selectedVendor.email}
+                    valueClass="text-blue-500"
+                  />
+
+                  <DetailField
+                    label="Phone"
+                    value={selectedVendor.phone}
+                  />
+
+                  <DetailField
+                    label="Account Type"
+                    value={
+                      selectedVendor.accountType
+                    }
+                  />
+                </div>
+              </div>
+
+              <div>
+                <p className="font-semibold text-gray-900 mb-3">
+                  Business Information
+                </p>
+
+                <div className="space-y-3">
+                  <DetailField
+                    label="GST Number"
+                    value={
+                      selectedVendor.gstNumber ||
+                      selectedVendor.gstin
+                    }
+                  />
+
+                  <DetailField
+                    label="IEC Code"
+                    value={
+                      selectedVendor.importExportId
+                        ? "••••••••••••"
+                        : "-"
+                    }
+                  />
+
+                  <DetailField
+                    label="Business Type"
+                    value={
+                      selectedVendor.businessType
+                    }
+                  />
+
+                  <DetailField
+                    label="Country"
+                    value={
+                      selectedVendor.country
+                    }
+                  />
+
+                  <DetailField
+                    label="City"
+                    value={selectedVendor.city}
+                  />
+
+                  <DetailField
+                    label="Address"
+                    value={
+                      selectedVendor.address
+                    }
+                  />
+                </div>
+              </div>
+
+              <div>
+                <p className="font-semibold text-gray-900 mb-3">
+                  Account Information
+                </p>
+
+                <div className="space-y-3">
+                  <DetailField
+                    label="Plan"
+                    value={selectedVendor.plan}
+                  />
+
+                  <DetailField
+                    label="Account Status"
+                    value={
+                      selectedVendor.accountStatus ||
+                      selectedVendor.status
+                    }
+                  />
+
+                  <DetailField
+                    label="Email Verified"
+                    value={
+                      selectedVendor.emailVerified
+                        ? "Yes"
+                        : "No"
+                    }
+                  />
+
+                  <DetailField
+                    label="Phone Verified"
+                    value={
+                      selectedVendor.phoneVerified
+                        ? "Yes"
+                        : "No"
+                    }
+                  />
+
+                  <DetailField
+                    label="Registered On"
+                    value={submittedDate}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between border-t pt-4 gap-3">
               <button
-                onClick={() => setShowDetail(false)}
-                className="whitespace-nowrap py-1.5 px-3 rounded-lg bg-gray-100 text-gray-600 font-medium text-xs hover:bg-gray-200 transition-colors"
+                onClick={handleSuspend}
+                className="py-2 px-4 rounded-lg bg-red-50 text-red-600 font-medium text-sm hover:bg-red-100"
               >
-                Close
+                Suspend
+              </button>
+
+              <button
+                onClick={() =>
+                  setKycVerify(true)
+                }
+                className="px-4 py-2 rounded-lg flex items-center justify-center gap-2 bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
+              >
+                <CircleCheckBig
+                  size={16}
+                  className="text-green-500"
+                />
+
+                Verify KYC
               </button>
             </div>
-          </div>
-
-          {/* Read-only Details */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-sm mb-6">
-
-            {/* BASIC INFORMATION */}
-            <div>
-              <p className="font-semibold text-gray-900 mb-3">Basic Information</p>
-              <div className="space-y-3">
-                <DetailField label="Company Name" value={selectedVendor.companyName} />
-                <DetailField label="Email" value={selectedVendor.email} valueClass="text-blue-500 underline" />
-                <DetailField label="Phone" value={selectedVendor.phone} />
-              </div>
-            </div>
-
-            {/* BUSINESS INFORMATION */}
-            <div>
-              <p className="font-semibold text-gray-900 mb-3">Business Information</p>
-              <div className="space-y-3">
-                <DetailField label="GST/VAT Number" value={selectedVendor.gstNumber} />
-                <DetailField label="Registration Number" value={selectedVendor.registrationNumber} />
-                <DetailField label="Business Type" value={selectedVendor.businessType} />
-                <DetailField label="Year of Establishment" value={selectedVendor.yearOfEstablishment} />
-                <DetailField label="Associated With" value={selectedVendor.associatedWith} />
-              </div>
-            </div>
-
-            {/* KYC INFORMATION 
-            <div>
-              <p className="font-semibold text-gray-900 mb-3">KYC Status</p>
-              <div className="space-y-3">
-                <DetailField
-                  label="KYC Status"
-                  value={selectedVendor.kyc}
-                  valueClass={selectedVendor.kyc === "Verified" ? "text-green-600" : "text-gray-900"}
-                />
-                <DetailField label="Verified On" value={selectedVendor.verifiedOn} />
-                <DetailField label="Verified By" value={selectedVendor.verifiedBy} />
-                <DetailField label="Next Review Date" value={selectedVendor.nextReviewDate} />
-              </div>
-            </div>
-
-            {/* BANK DETAILS */}
-            <div>
-              <p className="font-semibold text-gray-900 mb-3">Bank Details</p>
-              <div className="space-y-3">
-                <DetailField label="Bank Name" value={selectedVendor.bankName} />
-                <DetailField label="Account Holder" value={selectedVendor.accountHolder} />
-                <DetailField label="Account Number" value={selectedVendor.accountNumber} />
-                <DetailField label="IFSC Code" value={selectedVendor.ifscCode} />
-                <DetailField label="SWIFT Code" value={selectedVendor.swiftCode} />
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Actions - Save Changes removed, view-only actions kept */}
-          <div className="flex items-center justify-between border-t pt-4">
-            <button
-              onClick={() => {
-                setOpenMenu(null);
-                setRejectKyc(true)
-              }}
-              className="py-1.5 px-2.5 rounded-lg bg-red-50 text-red-600 font-medium text-xs hover:bg-red-100 transition-colors"
-            >
-              Suspend
-            </button>
-
-            <button
-              onClick={() => {
-                setOpenMenu(null);
-                setKycVerify(true)
-              }}
-              className="px-4 py-2 rounded-lg flex items-center gap-2 bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
-            >
-              <CircleCheckBig size={16} className="text-green-500" /> Verify KYC
-            </button>
           </div>
         </div>
       )}
 
-      {kycVerify && (<KYCVerificationModal onClose={() => setKycVerify(false)} />)}
-      {rejectKyc && (<RejectKYCModal onClose={() => setRejectKyc(false)} />)}
+      {kycVerify && selectedVendor && (
+        <KYCVerificationModal
+          applicant={selectedVendor}
+          onClose={() =>
+            setKycVerify(false)
+          }
+          onApprove={updateUserInState}
+          onReject={updateUserInState}
+        />
+      )}
 
+      {rejectKyc && selectedVendor && (
+        <RejectKYCModal
+          applicant={selectedVendor}
+          onClose={() =>
+            setRejectKyc(false)
+          }
+          onRejected={updateUserInState}
+        />
+      )}
     </div>
   );
 }

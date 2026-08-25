@@ -5,6 +5,10 @@ import blueship from "../../assets/Images/webp/blueship.webp"
 import orangeship from "../../assets/Images/webp/orangeship.webp"
 import NeedHelp from "../../components/core/NeedHelp";
 import Shipment from "../../components/ShipmentForm";
+import poster2 from "../../assets/Images/webp/poster2.webp"
+import poster from "../../assets/Images/webp/poster3.webp"
+
+
 
 const Icon = ({ d, d2, className = "w-4 h-4", viewBox = "0 0 24 24", fill = "none", stroke = "currentColor" }) => (
   <svg className={className} fill={fill} stroke={stroke} viewBox={viewBox}>
@@ -403,7 +407,7 @@ function AuditLog() {
     <section className="bg-white border border-gray-200 rounded-lg p-5">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-bold text-sm">
-          Audit Log <span className="text-xs font-normal text-gray-500">(This Search)</span>
+          Audit Log <span className="text-xs font-normal text-gray-500"></span>
         </h3>
         <a href="#" className="text-teal-600 text-[10px] font-bold">View All</a>
       </div>
@@ -485,14 +489,19 @@ export default function FreightCalculatorResult() {
             <ResultSummary setActiveTab={setActiveTab} setShipment={setShipment} />
             <ReportInformation />
             <SaveShare />
-            <AuditLog />
+            {/* <AuditLog /> */}
+              <div>
+                  <img src={poster} className='w-full max-h-48'/>
+              </div>
           </aside>
 
         </div>
 
         {/* Footer */}
         <PageFooter />
-         
+            <div className="min-w-0  mt-4"> 
+                <img src={poster2}  className='w-full max-h-60 ' />
+            </div>
       </div> )}
 
         {shipment === "shipment" && (

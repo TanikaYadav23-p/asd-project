@@ -242,7 +242,7 @@ function AIOutputAnalysis({ analysis }) {
 
   return (
     <SectionCard number={6} title="AI Output After Analysis">
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-2 ">
         {aiTopStats.map((s) => (
           <div key={s.label} className={`flex flex-col justify-around rounded-xl p-3 ${s.color} border border-white shadow-sm`}>
             <p className="text-xs xl:text-[10px] font-medium">{s.label}</p>
@@ -1023,7 +1023,7 @@ export default function Shipment({ setActiveTab, setShipment, currentTab, editId
           isEdit={isEdit}
         />
 
-        <div className="mt-7 grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+        <div className="mt-7 grid grid-cols-1  gap-5 items-start">
           <div className="xl:col-span-9 grid grid-cols-1 xl:grid-cols-9 gap-5 items-start">
             <div className="xl:col-span-3">
               <BasicShipmentDetails
@@ -1046,12 +1046,15 @@ export default function Shipment({ setActiveTab, setShipment, currentTab, editId
             </div>
           </div>
 
-          <div className="xl:col-span-3 flex flex-col gap-5">
-            <QuickTipsCard />
-            <DocumentsUpload uploadedDocs={uploadedDocs} handleDocumentUpload={handleDocumentUpload} fileInputRef={fileInputRef} />
-            <AIOutputAnalysis analysis={analysis} />
-          </div>
+         
         </div>
+         <div className=" grid grid-cols-1 lg:grid-cols-2 gap-5 mt-4">
+            {/* <QuickTipsCard /> */}
+             
+            <DocumentsUpload uploadedDocs={uploadedDocs} handleDocumentUpload={handleDocumentUpload} fileInputRef={fileInputRef} />
+             
+             <AIOutputAnalysis analysis={analysis} />
+          </div>
 
         <Footer />
       </div>

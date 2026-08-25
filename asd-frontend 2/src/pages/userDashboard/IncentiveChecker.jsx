@@ -9,6 +9,7 @@ import {
 import { MdOutlineAccountBalance, MdOutlineLocationOn, MdOutlineOpenInNew } from "react-icons/md";
 import { BsGraphUpArrow } from "react-icons/bs";
 import Shipment from "../../components/ShipmentForm";
+import poster2 from "../../assets/Images/webp/poster2.webp"
 
 const breakdownRows = [
   {
@@ -23,8 +24,8 @@ const breakdownRows = [
     eligible: true,
   },
   {
-    scheme: "MEIS",
-    fullName: "Merchandise Exports from India Scheme",
+    scheme: "Drawbacks",
+    fullName: "",
     type: "Central",
     typeColor: "bg-emerald-100 text-emerald-700",
     applicableOn: "Export Value",
@@ -33,28 +34,28 @@ const breakdownRows = [
     eligibility: "Eligible",
     eligible: true,
   },
-  {
-    scheme: "State Incentive – Tamil Nadu",
-    fullName: "Export Promotion Policy",
-    type: "State",
-    typeColor: "bg-orange-100 text-orange-600",
-    applicableOn: "Export Value",
-    rate: "2%",
-    benefit: "₹2,496",
-    eligibility: "Eligible",
-    eligible: true,
-  },
-  {
-    scheme: "IGST Refund (on Exports)",
-    fullName: "",
-    type: "Central",
-    typeColor: "bg-emerald-100 text-emerald-700",
-    applicableOn: "Tax Paid",
-    rate: "0%",
-    benefit: "₹0",
-    eligibility: "Not Applicable",
-    eligible: false,
-  },
+  // {
+  //   scheme: "State Incentive – Tamil Nadu",
+  //   fullName: "Export Promotion Policy",
+  //   type: "State",
+  //   typeColor: "bg-orange-100 text-orange-600",
+  //   applicableOn: "Export Value",
+  //   rate: "2%",
+  //   benefit: "₹2,496",
+  //   eligibility: "Eligible",
+  //   eligible: true,
+  // },
+  // {
+  //   scheme: "IGST Refund (on Exports)",
+  //   fullName: "",
+  //   type: "Central",
+  //   typeColor: "bg-emerald-100 text-emerald-700",
+  //   applicableOn: "Tax Paid",
+  //   rate: "0%",
+  //   benefit: "₹0",
+  //   eligibility: "Not Applicable",
+  //   eligible: false,
+  // },
 ];
 
 const auditLog = [
@@ -215,7 +216,13 @@ export default function IncentiveChecker() {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-4">
-            <p className="text-sm font-semibold text-gray-800 mb-3">Incentive Breakdown</p>
+         
+              <div className=" flex justify-between items-center ">
+                   <p className="text-base pl-3 font-semibold text-gray-800 ">Incentive Breakdown</p>
+              <button className="flex items-center  border border-gray-200 text-teal-600 text-xs font-medium px-2 py-2 rounded-lg hover:bg-teal-50  justify-center">
+                View Scheme Details & Eligibility 
+              </button>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[600px]">
                 <thead>
@@ -255,19 +262,17 @@ export default function IncentiveChecker() {
                       </td>
                     </tr>
                   ))}
-                  <tr className="border-t-2 border-gray-200">
-                    <td colSpan={4} className="px-3 py-3 text-xs font-bold text-gray-800 text-right">Total Estimated Incentive</td>
-                    <td className="px-3 py-3 text-sm font-bold text-emerald-600">₹8,420</td>
-                    <td />
-                  </tr>
+
+                 
                 </tbody>
               </table>
+                   <div className="border-t-2 border-gray-200 ">
+                    <span  className="px-3 py-3 text-xs font-bold text-gray-800 text-right">Total Estimated Incentive</span>
+                    <span className="px-3 py-3 text-sm font-bold text-emerald-600">₹8,420</span>
+                    <div />
+                  </div>
             </div>
-            <div className="mt-3 flex justify-center">
-              <button className="flex items-center gap-1.5 border border-gray-200 text-teal-600 text-xs font-medium px-5 py-2 rounded-lg hover:bg-teal-50 w-full justify-center">
-                View Scheme Details & Eligibility <MdOutlineOpenInNew size={13} />
-              </button>
-            </div>
+          
           </div>
 
           
@@ -330,7 +335,7 @@ export default function IncentiveChecker() {
             </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
+          {/* <div className="bg-white border border-gray-200 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-semibold text-gray-900">Audit Log (This Search)</p>
               <button className="text-teal-500 text-[11px] font-medium hover:underline">View All</button>
@@ -342,10 +347,11 @@ export default function IncentiveChecker() {
                 <span className="text-[11px] text-gray-600">{entry.text}</span>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 min-w-0 mx-6">
             <div className="bg-white border border-gray-200 rounded-xl p-4">
               <p className="text-sm font-semibold text-gray-800 mb-3">Data Sources Used</p>
               <div className="grid grid-cols-2 gap-y-2 gap-x-3">
@@ -377,7 +383,7 @@ export default function IncentiveChecker() {
                 <p className="text-xs text-gray-600 leading-relaxed">
                   Incentives are subject to change as per government notifications. Please verify with official sources before making any business decisions.
                 </p>
-                <button className="mt-2 text-blue-500 text-xs font-medium hover:underline">Read Full Disclaimer</button>
+                {/* <button className="mt-2 text-blue-500 text-xs font-medium hover:underline">Read Full Disclaimer</button> */}
               </div>
            
             </div>
@@ -395,7 +401,11 @@ export default function IncentiveChecker() {
                   <FiMessageSquare size={12} /> Chat with Expert
                 </button>
               </div>
-          </div></div> )}
+          </div>
+           <div className="min-w-0 mx-6"> 
+             <img src={poster2}  className='w-full max-h-60 mb-4' />
+            </div>
+          </div> )}
 
 
           {shipment === "shipment" && (
