@@ -8,6 +8,7 @@ import {
 import { BsShieldCheck } from "react-icons/bs";
 import { MdOutlineVerified } from "react-icons/md";
 import NeedHelp from "../../components/core/NeedHelp";
+import Shipment from "../../components/ShipmentForm";
 
 const otherMatches = [
   { code: "6109.90.00", desc: "Other T-shirts, singlets and other vests, of cotton", score: 78, type: "8 Digit", duty: "5%" },
@@ -61,11 +62,15 @@ function ScoreBar({ score, color = "bg-emerald-500" }) {
 }
 
 export default function HSCodeLookup() {
-  const [activeTab, setActiveTab] = useState("HS Code Details");
+  const [activeTab, setActiveTab] = useState("HS Code Lookup");
   const [query, setQuery] = useState("Cotton T-shirt 100% cotton, knitted, for men");
+   const [shipment, setShipment] = useState("")
 
   return (
     <div className=" bg-gray-50 font-sans  flex-1 overflow-y-auto pt-14">
+     {
+      activeTab === "HS Code Lookup"  && (
+      <div> 
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
       
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -83,7 +88,10 @@ export default function HSCodeLookup() {
             <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
               <FiDownload size={12} /> Download Report (PDF)
             </button>
-            <button className="flex items-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">
+            <button   onClick={() => {
+                setShipment("shipment")
+                setActiveTab("")
+              }} className="flex items-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">
               <FiPlus size={12} /> Create Shipment from this Result
             </button>
           </div>
@@ -402,7 +410,7 @@ export default function HSCodeLookup() {
 
       </div>
    
-     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-3 mx-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mt-3 mx-4">
                   <div className="bg-white  flex flex-col justify-center gap-10 rounded-xl border border-gray-200  px-3 py-4 ">
                     <div className=' flex flex-row items-center justify-between'>
                        <h3 className="text-xs  font-bold text-gray-900 ">
@@ -473,8 +481,15 @@ export default function HSCodeLookup() {
                   
                   </div>
                 
-                </div>
+          </div>
+      </div> ) }
 
+       {shipment === "shipment" && (
+        <div>
+          <Shipment setActiveTab={setActiveTab} setShipment={setShipment} currentTab={"HS Code Lookup"} />
+        </div>
+      )
+      }
       
     </div>
   );

@@ -8,6 +8,7 @@ import {
 } from "react-icons/fi";
 import { MdOutlineAccountBalance, MdOutlineLocationOn, MdOutlineOpenInNew } from "react-icons/md";
 import { BsGraphUpArrow } from "react-icons/bs";
+import Shipment from "../../components/ShipmentForm";
 
 const breakdownRows = [
   {
@@ -83,6 +84,8 @@ const dataSources = [
 
 export default function IncentiveChecker() {
   const [copied, setCopied] = useState(false);
+   const [shipment, setShipment] = useState("")
+   const [activeTab, setActiveTab] = useState("Incentive Checker");
 
   function handleCopy() {
     setCopied(true);
@@ -91,6 +94,7 @@ export default function IncentiveChecker() {
 
   return (
     <div className=" bg-gray-50 font-sans flex-1 overflow-y-auto pt-14">
+     {activeTab === "Incentive Checker" && ( <div> 
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
        
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -108,7 +112,11 @@ export default function IncentiveChecker() {
             <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
               <FiDownload size={12} /> Download Report (PDF)
             </button>
-            <button className="flex items-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">
+            <button  onClick={() => {
+                setShipment("shipment")
+                setActiveTab("")
+              }}
+            className="flex items-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">
               <FiPlus size={12} /> Create Shipment from this Result
             </button>
           </div>
@@ -282,7 +290,10 @@ export default function IncentiveChecker() {
                 <span className="font-semibold text-gray-900 text-right">{value}</span>
               </div>
             ))}
-            <button className="mt-3 w-full bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold py-2.5 rounded-xl">
+            <button onClick={() => {
+                setShipment("shipment")
+                setActiveTab("")
+              }} className="mt-3 w-full bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold py-2.5 rounded-xl">
               Create Shipment from this Result
             </button>
           </div>
@@ -384,7 +395,15 @@ export default function IncentiveChecker() {
                   <FiMessageSquare size={12} /> Chat with Expert
                 </button>
               </div>
-          </div>
+          </div></div> )}
+
+
+          {shipment === "shipment" && (
+                 <div>
+                   <Shipment setActiveTab={setActiveTab} setShipment={setShipment} currentTab={"Incentive Checker"} />
+                 </div>
+               )
+               }
     </div>
   );
 }

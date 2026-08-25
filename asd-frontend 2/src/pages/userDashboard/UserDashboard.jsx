@@ -895,7 +895,7 @@ export default function UserDashboard() {
 
         {activeTab === "HS Code Lookup" && <HSCodeLookup />}
         {activeTab === "Incentive Checker" && <IncentiveChecker />}
-        {activeTab === "Shipment Planning" && <ShipmentPlanning setActiveTab={setActiveTab} />}
+        {activeTab === "Shipment Planning" && <ShipmentPlanning setActiveTab={setActiveTab} activeTab={activeTab} />}
         {activeTab === "Freight Calculator" && <FreightCalculator />}
 
         {activeTab === "Saved" && <Saved />}

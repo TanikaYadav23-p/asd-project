@@ -1,10 +1,10 @@
-import React from "react";
+import React, {useState} from "react";
 
 import plane from "../../assets/Images/webp/plane.webp"
 import blueship from "../../assets/Images/webp/blueship.webp"
 import orangeship from "../../assets/Images/webp/orangeship.webp"
 import NeedHelp from "../../components/core/NeedHelp";
-
+import Shipment from "../../components/ShipmentForm";
 
 const Icon = ({ d, d2, className = "w-4 h-4", viewBox = "0 0 24 24", fill = "none", stroke = "currentColor" }) => (
   <svg className={className} fill={fill} stroke={stroke} viewBox={viewBox}>
@@ -15,7 +15,7 @@ const Icon = ({ d, d2, className = "w-4 h-4", viewBox = "0 0 24 24", fill = "non
 
  
 
-function HeaderActions() {
+function HeaderActions({setShipment, setActiveTab}) {
   return (
     <div className="flex flex-wrap gap-2">
       <button className="px-4 py-2 bg-white border border-gray-200 rounded-md text-xs font-bold flex items-center gap-2 hover:bg-gray-50">
@@ -30,7 +30,11 @@ function HeaderActions() {
         <Icon d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
         Download Report (PDF)
       </button>
-      <button className="px-4 py-2 bg-teal-600 text-white rounded-md text-xs font-bold hover:bg-teal-700">
+      <button  onClick={() => {
+                setShipment("shipment")
+                setActiveTab("")
+         }}
+       className="px-4 py-2 bg-teal-600 text-white rounded-md text-xs font-bold hover:bg-teal-700">
         Create Shipment from this Result
       </button>
     </div>
@@ -301,7 +305,7 @@ function DataSources() {
   );
 }
 
-function ResultSummary() {
+function ResultSummary({setActiveTab, setShipment}) {
   const rows = [
     { iconD: "M13 10V3L4 14h7v7l9-11h-7z", iconColor: "text-blue-500", label: "Best Mode", value: "Air Freight" },
     { iconD: "M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z", iconColor: "text-blue-500", label: "Recommended Route", value: "Tirupur → Dubai" },
@@ -328,7 +332,11 @@ function ResultSummary() {
           </div>
         ))}
       </div>
-      <button className="w-full bg-teal-600 text-white font-bold py-3  text-xs rounded-lg mt-6 hover:bg-teal-700">
+      <button  onClick={() => {
+                setShipment("shipment")
+                setActiveTab("")
+              }} 
+        className="w-full bg-teal-600 text-white font-bold py-3  text-xs rounded-lg mt-6 hover:bg-teal-700">
         Create Shipment from this Result
       </button>
     </section>
@@ -437,12 +445,15 @@ function PageFooter() {
 
 
 export default function FreightCalculatorResult() {
+        const [shipment, setShipment] = useState("")
+        const [activeTab, setActiveTab] = useState("Freight Calculator");
+
 
   return (
     <div className="bg-gray-50 font-sans text-gray-900 antialiased overflow-y-auto pt-10 ">
-      <div className="max-w-[1440px] mx-auto p-4 md:p-6 lg:p-8">
+    {activeTab === "Freight Calculator" && ( 
+       <div className="max-w-[1440px] mx-auto p-4 md:p-6 lg:p-8">
 
-        {/* Header */}
         <header className="mb-6">
        
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -450,14 +461,12 @@ export default function FreightCalculatorResult() {
               <h1 className="text-xl font-bold text-gray-900">Freight Calculator</h1>
               <p className="text-gray-500 text-xs ">Get accurate freight estimates and compare the best shipping options.</p>
             </div>
-            <HeaderActions />
+            <HeaderActions setActiveTab={setActiveTab} setShipment={setShipment} />
           </div>
         </header>
 
-        {/* AI Banner */}
         <AiBanner />
 
-        {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
           {/* Left Column */}
@@ -473,7 +482,7 @@ export default function FreightCalculatorResult() {
 
           {/* Right Sidebar */}
           <aside className="lg:col-span-4 space-y-6">
-            <ResultSummary />
+            <ResultSummary setActiveTab={setActiveTab} setShipment={setShipment} />
             <ReportInformation />
             <SaveShare />
             <AuditLog />
@@ -484,7 +493,15 @@ export default function FreightCalculatorResult() {
         {/* Footer */}
         <PageFooter />
          
-      </div>
+      </div> )}
+
+        {shipment === "shipment" && (
+               <div>
+                 <Shipment setActiveTab={setActiveTab} setShipment={setShipment} currentTab={"Freight Calculator"} />
+               </div>
+        )}
+
+
     </div>
   );
 }

@@ -10,7 +10,11 @@ import { BsAirplane } from "react-icons/bs";
 import { MdOutlineRocketLaunch } from "react-icons/md";
 import plane from "../../assets/Images/webp/aeroplane.webp"
 import girl from "../../assets/Images/webp/girll.webp"
-
+import BookShipment from "../../components/userComponent/BookShipment"
+import SharePlan from "../../components/userComponent/SharePlan"
+import UploadDocument from "../../components/userComponent/UploadDocument"
+import TrackShipment from "../../components/userComponent/TrackShipment"
+import Shipment from "../../components/ShipmentForm";
 const tabs = [
   { id: 1, label: "Shipment Details" },
   { id: 2, label: "Route & Schedule" },
@@ -78,12 +82,85 @@ import PlanSummary from "../../components/userComponent/PlanSummary";
 
 
 
-export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
+export default function ShipmentPlanning() {
   const [activeTab, setActiveTab] = useState(1);
+  const [mainTab, setMainTab] = useState("Shipment Planning")
   const [savePlan, setSavePlan] = useState(false)
+  const [sharePlan, setSharePlan] = useState(false)
+  const [bookShipment, setBookShipment] = useState(false)
+  const[uploadDocument,setUploadDocument] = useState(false)
+  const[trackShipment, setTrackShipment]  = useState(false)
+  const [isEditingGoods, setIsEditingGoods] = useState(false);
+const [editedGoodsInfo, setEditedGoodsInfo] = useState(goodsInfo);
+   const [shipment, setShipment] = useState("")
+ 
+
+const handleGoodsChange = (index, value) => {
+  const updated = [...editedGoodsInfo];
+  updated[index] = [updated[index][0], value];
+  setEditedGoodsInfo(updated);
+};
+
+const handleSaveGoods = () => {
+  setIsEditingGoods(false);
+};
+
+const [isEditingAdditional, setIsEditingAdditional] = useState(false);
+const [editedAdditionalInfo, setEditedAdditionalInfo] =
+  useState(additionalInfo);
+
+const handleAdditionalChange = (index, value) => {
+  const updated = [...editedAdditionalInfo];
+  updated[index] = [updated[index][0], value];
+  setEditedAdditionalInfo(updated);
+};
+
+const handleSaveAdditional = () => {
+  setIsEditingAdditional(false);
+};
+
+const [isEditingParties, setIsEditingParties] = useState(false);
+
+const [partiesInfo, setPartiesInfo] = useState({
+  exporter: {
+    name: "ABC Exports Pvt. Ltd.",
+    location: "Tirupur, India",
+  },
+  importer: {
+    name: "XYZ Trading LLC",
+    location: "Dubai, UAE",
+  },
+  notifyParty: {
+    name: "XYZ Trading LLC",
+    location: "Dubai, UAE",
+  },
+});
+
+const [originalPartiesInfo] = useState(partiesInfo);
+
+const handlePartyChange = (party, field, value) => {
+  setPartiesInfo((prev) => ({
+    ...prev,
+    [party]: {
+      ...prev[party],
+      [field]: value,
+    },
+  }));
+};
+
+const handleSaveParties = () => {
+  setIsEditingParties(false);
+};
+
+const handleCancelParties = () => {
+  setPartiesInfo(originalPartiesInfo);
+  setIsEditingParties(false);
+};
   return (
     <div className="h-auto bg-gray-50 font-sans flex-1 overflow-y-auto pt-14">
-      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
+     { mainTab === "Shipment Planning" && (
+      <div className=" flex-1 overflow-y-auto"> 
+       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
@@ -104,7 +181,10 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
             <FiDownload size={15} /> Download Plan (PDF)
           </button>
 
-          <button className="flex items-center justify-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-xs   font-bold px-3 py-1.5 rounded-lg">
+          <button  onClick={() => {
+                setShipment("shipment")
+                setMainTab("")
+              }} className="flex items-center justify-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-xs   font-bold px-3 py-1.5 rounded-lg">
             <FiPlus size={15} /> Create Shipment from this Plan
           </button>
         </div>
@@ -183,52 +263,243 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
                 {activeTab === 1 && (
                   <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-1 md:grid-cols-[1.8fr_1fr] gap-4">
+                    <div>
+                    {editedGoodsInfo.map(([k, v], index) => (
+                      <div
+                        key={k}
+                        className="flex justify-between py-1.5 border-b border-gray-100 last:border-0 gap-3"
+                      >
+                        <span className="text-xs font-normal text-gray-500 flex-shrink-0 w-36">
+                          {k}
+                        </span>
+
+                        <div className="flex items-center gap-2 flex-1 justify-start">
+                          {isEditingGoods ? (
+                            <input
+                              type="text"
+                              value={v}
+                              onChange={(e) =>
+                                handleGoodsChange(index, e.target.value)
+                              }
+                              className="w-full border border-gray-200 rounded-md px-2 py-1 text-[11px] font-bold text-[#071B60] outline-none focus:border-teal-500"
+                            />
+                          ) : (
+                            <span className="text-[11px] font-bold text-[#071B60]">
+                              {v}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="flex justify-end gap-2 mt-3">
+                      {isEditingGoods ? (
+                        <>
+                          <button
+                            onClick={() => {
+                              setEditedGoodsInfo(goodsInfo);
+                              setIsEditingGoods(false);
+                            }}
+                            className="px-5 border border-gray-300 text-gray-500 text-xs font-medium py-2 rounded-lg hover:bg-gray-50"
+                          >
+                            Cancel
+                          </button>
+
+                          <button
+                            onClick={handleSaveGoods}
+                            className="px-7 border border-teal-600 bg-teal-600 text-white text-xs font-medium py-2 rounded-lg hover:bg-teal-700 flex items-center justify-center gap-1.5"
+                          >
+                            Save
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => setIsEditingGoods(true)}
+                          className="px-7 border border-teal-600 text-teal-600 text-xs font-medium py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                        >
+                          <FiEdit2 size={12} />
+                          Edit Details
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                   <div className="flex flex-col justify-between">
                       <div>
-                        <p className="text-base font-bold text-[#071B60] mb-3">Goods Information</p>
-                        {goodsInfo.map(([k, v, hasLink, linkLabel]) => (
-                          <div key={k} className="flex justify-between py-1 border-b border-gray-100 last:border-0 gap-3">
-                            <span className="text-xs  font-normal text-gray-500 flex-shrink-0 w-36">{k}</span>
-                            <div className="flex items-center gap-2 flex-1 justify-start ">
-                              <span className="text-[11px]  font-bold text-[#071B60] text-right">{v}</span>
-                              {hasLink && linkLabel && (
-                                <button className="text-blue-500 text-xs sm:text-sm   font-medium hover:underline whitespace-nowrap">{linkLabel}</button>
-                              )}
-                              {hasLink && !linkLabel && (
-                                <button className="text-blue-500 text-xs sm:text-sm  text-end  font-medium hover:underline">View Details</button>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                        <div className="flex justify-end"> 
-                        <button className="mt-3  px-7  border border-teal-600  text-teal-600 text-xs   font-medium py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1.5">
-                          <FiEdit2 size={12} /> Edit Details
-                        </button> </div>
+                        <p className="text-base font-bold text-[#071B60] mb-3">
+                          Parties Information
+                        </p>
+
+                        {/* Exporter */}
+                        <div className="mb-2">
+                          <p className="text-xs text-[#687398] font-medium mb-1">
+                            Exporter (Ship From)
+                          </p>
+
+                          {isEditingParties ? (
+                            <>
+                              <input
+                                type="text"
+                                value={partiesInfo.exporter.name}
+                                onChange={(e) =>
+                                  handlePartyChange(
+                                    "exporter",
+                                    "name",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full text-xs sm:text-sm font-bold text-[#071B60] border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-teal-500 mb-1"
+                              />
+
+                              <input
+                                type="text"
+                                value={partiesInfo.exporter.location}
+                                onChange={(e) =>
+                                  handlePartyChange(
+                                    "exporter",
+                                    "location",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full text-xs sm:text-sm text-gray-500 border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-teal-500"
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-xs sm:text-sm font-bold text-[#071B60]">
+                                {partiesInfo.exporter.name}
+                              </p>
+
+                              <p className="text-xs sm:text-sm text-gray-500">
+                                {partiesInfo.exporter.location}
+                              </p>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Importer */}
+                        <div className="mb-2">
+                          <p className="text-xs text-[#687398] font-medium mb-1">
+                            Importer (Ship To)
+                          </p>
+
+                          {isEditingParties ? (
+                            <>
+                              <input
+                                type="text"
+                                value={partiesInfo.importer.name}
+                                onChange={(e) =>
+                                  handlePartyChange(
+                                    "importer",
+                                    "name",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full text-xs sm:text-sm font-bold text-[#071B60] border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-teal-500 mb-1"
+                              />
+
+                              <input
+                                type="text"
+                                value={partiesInfo.importer.location}
+                                onChange={(e) =>
+                                  handlePartyChange(
+                                    "importer",
+                                    "location",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full text-xs sm:text-sm text-gray-500 border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-teal-500"
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-xs sm:text-sm font-bold text-[#071B60]">
+                                {partiesInfo.importer.name}
+                              </p>
+
+                              <p className="text-xs sm:text-sm text-gray-500">
+                                {partiesInfo.importer.location}
+                              </p>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Notify Party */}
+                        <div className="mb-2">
+                          <p className="text-xs text-[#687398] font-medium mb-1">
+                            Notify Party
+                          </p>
+
+                          {isEditingParties ? (
+                            <>
+                              <input
+                                type="text"
+                                value={partiesInfo.notifyParty.name}
+                                onChange={(e) =>
+                                  handlePartyChange(
+                                    "notifyParty",
+                                    "name",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full text-xs sm:text-sm font-bold text-[#071B60] border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-teal-500 mb-1"
+                              />
+
+                              <input
+                                type="text"
+                                value={partiesInfo.notifyParty.location}
+                                onChange={(e) =>
+                                  handlePartyChange(
+                                    "notifyParty",
+                                    "location",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full text-xs sm:text-sm text-gray-500 border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-teal-500"
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-xs sm:text-sm font-bold text-[#071B60]">
+                                {partiesInfo.notifyParty.name}
+                              </p>
+
+                              <p className="text-xs sm:text-sm text-gray-500">
+                                {partiesInfo.notifyParty.location}
+                              </p>
+                            </>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="flex flex-col justify-between">
-                        <div> 
-                        <p className="text-base font-bold text-[#071B60] mb-3">Parties Information</p>
-                        <div className="mb-2">
-                          <p className="text-xs text-[#687398] font-medium mb-1">Exporter (Ship From)</p>
-                          <p className="text-xs sm:text-sm font-bold text-[#071B60]">ABC Exports Pvt. Ltd.</p>
-                          <p className="text-xs sm:text-sm  text-gray-500">Tirupur, India</p>
-                        </div>
-                        <div className="mb-2">
-                          <p className="text-xs text-[#687398] font-medium mb-1">Importer (Ship To)</p>
-                          <p className="text-xs sm:text-sm font-bold text-[#071B60]">XYZ Trading LLC</p>
-                          <p className="text-xs sm:text-sm  text-gray-500">Dubai, UAE</p>
-                        </div>
-                        <div className="mb-2">
-                          <p className="text-xs text-[#687398] font-medium mb-1">Notify Party</p>
-                          <p className="text-xs sm:text-sm font-bold text-[#071B60]">XYZ Trading LLC</p>
-                          <p className="text-xs sm:text-sm  text-gray-500">Dubai, UAE</p>
-                        </div>
-                        </div>
-                        <div> 
-                        <button className="w-full border border-teal-600 text-teal-600 text-xs   font-medium py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1.5">
-                          <FiEdit2 size={12} /> Edit Details
-                        </button> </div>
+                      <div>
+                        {isEditingParties ? (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={handleCancelParties}
+                              className="w-full border border-gray-300 text-gray-500 text-xs font-medium py-2 rounded-lg hover:bg-gray-50"
+                            >
+                              Cancel
+                            </button>
+
+                            <button
+                              onClick={handleSaveParties}
+                              className="w-full border border-teal-600 text-teal-600 text-xs font-medium py-2 rounded-lg hover:bg-gray-50"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setIsEditingParties(true)}
+                            className="w-full border border-teal-600 text-teal-600 text-xs font-medium py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1.5"
+                          >
+                            <FiEdit2 size={12} />
+                            Edit Details
+                          </button>
+                        )}
                       </div>
+                    </div>
                     </div>
                   </div>
                 )}
@@ -280,22 +551,69 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-xl p-4 ">
-              <p className="text-base  font-bold text-[#071B60] mb-3">Additional Information</p>
-              <div className="flex  w-full flex-1 justify-between "> 
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 mb-3">
-                {additionalInfo.map(([k, v]) => (
-                  <div key={k}>
-                    <p className="text-xs  text-[#071B60] font-normal mb-0.5">{k}</p>
-                    <p className="text-xs  font-medium text-[#071B60]">{v}</p>
-                  </div>
-                ))}
-              </div>
-              <div> 
-              <button className="border border-teal-600 text-teal-600 text-xs  font-medium px-4 py-1.5 rounded-lg hover:bg-gray-50 flex items-center gap-1.5">
-                <FiEdit2   /> Edit Details
-              </button> </div> </div>
-            </div>
+                          <div className="bg-white border border-gray-200 rounded-xl p-4">
+                          <p className="text-base font-bold text-[#071B60] mb-3">
+                            Additional Information
+                          </p>
+
+                          <div className="flex w-full flex-1 justify-between">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-1 mb-3">
+                              {editedAdditionalInfo.map(([k, v], index) => (
+                                <div key={k}>
+                                  <p className="text-xs text-[#071B60] font-normal mb-0.5">
+                                    {k}
+                                  </p>
+
+                                  {isEditingAdditional ? (
+                                    <input
+                                      type="text"
+                                      value={v}
+                                      onChange={(e) =>
+                                        handleAdditionalChange(index, e.target.value)
+                                      }
+                                      className="text-xs font-medium text-[#071B60] border border-gray-200 rounded px-1.5 py-1 outline-none focus:border-teal-500 w-full"
+                                    />
+                                  ) : (
+                                    <p className="text-xs font-medium text-[#071B60]">
+                                      {v}
+                                    </p>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+
+                            <div>
+                              {isEditingAdditional ? (
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => {
+                                      setEditedAdditionalInfo(additionalInfo);
+                                      setIsEditingAdditional(false);
+                                    }}
+                                    className="border border-gray-300 text-gray-500 text-xs font-medium px-4 py-1.5 rounded-lg hover:bg-gray-50"
+                                  >
+                                    Cancel
+                                  </button>
+
+                                  <button
+                                    onClick={handleSaveAdditional}
+                                    className="border border-teal-600 text-teal-600 text-xs font-medium px-4 py-1.5 rounded-lg hover:bg-gray-50"
+                                  >
+                                    Save
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => setIsEditingAdditional(true)}
+                                  className="border border-teal-600 text-teal-600 text-xs font-medium px-4 py-1.5 rounded-lg hover:bg-gray-50 flex items-center gap-1.5"
+                                >
+                                  <FiEdit2 />
+                                  Edit Details
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
 
            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 w-full ">
               <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -307,9 +625,9 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
                     <span className="text-xs  text-gray-700 font-medium">{v}</span>
                   </div>
                 ))}
-                <button className="mt-2 text-teal-500 text-xs font-medium hover:underline flex items-center gap-1">
+                {/* <button className="mt-2 text-teal-500 text-xs font-medium hover:underline flex items-center gap-1">
                   View All Sources <FiChevronRight size={11} />
-                </button>
+                </button> */}
               </div>
 
               <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -321,9 +639,9 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
                     </li>
                   ))}
                 </ul>
-                <button className="mt-2 text-teal-500 text-xs font-medium hover:underline flex items-center gap-1">
+                {/* <button className="mt-2 text-teal-500 text-xs font-medium hover:underline flex items-center gap-1">
                   View All Assumptions <FiChevronRight size={11} />
-                </button>
+                </button> */}
               </div>
 
               <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -331,9 +649,8 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
                 <p className="text-xs  font-medium text-gray-400 leading-relaxed">
                   This plan is for reference only. Please verify all details with official sources before finalizing your shipment.
                 </p>
-                <button className="mt-2 text-[#0FB5A9] text-xs font-medium hover:underline">Read Full Disclaimer</button>
+                {/* <button className="mt-2 text-[#0FB5A9] text-xs font-medium hover:underline">Read Full Disclaimer</button> */}
               </div>
-
             </div>
 
 
@@ -350,7 +667,17 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
                       <p className="text-xs sm:text-sm font-semibold text-gray-800">{title}</p>
                       <p className="text-xs text-gray-400 font-medium mt-0.5">{sub}</p>
                     </div>
-                    <button className="w-full border border-teal-500 text-teal-600 text-[11px] font-semibold py-1.5 rounded-lg hover:bg-teal-50 mt-auto">
+                    <button  onClick={() => {
+                    if (title === "Track Shipment") {
+                      setTrackShipment(true);
+                    } else if (title === "Upload Documents") {
+                      setUploadDocument(true);
+                    } else if (title === "Share Plan") {
+                      setSharePlan(true);
+                    }else 
+                      setBookShipment(true)
+                  }}
+                  className="w-full border border-teal-500 text-teal-600 text-[11px] font-semibold py-1.5 rounded-lg hover:bg-teal-50 mt-auto">
                       {btn}
                     </button>
                   </div>
@@ -387,9 +714,9 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
                   </div>
                 </div>
               </div>
-              <button className="mt-3 text-teal-500 text-xs sm:text-sm font-medium hover:underline flex items-center gap-1">
+              {/* <button className="mt-3 text-teal-500 text-xs sm:text-sm font-medium hover:underline flex items-center gap-1">
                 View All Alerts <FiChevronRight className="text-xs sm:text-sm" />
-              </button>
+              </button> */}
             </div>
 
             <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -399,9 +726,9 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
                       <div className="bg-[#DDE6F4] w-12 flex items-center justify-center h-16 rounded-full "><img src={girl} /> </div>  
                    </div>
                
-                <button className="w-full border border-gray-200 text-[#009B8D] text-sm sm:text-sm font-medium py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1.5">
+                {/* <button className="w-full border border-gray-200 text-[#009B8D] text-sm sm:text-sm font-medium py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1.5">
                   <FiMessageSquare size={12} /> Chat with Expert
-                </button>
+                </button> */}
               </div>
             </div>
 
@@ -428,9 +755,9 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
                   <span className="text-xs sm:text-sm  font-medium text-[#071B60] text-right">{v}</span>
                 </div>
               ))}
-              <button className="mt-3 w-full border border-teal-500 text-teal-600 text-xs sm:text-sm  font-medium py-2 rounded-lg hover:bg-teal-50">
+              {/* <button className="mt-3 w-full border border-teal-500 text-teal-600 text-xs sm:text-sm  font-medium py-2 rounded-lg hover:bg-teal-50">
                 View Full Route & Schedule
-              </button>
+              </button> */}
             </div>
 
             <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -445,9 +772,9 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
                 <span className="text-sm  font-bold text-[#071B60]">Total Estimated Cost</span>
                 <span className="text-sm font-bold text-emerald-600">₹24,860</span>
               </div>
-              <button className="mt-2 w-full border border-teal-600 text-teal-600 text-xs sm:text-sm  font-medium py-2 rounded-lg hover:bg-gray-50">
+              {/* <button className="mt-2 w-full border border-teal-600 text-teal-600 text-xs sm:text-sm  font-medium py-2 rounded-lg hover:bg-gray-50">
                 View Cost Breakdown
-              </button>
+              </button> */}
             </div>
 
             <div className="bg-white  border border-gray-200 rounded-xl p-4">
@@ -465,9 +792,11 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
                 </div>
               ))} </div> 
               <div className=""> 
-                  <button className="mt-3 w-full border border-teal-600 text-teal-600 text-xs  sm:text-sm font-medium py-2 rounded-lg hover:bg-gray-50">
+                  {/* <button className="mt-3 w-full border border-teal-600 text-teal-600 text-xs  sm:text-sm font-medium py-2 rounded-lg hover:bg-gray-50">
                 View All Documents
-              </button></div> </div> 
+              </button> */}
+              
+              </div> </div> 
             
             </div>
 
@@ -475,9 +804,9 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
             <div className="bg-white border border-gray-200 rounded-xl p-4">
               <p className="text-base  font-bold text-[#071B60] mb-2">Plan Notes</p>
               <p className="text-xs sm:text-sm font-medium text-gray-600">Urgent shipment for new collection launch.</p>
-              <button className="mt-2 text-teal-500 border-teal-600  text-xs sm:text-sm  font-medium hover:underline flex items-center justify-center mx-auto w-full border px-3 py-2 rounded-lg  gap-1">
+              {/* <button className="mt-2 text-teal-500 border-teal-600  text-xs sm:text-sm  font-medium hover:underline flex items-center justify-center mx-auto w-full border px-3 py-2 rounded-lg  gap-1">
                 <FiEdit2 size={11} /> Edit Notes
-              </button>
+              </button> */}
             </div>
 
           
@@ -487,10 +816,18 @@ export default function ShipmentPlanning({ setActiveTab: setMainTab }) {
         </div>
  
         
-      </div>
-
+      </div> 
+       </div>)}
       
-     
+       {shipment === "shipment" && (
+                     <div>
+                       <Shipment setActiveTab={setMainTab} setShipment={setShipment} currentTab={"Shipment Planning"} />
+                     </div>
+              )}
+      {bookShipment && (<BookShipment onClose={() => setBookShipment(false)} />)}
+       {sharePlan && (<SharePlan onClose={() => setSharePlan(false)} />)}
+       {trackShipment && (<TrackShipment onClose={() => setTrackShipment(false)} />)}
+       {uploadDocument && (<UploadDocument onClose={() => setUploadDocument(false)} />)}
 
     </div>
   );
