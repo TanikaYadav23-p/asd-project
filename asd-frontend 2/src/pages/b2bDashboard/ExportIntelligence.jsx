@@ -381,7 +381,7 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
 
         {/* FILTERS PANEL */}
         <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4 items-end">
             <div>
               <label className="text-[11px] text-slate-400 font-bold block mb-1.5 uppercase">HS Code / Product</label>
               <input
@@ -393,7 +393,7 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
               />
             </div>
 
-            <div>
+            {/*<div>
               <label className="text-[11px] text-slate-400 font-bold block mb-1.5 uppercase">Port of Exit</label>
               <div className="relative">
                 <select value={selectedPort} onChange={(e) => setSelectedPort(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
@@ -404,7 +404,7 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
-            </div>
+            </div>*/}
 
             <div>
               <label className="text-[11px] text-slate-400 font-bold block mb-1.5 uppercase">Country of Destination</label>
@@ -419,7 +419,7 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
               </div>
             </div>
 
-            <div>
+            {/*<div>
               <label className="text-[11px] text-slate-400 font-bold block mb-1.5 uppercase">Exporter</label>
               <div className="relative">
                 <select value={selectedExporter} onChange={(e) => setSelectedExporter(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-600 appearance-none focus:outline-none focus:border-blue-500">
@@ -443,14 +443,14 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
                 </select>
                 <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
-            </div>
+            </div>*/}
 
 
             <div className="flex gap-2 w-full">
               <button onClick={handleApplyFilters} className="flex-1  whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm">
-                Apply Filters
+                Search
               </button>
-              <button onClick={handleResetFilters} className="text-slate-400 hover:text-slate-600 font-medium text-xs rounded-xl py-2 px-2 transition border border-slate-200 bg-white">
+              <button onClick={handleResetFilters} className="text-slate-400 hover:text-slate-600 font-medium text-xs rounded-xl py-2 px-3 transition border border-slate-200 bg-white">
                 Reset
               </button>
             </div>

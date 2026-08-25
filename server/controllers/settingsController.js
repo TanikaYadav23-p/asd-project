@@ -412,7 +412,7 @@ exports.uploadKYCDocuments = async (req, res) => {
       const newDocument = {
         type: documentType,
         title: documentTitle,
-        url: `https://${req.get("host")}/uploads/documents/${file.filename}`,
+        url: `${req.protocol}://${req.get("host")}/uploads/documents/${file.filename}`,
         uploadedAt: new Date(),
       };
 

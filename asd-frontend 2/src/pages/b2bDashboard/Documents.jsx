@@ -196,7 +196,8 @@ const [selectedDocStatus, setSelectedDocStatus] = useState("");
 const [selectedDocCountry, setSelectedDocCountry] = useState("");
 const [selectedDocType, setSelectedDocType] = useState("");
 const [selectedDocShipment, setSelectedDocShipment] = useState("");
-
+const [currentDocumentPage, setCurrentDocumentPage] = useState(1);
+const documentsPerPage = 10;
 const [appliedDocFilters, setAppliedDocFilters] = useState({
   search: "",
   status: "",
@@ -298,6 +299,7 @@ const [appliedDocFilters, setAppliedDocFilters] = useState({
     startDate: startDate,
     endDate: endDate,
   });
+  setCurrentDocumentPage(1);
 };
 
 const handleResetDocumentFilters = () => {
@@ -319,6 +321,8 @@ const handleResetDocumentFilters = () => {
     startDate: null,
     endDate: null,
   });
+
+  setCurrentDocumentPage(1);
 };
   const KPI_STATS = [
     {title: "Total Documents", value: dashboard.totalDocuments || 0, change: "", icon: FileText, bg: "bg-blue-50", color: "text-blue-500", up: true,},
@@ -424,7 +428,29 @@ const handleResetDocumentFilters = () => {
     matchesEndDate
   );
 });
+const totalDocumentPages = Math.max(
+  1,
+  Math.ceil(filteredDocuments.length / documentsPerPage)
+);
 
+const documentStartIndex =
+  (currentDocumentPage - 1) * documentsPerPage;
+
+const paginatedDocuments = filteredDocuments.slice(
+  documentStartIndex,
+  documentStartIndex + documentsPerPage
+);
+
+const visibleDocumentPages = Array.from(
+  { length: totalDocumentPages },
+  (_, index) => index + 1
+).filter((page) => {
+  return (
+    page === 1 ||
+    page === totalDocumentPages ||
+    Math.abs(page - currentDocumentPage) <= 1
+  );
+});
   return (
     <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600 font-sans antialiased py-5">
       <div className="max-w-[1500px] mx-auto p-3 sm:p-4 md:p-6">
@@ -617,13 +643,16 @@ const handleResetDocumentFilters = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {filteredDocuments.map((d, i) => (
+                {paginatedDocuments.map((d, i) => (
                   <tr key={i}>
                     <td className="py-3 pr-2"><input type="checkbox" className="accent-blue-600" /></td>
                     <td className="py-3 whitespace-nowrap">
                       <div className="flex items-center gap-2">
                         <DocIcon type={d.documentType} />
-                        <span className="text-blue-600 font-bold underline cursor-pointer">{d.fileUrl?.split("/").pop()}</span>
+                        <span className="text-blue-600 text-xs font-bold  cursor-pointer">{d.documentName}</span>
+                       {/* <span className="text-1px text-teal-600 truncate">{d.fileName ||
+                          d.fileUrl?.split("/").pop() ||
+                          "-"}</span>*/}
                       </div>
                     </td>
                     <td className="py-3 text-slate-600  font-bold whitespace-nowrap">{d.documentType}</td>
@@ -648,21 +677,71 @@ const handleResetDocumentFilters = () => {
             </table>
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-4 pt-3 border-t border-slate-100">
-            <span className="text-[11px] text-blue-500 font-medium">Showing 1 to {filteredDocuments.length} of {filteredDocuments.length} documents</span>
-            <div className="flex items-center gap-1.5">
-              <button className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400">
-                <ChevronLeft size={14} />
-              </button>
-              <button className="w-7 h-7 flex items-center justify-center rounded-lg bg-blue-600 text-white text-[11px] font-bold">1</button>
-              <button className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 text-[11px] font-bold">2</button>
-              <button className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 text-[11px] font-bold">3</button>
-              <span className="text-slate-400 text-[11px]">...</span>
-              <button className="w-7 h-7 flex items-center justify-center rounded-lg text-slate-500 text-[11px] font-bold">246</button>
-              <button className="w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400">
-                <ChevronRight size={14} />
-              </button>
-            </div>
-          </div>
+  <span className="text-[11px] text-blue-500 font-medium">
+    {filteredDocuments.length > 0
+      ? `Showing ${documentStartIndex + 1} to ${Math.min(
+          documentStartIndex + documentsPerPage,
+          filteredDocuments.length
+        )} of ${filteredDocuments.length} documents`
+      : "Showing 0 to 0 of 0 documents"}
+  </span>
+
+  {totalDocumentPages > 1 && (
+    <div className="flex items-center gap-1.5">
+      <button
+        onClick={() =>
+          setCurrentDocumentPage((prev) => Math.max(prev - 1, 1))
+        }
+        disabled={currentDocumentPage === 1}
+        className={`w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 transition ${
+          currentDocumentPage === 1
+            ? "text-slate-300 cursor-not-allowed"
+            : "text-slate-500 hover:bg-slate-50"
+        }`}
+      >
+        <ChevronLeft size={14} />
+      </button>
+
+      {visibleDocumentPages.map((page, index) => (
+        <React.Fragment key={page}>
+          {index > 0 &&
+            visibleDocumentPages[index - 1] !== page - 1 && (
+              <span className="text-slate-400 text-[11px] px-1">
+                ...
+              </span>
+            )}
+
+          <button
+            onClick={() => setCurrentDocumentPage(page)}
+            className={`w-7 h-7 flex items-center justify-center rounded-lg text-[11px] font-bold transition ${
+              currentDocumentPage === page
+                ? "bg-blue-600 text-white"
+                : "text-slate-500 hover:bg-slate-100"
+            }`}
+          >
+            {page}
+          </button>
+        </React.Fragment>
+      ))}
+
+      <button
+        onClick={() =>
+          setCurrentDocumentPage((prev) =>
+            Math.min(prev + 1, totalDocumentPages)
+          )
+        }
+        disabled={currentDocumentPage === totalDocumentPages}
+        className={`w-7 h-7 flex items-center justify-center rounded-lg border border-slate-200 transition ${
+          currentDocumentPage === totalDocumentPages
+            ? "text-slate-300 cursor-not-allowed"
+            : "text-slate-500 hover:bg-slate-50"
+        }`}
+      >
+        <ChevronRight size={14} />
+      </button>
+    </div>
+  )}
+</div>
         </SectionCard>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
@@ -805,12 +884,12 @@ const handleResetDocumentFilters = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {recentUploads.map((u) => (
+                  {recentUploads.slice(0, 5).map((u) => (
                     <tr key={u._id}>
                       <td className="py-2.5">
                         <div className="flex items-center gap-2">
                           <DocIcon type={u.documentType} />
-                          <span className="text-blue-600 font-semibold underline whitespace-nowrap">{u.fileUrl?.split("/").pop()}</span>
+                          <span className="text-blue-600 font-semibold  whitespace-nowrap">{u.documentName}</span>
                         </div>
                       </td>
                       <td className="py-2.5 text-slate-600 whitespace-nowrap">{u.documentType}</td>
