@@ -25,6 +25,7 @@ import {
   SlidersHorizontal,
   FileSpreadsheet,
   LayoutGrid,
+  Download
 } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 const countryCodes = {
@@ -238,7 +239,8 @@ export default function ShipmentDatabase() {
     const [shipmentEndDate, setShipmentEndDate] = useState(null);
      const [dateRange, setDateRange] = useState(false)
      const [exportReport, setExportReport] = useState(false)
-
+const [currentPage, setCurrentPage] = useState(1);
+const rowsPerPage = 10;
   const fetchDashboard = async () => {
     try {
       const res = await getDashboard();
@@ -315,6 +317,7 @@ export default function ShipmentDatabase() {
     setSelectedImporter("All Importers");
     setSelectedExporter("All Exporters");
     setSelectedPort("All Ports");
+      setCurrentPage(1);
   };
 
   // --- DYNAMIC SEARCH & FILTER LOGIC ---
@@ -368,6 +371,29 @@ export default function ShipmentDatabase() {
   selectedExporter,
   selectedPort,
 ]);
+const totalPages = Math.ceil(
+  filteredShipments.length / rowsPerPage
+);
+
+const paginatedShipments = useMemo(() => {
+  const startIndex =
+    (currentPage - 1) * rowsPerPage;
+
+  return filteredShipments.slice(
+    startIndex,
+    startIndex + rowsPerPage
+  );
+}, [filteredShipments, currentPage]);
+
+const startRow =
+  filteredShipments.length === 0
+    ? 0
+    : (currentPage - 1) * rowsPerPage + 1;
+
+const endRow = Math.min(
+  currentPage * rowsPerPage,
+  filteredShipments.length
+);
   // --- DYNAMIC COUNTERS & STATS COMPUTATION ---
   const totalValue = useMemo(() => {
    return (
@@ -391,7 +417,16 @@ export default function ShipmentDatabase() {
       importer: selectedImporter,
     });
   };
-
+useEffect(() => {
+  setCurrentPage(1);
+}, [
+  searchTerm,
+  selectedOrigin,
+  selectedDest,
+  selectedImporter,
+  selectedExporter,
+  selectedPort,
+]);
   return (
     <div className="overflow-y-auto  bg-[#f8fafc] p-6 font-sans text-slate-700 pt-14">
       {/* --- HEADER SECTION --- */}
@@ -428,15 +463,15 @@ export default function ShipmentDatabase() {
                        />
                      </div>
 
-          <button className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50">
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
-            <span>Export Excel</span>
-          </button>
+           <button onClick={() => setExportReport(true)} className={`flex-1 md:flex-none flex items-center justify-center gap-2 bg-white border border-slate-200 text-[11px] sm:text-xs font-semibold px-3 sm:px-4 py-2 rounded-xl shadow-xs hover:bg-slate-50 transition whitespace-nowrap ${HEADING}`}>
+                     <Download size={14} className="text-slate-400" />
+                     Export Report
+                   </button>
 
-          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition-colors">
+         {/* <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition-colors">
             <Filter className="w-4 h-4" />
             <span>Advanced Filters</span>
-          </button>
+          </button>*/}
         </div>
       </div>
 
@@ -568,7 +603,7 @@ export default function ShipmentDatabase() {
 
       {/* --- DYNAMIC FILTERS ROW BAR --- */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 items-end">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-3 items-end">
           {/* Input Search Box */}
           <div>
             <label className="text-[11px] font-bold text-slate-400 block mb-1 uppercase">
@@ -628,7 +663,7 @@ export default function ShipmentDatabase() {
             </div>
           </div>
 
-          {/* Importer Dropdown */}
+          {/* Importer Dropdown 
           <div>
             <label className="text-[11px] font-bold text-slate-400 block mb-1 uppercase">
               Importer
@@ -649,7 +684,7 @@ export default function ShipmentDatabase() {
             </div>
           </div>
 
-          {/* Exporter Dropdown */}
+          {/* Exporter Dropdown 
           <div>
             <label className="text-[11px] font-bold text-slate-400 block mb-1 uppercase">
               Exporters
@@ -670,7 +705,7 @@ export default function ShipmentDatabase() {
             </div>
           </div>
 
-          {/* Loading Port Dropdown */}
+          {/* Loading Port Dropdown 
           <div>
             <label className="text-[11px] font-bold text-slate-400 block mb-1 uppercase">
               Port of Loading
@@ -697,14 +732,14 @@ export default function ShipmentDatabase() {
           <div className="flex gap-2">
             <button
               onClick={handleApplyFilters}
-              className="flex-1  bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm  whitespace-nowrap"
+              className="flex-1  bg-blue-600 hover:bg-blue-700  text-white font-medium text-xs rounded-xl py-2 px-3 transition shadow-sm  w-full whitespace-nowrap"
             >
-              Apply Filters
+              Search
             </button>
 
             <button
               onClick={handleResetFilters}
-              className="flex items-center justify-center border border-slate-200 text-red-500 hover:bg-red-50 rounded-lg px-4 py-2 bg-white shadow-sm font-semibold text-xs w-full transition-colors"
+              className="flex items-center justify-center border border-slate-200 text-red-500 hover:bg-red-50 rounded-lg px-2 py-3 bg-white shadow-sm font-semibold text-xs w-full transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5 mr-1" /> Reset
             </button>
@@ -750,12 +785,12 @@ export default function ShipmentDatabase() {
                 <th className="py-3 px-3">Arr. Date</th>
                 <th className="py-3 px-4 text-right">Value (INR)</th>
                 <th className="py-3 px-4 text-center">Status</th>
-                <th className="py-3 px-3 text-center">Actions</th>
+                {/*<th className="py-3 px-3 text-center">Actions</th>*/}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 text-xs">
-              {filteredShipments.length > 0 ? (
-                filteredShipments.map((row, idx) => (
+              {paginatedShipments.length > 0 ? (
+                paginatedShipments.map((row, idx) => (
                   <tr
                     key={idx}
                     className="hover:bg-slate-50/80 transition-colors"
@@ -830,9 +865,9 @@ export default function ShipmentDatabase() {
                         {row.shipmentStatus}
                       </span>
                     </td>
-                    <td className="py-3.5 px-3 text-center text-slate-400 hover:text-slate-600 cursor-pointer text-lg font-bold">
+                   {/* <td className="py-3.5 px-3 text-center text-slate-400 hover:text-slate-600 cursor-pointer text-lg font-bold">
                       ⋮
-                    </td>
+                    </td>*/}
                   </tr>
                 ))
               ) : (
@@ -852,23 +887,72 @@ export default function ShipmentDatabase() {
         {/* Footer info pagination */}
         <div className="p-4 border-t border-slate-100 bg-slate-50/30 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-xs font-semibold text-slate-400">
-            Showing {filteredShipments.length} rows
+           Showing {startRow}-{endRow} of{" "}
+  {filteredShipments.length} rows
           </div>
           <div className="flex items-center gap-1">
-            <button className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-400">
-              <ChevronLeft className="w-3.5 h-3.5" />
-            </button>
-            <button className="px-3 py-1 rounded-lg text-xs font-bold bg-blue-600 text-white border border-blue-600">
-              1
-            </button>
-            <button className="p-1.5 rounded-lg border border-slate-200 bg-white text-slate-500">
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
+  <button
+    type="button"
+    onClick={() =>
+      setCurrentPage((prev) =>
+        Math.max(prev - 1, 1)
+      )
+    }
+    disabled={currentPage === 1}
+    className={`p-1.5 rounded-lg border border-slate-200 bg-white ${
+      currentPage === 1
+        ? "text-slate-300 cursor-not-allowed"
+        : "text-slate-500 hover:bg-slate-100"
+    }`}
+  >
+    <ChevronLeft className="w-3.5 h-3.5" />
+  </button>
+
+  {Array.from(
+    { length: totalPages },
+    (_, index) => index + 1
+  ).map((page) => (
+    <button
+      key={page}
+      type="button"
+      onClick={() => setCurrentPage(page)}
+      className={`px-3 py-1 rounded-lg text-xs font-bold border ${
+        currentPage === page
+          ? "bg-blue-600 text-white border-blue-600"
+          : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+      }`}
+    >
+      {page}
+    </button>
+  ))}
+
+  <button
+    type="button"
+    onClick={() =>
+      setCurrentPage((prev) =>
+        Math.min(prev + 1, totalPages)
+      )
+    }
+    disabled={
+      currentPage === totalPages ||
+      totalPages === 0
+    }
+    className={`p-1.5 rounded-lg border border-slate-200 bg-white ${
+      currentPage === totalPages ||
+      totalPages === 0
+        ? "text-slate-300 cursor-not-allowed"
+        : "text-slate-500 hover:bg-slate-100"
+    }`}
+  >
+    <ChevronRight className="w-3.5 h-3.5" />
+  </button>
+</div>
         </div>
 
       </div> 
-      
+       {exportReport && (
+                               <ExportReport onClose={() => setExportReport(false)} />
+                             )}
     <div className="mt-5 pt-3 border-t border-slate-200/60 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 gap-2">
         <div className="flex items-center gap-1.5">
           <Clock size={13} className="text-slate-300" />

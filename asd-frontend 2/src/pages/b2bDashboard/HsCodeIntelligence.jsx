@@ -119,6 +119,7 @@ export default function HSCodeIntelligence() {
   const [trendData, setTrendData] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
   const [importers, setImporters] = useState([]);
+  const [showAllImporters, setShowAllImporters] = useState(false);
   const [exporters, setExporters] = useState([]);
   const [countries, setCountries] = useState([]);
   const [filterOptions, setFilterOptions] = useState({});
@@ -345,7 +346,7 @@ const fetchFilterOptions = async () => {
 
       {/* SEARCH AND FILTERS PANEL */}
       <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm mb-5">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3 items-end">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 xl:grid-cols-4 gap-3 items-end">
           <div>
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">HS Code / Product</label>
             <input
@@ -356,7 +357,7 @@ const fetchFilterOptions = async () => {
               className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 px-3 text-xs focus:outline-none focus:border-blue-500"
             />
           </div>
-          <div>
+          {/*<div>
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">Chapter</label>
             <div className="relative">
               <select value={selectedChapter} onChange={(e) => setSelectedChapter(e.target.value)} className="w-full bg-slate-50/60 border border-slate-200 rounded-xl py-2 pl-3 pr-8 text-xs appearance-none focus:outline-none focus:border-blue-500">
@@ -391,7 +392,7 @@ const fetchFilterOptions = async () => {
               </select>
               <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
-          </div>
+          </div>*/}
           <div>
             <label className="text-[10px] text-slate-400 font-bold block mb-1 uppercase">Country</label>
             <div className="relative">
@@ -420,7 +421,7 @@ const fetchFilterOptions = async () => {
           
           
           <div className="flex gap-2 w-full">
-            <button onClick={handleApply} className="flex-1 bg-blue-600  whitespace-nowrap hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 transition shadow-sm">Apply Filters</button>
+            <button onClick={handleApply} className="flex-1 bg-blue-600  whitespace-nowrap hover:bg-blue-700 text-white font-medium text-xs rounded-xl py-2 transition shadow-sm">Search</button>
             <button onClick={handleReset} className="text-slate-400 hover:text-slate-600 text-xs font-semibold px-2 border border-slate-200 rounded-xl bg-white">Reset</button>
           </div>
         </div>
@@ -532,26 +533,52 @@ const fetchFilterOptions = async () => {
       {/* DOUBLE GRAPH SLOT LAYER */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
         {/* Top HS Codes by Growth */}
-        <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-bold text-xs text-slate-800">Top HS Codes by Growth <span className="text-[10px] text-slate-400 font-normal">(vs last month)</span></h3>
-            {/*<button className="text-blue-600 text-[11px] font-bold">View All</button>*/}
-          </div>
-          <div className="divide-y divide-slate-50">
-            {importers.map((item, i) => (
-              <div key={i} className="flex justify-between items-center py-2 text-[11px]">
-                <div>
-                  <div className="flex items-center gap-2"><span className="font-bold text-slate-700">{item.importer}</span></div>
-                </div>
-                <div className="text-right flex items-center gap-4">
-                  <span className="font-semibold text-slate-500">₹ {(item.tradeValue / 10000000).toFixed(2)} Cr</span>
-                  <span className="text-green-500 font-bold w-12">{item.shipments} Shipments</span>
-                </div>
-              </div>
-            ))}
+<div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
+  <div className="flex justify-between items-center mb-3">
+    <h3 className="font-bold text-xs text-slate-800">
+      Top HS Codes by Growth{" "}
+      <span className="text-[10px] text-slate-400 font-normal">
+        (vs last month)
+      </span>
+    </h3>
+
+    {importers.length > 5 && (
+      <button
+        onClick={() => setShowAllImporters(true)}
+        className="text-blue-600 hover:text-blue-700 text-[11px] font-bold"
+      >
+        View All
+      </button>
+    )}
+  </div>
+
+  <div className="divide-y divide-slate-50">
+    {importers.slice(0, 5).map((item, i) => (
+      <div
+        key={item._id || i}
+        className="flex justify-between items-center py-2 text-[11px]"
+      >
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-slate-700">
+              {item.importer || "-"}
+            </span>
           </div>
         </div>
 
+        <div className="text-right flex items-center gap-4">
+          <span className="font-semibold text-slate-500">
+            ₹ {((item.tradeValue || 0) / 10000000).toFixed(2)} Cr
+          </span>
+
+          <span className="text-green-500 font-bold w-12">
+            {item.shipments || 0} Shipments
+          </span>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
         {/* Top HS Codes by Shipments */}
         <div className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm">
           <div className="flex justify-between items-center mb-3">
@@ -695,6 +722,77 @@ const fetchFilterOptions = async () => {
         {exportReport && (
                          <ExportReport onClose={() => setExportReport(false)} />
                        )}
+
+        {showAllImporters && (
+  <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
+    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl max-h-[85vh] flex flex-col">
+      
+      {/* Modal Header */}
+      <div className="flex items-center justify-between p-5 border-b border-slate-100">
+        <div>
+          <h2 className="text-lg font-bold text-slate-800">
+            Top HS Codes by Growth
+          </h2>
+
+          <p className="text-xs text-slate-400 mt-1">
+            All importers and shipment details
+          </p>
+        </div>
+
+        <button
+          onClick={() => setShowAllImporters(false)}
+          className="w-9 h-9 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-500 text-xl"
+        >
+          ×
+        </button>
+      </div>
+
+      {/* Modal Content */}
+      <div className="overflow-y-auto p-5">
+        <div className="divide-y divide-slate-100">
+          {importers.map((item, i) => (
+            <div
+              key={item._id || i}
+              className="flex justify-between items-center py-4"
+            >
+              <div>
+                <p className="text-sm font-bold text-slate-700">
+                  {item.importer || "-"}
+                </p>
+              </div>
+
+              <div className="text-right flex items-center gap-6">
+                <span className="text-sm font-semibold text-slate-500">
+                  ₹ {((item.tradeValue || 0) / 10000000).toFixed(2)} Cr
+                </span>
+
+                <span className="text-green-500 font-bold text-sm w-20">
+                  {item.shipments || 0} Shipments
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {importers.length === 0 && (
+          <div className="py-10 text-center text-sm text-slate-400">
+            No data available
+          </div>
+        )}
+      </div>
+
+      {/* Modal Footer */}
+      <div className="p-4 border-t border-slate-100 flex justify-end">
+        <button
+          onClick={() => setShowAllImporters(false)}
+          className="px-5 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

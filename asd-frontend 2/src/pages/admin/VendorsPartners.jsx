@@ -481,16 +481,12 @@ export default function VendorsPartners() {
         {/* ANALYTICS CARDS */}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-
-          {/* PLAN TYPE VENDOR */}
-
           <div className="bg-white border border-gray-200 rounded-2xl p-6 min-h-[300px]">
             <h3 className="text-lg font-medium text-gray-700 mb-4">
               Plan type vendor
             </h3>
 
             <div className="flex flex-col sm:flex-row items-center gap-6">
-              
               <div className="relative w-[180px] h-[180px] flex-shrink-0">
                 <ResponsiveContainer
                   width="100%"
@@ -554,7 +550,6 @@ export default function VendorsPartners() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#7C4DFF]" />
-
                     <span className="text-sm text-gray-600">
                       Basic Plan
                     </span>
@@ -568,7 +563,6 @@ export default function VendorsPartners() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#4A78C2]" />
-
                     <span className="text-sm text-gray-600">
                       Starter Plan
                     </span>
@@ -582,7 +576,6 @@ export default function VendorsPartners() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-[#1FA45B]" />
-
                     <span className="text-sm text-gray-600">
                       Other Plan
                     </span>
@@ -595,8 +588,6 @@ export default function VendorsPartners() {
               </div>
             </div>
           </div>
-
-          {/* VENDOR REGISTRATION */}
 
           <div className="bg-white border border-gray-200 rounded-2xl p-6 min-h-[300px]">
             <h3 className="text-lg font-medium text-gray-700 mb-4">
@@ -647,8 +638,6 @@ export default function VendorsPartners() {
               </ResponsiveContainer>
             </div>
           </div>
-
-          {/* VENDOR BY STATUS */}
 
           <div className="bg-white border border-gray-200 rounded-2xl p-6 min-h-[300px]">
             <h3 className="text-lg font-medium text-gray-700 mb-2">
@@ -923,26 +912,18 @@ export default function VendorsPartners() {
             </table>
           </div>
         )}
-      </div>
 
-      {/* DETAILS MODAL */}
+        {/* DETAILS SECTION - TABLE KE BAHAR AUR NEECHAY */}
 
-      {showDetail && selectedVendor && (
-        <div
-          className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-3 sm:p-6"
-          onClick={() =>
-            setShowDetail(false)
-          }
-        >
-          <div
-            className="w-full max-w-6xl bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 max-h-[90vh] overflow-y-auto"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
-          >
+        {showDetail && selectedVendor && (
+          <div className="w-full mt-6 bg-white rounded-2xl border border-gray-200 p-5 sm:p-6 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <div>
-                <p className="font-semibold text-gray-900">
+                <h2 className="font-semibold text-gray-900 text-lg">
+                  Vendor Details
+                </h2>
+
+                <p className="text-sm text-gray-400 mt-1">
                   {selectedVendor.companyName ||
                     selectedVendor.name}
                 </p>
@@ -1124,8 +1105,8 @@ export default function VendorsPartners() {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {kycVerify && selectedVendor && (
         <KYCVerificationModal
@@ -1149,4 +1130,4 @@ export default function VendorsPartners() {
       )}
     </div>
   );
-}
+} 
