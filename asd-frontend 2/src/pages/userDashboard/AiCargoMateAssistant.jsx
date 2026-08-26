@@ -46,6 +46,7 @@ import SaveReportPopup from '../../components/userComponent/SaveReportPopup';
 import ShareReportModal from '../../components/userComponent/ShareReport';
 import DataSourceModal from '../../components/userComponent/DataSource';
 import poster from "../../assets/Images/webp/poster3.webp"
+import poster2 from "../../assets/Images/webp/poster2.webp"
 
 
 const recCards = [
@@ -517,7 +518,7 @@ const AiCargoMateAssistant = () => {
                     ))}
 
  
-
+                      <img src={poster2}  className='w-full max-h-32' />
 
                   </div>
 

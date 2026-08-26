@@ -31,7 +31,7 @@ import {
 
 function Label({ children, required = true }) {
   return (
-    <label className="block text-[11px] font-semibold text-slate-700 mb-2 leading-tight">
+    <label className="block text-[13px] font-semibold text-slate-700 mb-2 leading-tight">
       {children}
       {required && <span className="text-red-500 ml-0.5">*</span>}
     </label>
@@ -95,7 +95,7 @@ function Select({
 }) {
   return (
     <div>
-      <Label required={required}>{label}</Label>
+      <Label  required={required}>{label}</Label>
       <div className="relative">
         <select
           name={name}
@@ -156,9 +156,9 @@ function SectionCard({ number, title, subtitle, children }) {
         <span className="w-7 h-7 rounded-full bg-blue-600 text-white text-[11px] font-bold flex items-center justify-center shrink-0 shadow-sm shadow-blue-200">
           {number}
         </span>
-        <h3 className="text-[15px] font-bold text-slate-900 tracking-tight">{title}</h3>
+        <h3 className="text-lg font-bold text-slate-900 tracking-tight">{title}</h3>
       </div>
-      {subtitle && <p className="text-xs text-slate-500 mt-1 ml-9">{subtitle}</p>}
+      {subtitle && <p className="text-[13px] text-slate-500 mt-1 ml-9">{subtitle}</p>}
       <div className="mt-5 space-y-4">{children}</div>
     </section>
   );
@@ -190,7 +190,7 @@ function DocumentsUpload({ uploadedDocs, handleDocumentUpload, fileInputRef }) {
                 <Icon size={14} />
               </div>
               <div>
-                <p className="text-[10px] font-semibold text-slate-700 mt-2 leading-[1.15] min-h-[23px] flex items-center justify-center">
+                <p className="text-sm font-semibold text-slate-700 mt-2 leading-[1.15] min-h-[23px] flex items-center justify-center">
                   {d.label}
                 </p>
                 <>
@@ -208,7 +208,7 @@ function DocumentsUpload({ uploadedDocs, handleDocumentUpload, fileInputRef }) {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current[d.label].click()}
-                    className="text-[10px] text-blue-600 font-semibold mt-1"
+                    className="text-xs text-blue-600 font-semibold mt-1"
                   >
                     {uploadedDocs[d.label] ? "Uploaded ✔" : "Upload"}
                   </button>
@@ -245,19 +245,19 @@ function AIOutputAnalysis({ analysis }) {
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-2 ">
         {aiTopStats.map((s) => (
           <div key={s.label} className={`flex flex-col justify-around rounded-xl p-3 ${s.color} border border-white shadow-sm`}>
-            <p className="text-xs xl:text-[10px] font-medium">{s.label}</p>
-            <p className="text-xs xl:text-[9px] font-bold mt-0.5">{s.value}</p>
+            <p className="text-xs  font-medium">{s.label}</p>
+            <p className="text-xs  font-bold mt-0.5">{s.value}</p>
           </div>
         ))}
       </div>
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-2">
         {aiBottomStats.map((s) => (
           <div key={s.label} className="rounded-xl p-3 bg-slate-50 border border-slate-100">
-            <p className="text-sm xl:text-[10px] text-gray-500">{s.label}</p>
-            <p className={`text-sm xl:text-[10px] font-bold mt-0.5 ${s.green ? "text-green-600" : "text-gray-900"}`}>
+            <p className="text-sm text-gray-500">{s.label}</p>
+            <p className={`text-sm font-bold mt-0.5 ${s.green ? "text-green-600" : "text-gray-900"}`}>
               {s.value}
             </p>
-            {s.sub && <p className="text-xs xl:text-[10px] text-gray-400">{s.sub}</p>}
+            {s.sub && <p className="text-xs  text-gray-400">{s.sub}</p>}
           </div>
         ))}
       </div>

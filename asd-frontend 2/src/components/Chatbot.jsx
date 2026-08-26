@@ -1,15 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, useRef, useEffect } from "react";
 import {
   Bot,
@@ -535,7 +524,7 @@ export default function CargoMateChat() {
 
   return (
     <div className="flex flex-col">
-      <header className="flex items-center justify-between gap-3 px-3 sm:px-5 py-3 border-b border-gray-200 shrink-0">
+      {/* <header className="flex items-center justify-between gap-3 px-3 sm:px-5 py-3 border-b border-gray-200 shrink-0">
         <div className="flex">
           <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
             <Menu size={22} className="text-gray-600" />
@@ -554,19 +543,8 @@ export default function CargoMateChat() {
           </div>
         </div>
 
-        {/* <div className="flex-1 hidden justify-center lg:flex items-center gap-2 overflow-x-auto no-scrollbar">
-          {badges.map((b) => (
-            <Badge key={b.label} {...b} />
-          ))}
-        </div> */}
-
         <div className="flex sm:hidden md:flex items-center gap-2 sm:gap-4 shrink-0">
-          {/* <button className="relative">
-            <Bell size={19} className="text-gray-500" />
-            <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
-              3
-            </span>
-          </button> */}
+        
           <button className="flex items-center gap-1 text-sm text-gray-600">
             English <ChevronDown size={14} />
           </button>
@@ -580,7 +558,7 @@ export default function CargoMateChat() {
             </div>
           </div>
         </div>
-      </header>
+      </header> */}
 
       <div className="flex h-screen w-full bg-white text-gray-900 overflow-hidden font-sans">
         {sidebarOpen && (
@@ -590,7 +568,7 @@ export default function CargoMateChat() {
           />
         )}
 
-        <aside
+        {/* <aside
           className={`fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           } lg:translate-x-0`}
@@ -620,24 +598,7 @@ export default function CargoMateChat() {
           </div>
 
           <nav className="flex-1 overflow-y-auto p-3 space-y-1 light-scrollbar">
-            {/* {navItems.map((item) => (
-              <button
-                key={item.label}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition ${
-                  item.active
-                    ? "bg-blue-50 text-blue-700 font-medium"
-                    : "text-gray-600 hover:bg-gray-50"
-                }`}
-              >
-                <item.icon size={17} />
-                <span className="flex-1 text-left">{item.label}</span>
-                {item.badge && (
-                  <span className="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded-full">
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            ))} */}
+        
 
             <div className="pt-3 mt-2 border-t border-gray-100">
               <p className="px-3 pb-1 text-xs font-semibold text-gray-400 uppercase tracking-wide">
@@ -681,7 +642,7 @@ export default function CargoMateChat() {
               </div>
             </div>
           </div>
-        </aside>
+        </aside> */}
 
         <div className="flex-1 flex flex-col min-w-0">
           <main
