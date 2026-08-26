@@ -131,8 +131,98 @@ function FreightCard({ badge, badgeClass, outerBorderClass, iconBg, iconColor, i
   );
 }
 
+// function FreightOptions() {
+//   const cards = [
+//     {
+//       badge: "Best Value",
+//       badgeClass: "bg-green-100 text-green-700",
+//       outerBorderClass: "border-teal-200",
+//       iconBg: "bg-green-50 border-green-100",
+//       iconColor: "text-green-600",
+//       iconD: plane,
+//       title: "Air Freight",
+//       subtitle: "Fastest Delivery",
+//       subtitleColor: "text-green-600",
+//       price: "₹24,860",
+//       priceColor: "text-green-600",
+//       departure: "26 Apr 2025",
+//       arrival: "30 Apr 2025",
+//       viewBtnClass: "text-teal-600",
+//       viewBorderClass: "border-teal-200",
+//       viewHoverClass: "hover:bg-teal-50",
+//     },
+//     {
+//       badge: "Best Balance",
+//       badgeClass: "bg-blue-100 text-blue-700",
+//       outerBorderClass: "border-gray-200",
+//       iconBg: "bg-blue-50 border-blue-100",
+//       iconColor: "text-blue-600",
+//       iconD: blueship,
+//       title: "Sea Freight (LCL)",
+//       subtitle: "Cost Effective",
+//       subtitleColor: "text-blue-600",
+//       price: "₹18,450",
+//       priceColor: "text-blue-700",
+//       departure: "26 Apr 2025",
+//       arrival: "30 Apr 2025",
+//       viewBtnClass: "text-blue-700",
+//       viewBorderClass: "border-blue-200",
+//       viewHoverClass: "hover:bg-blue-50",
+//     },
+//     {
+//       badge: "Lowest Cost",
+//       badgeClass: "bg-orange-100 text-orange-700",
+//       outerBorderClass: "border-gray-200",
+//       iconBg: "bg-orange-50 border-orange-100",
+//       iconColor: "text-orange-600",
+//       iconD: orangeship,
+//       title: "Sea Freight (FCL)",
+//       subtitle: "Lowest Cost",
+//       subtitleColor: "text-orange-600",
+//       price: "₹15,230",
+//       priceColor: "text-orange-700",
+//       departure: "26 Apr 2025",
+//       arrival: "30 Apr 2025",
+//       viewBtnClass: "text-orange-700",
+//       viewBorderClass: "border-orange-200",
+//       viewHoverClass: "hover:bg-orange-50",
+//     },
+//   ];
+
+//   return (
+//     <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+   
+//       <div>
+//       <div className="flex border-b border-gray-200">
+//         <button className="px-6 py-4 text-xs font-semibold text-teal-600 border-b-2 border-teal-600">Freight Options</button>
+//         <button className="px-6 py-4 text-xs font-semibold text-gray-500 hover:text-gray-900">Cost Breakdown</button>
+//         <button className="px-6 py-4 text-xs font-semibold text-gray-500 hover:text-gray-900">Transit Time Comparison</button>
+//         <div className="ml-auto flex items-center pr-4">
+//           <span className="text-xs text-gray-500 mr-2">Currency:</span>
+//           <select className="text-xs font-bold border-gray-200 rounded px-2 py-1">
+//             <option>INR</option>
+//             <option>USD</option>
+//           </select>
+//         </div>
+//       </div>
+//       <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+//         {cards.map((card) => (
+//           <FreightCard key={card.badge} {...card} />
+//         ))}
+//       </div>
+//        </div>
+//       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center gap-2 text-[10px] text-gray-500">
+//         <Icon d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-4 h-4" />
+//         Rates are subject to change based on actual booking date, availability, and market conditions.
+//       </div>
+//     </section>
+//   );
+// }
+
 function FreightOptions() {
-  const cards = [
+  const [activeTab, setActiveTab] = useState("freight");
+
+  const freightCards = [
     {
       badge: "Best Value",
       badgeClass: "bg-green-100 text-green-700",
@@ -189,32 +279,131 @@ function FreightOptions() {
     },
   ];
 
+  const costCards = [
+    {
+      ...freightCards[0],
+      subtitle: "Freight Charges",
+      price: "₹18,500",
+      priceColor: "text-green-600",
+      departure: "Handling: ₹3,200",
+      arrival: "Documentation: ₹1,160",
+    },
+    {
+      ...freightCards[1],
+      subtitle: "Freight Charges",
+      price: "₹13,800",
+      priceColor: "text-blue-700",
+      departure: "Handling: ₹3,500",
+      arrival: "Documentation: ₹1,150",
+    },
+    {
+      ...freightCards[2],
+      subtitle: "Freight Charges",
+      price: "₹11,200",
+      priceColor: "text-orange-700",
+      departure: "Handling: ₹2,900",
+      arrival: "Documentation: ₹1,130",
+    },
+  ];
+
+  const transitCards = [
+    {
+      ...freightCards[0],
+      subtitle: "Transit Time",
+      price: "4 Days",
+      priceColor: "text-green-600",
+      departure: "Departure: 26 Apr 2025",
+      arrival: "Arrival: 30 Apr 2025",
+    },
+    {
+      ...freightCards[1],
+      subtitle: "Transit Time",
+      price: "12 Days",
+      priceColor: "text-blue-700",
+      departure: "Departure: 26 Apr 2025",
+      arrival: "Arrival: 08 May 2025",
+    },
+    {
+      ...freightCards[2],
+      subtitle: "Transit Time",
+      price: "14 Days",
+      priceColor: "text-orange-700",
+      departure: "Departure: 26 Apr 2025",
+      arrival: "Arrival: 10 May 2025",
+    },
+  ];
+
+  const activeCards =
+    activeTab === "freight"
+      ? freightCards
+      : activeTab === "cost"
+      ? costCards
+      : transitCards;
+
   return (
     <section className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-      {/* Tabs */}
-      <div className="flex border-b border-gray-200">
-        <button className="px-6 py-4 text-xs font-semibold text-teal-600 border-b-2 border-teal-600">Freight Options</button>
-        <button className="px-6 py-4 text-xs font-semibold text-gray-500 hover:text-gray-900">Cost Breakdown</button>
-        <button className="px-6 py-4 text-xs font-semibold text-gray-500 hover:text-gray-900">Transit Time Comparison</button>
-        <div className="ml-auto flex items-center pr-4">
-          <span className="text-xs text-gray-500 mr-2">Currency:</span>
-          <select className="text-xs font-bold border-gray-200 rounded px-2 py-1">
-            <option>INR</option>
-            <option>USD</option>
-          </select>
+      <div>
+        <div className="flex border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab("freight")}
+            className={`px-6 py-4 text-xs font-semibold ${
+              activeTab === "freight"
+                ? "text-teal-600 border-b-2 border-teal-600"
+                : "text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            Freight Options
+          </button>
+
+          <button
+            onClick={() => setActiveTab("cost")}
+            className={`px-6 py-4 text-xs font-semibold ${
+              activeTab === "cost"
+                ? "text-teal-600 border-b-2 border-teal-600"
+                : "text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            Cost Breakdown
+          </button>
+
+          <button
+            onClick={() => setActiveTab("transit")}
+            className={`px-6 py-4 text-xs font-semibold ${
+              activeTab === "transit"
+                ? "text-teal-600 border-b-2 border-teal-600"
+                : "text-gray-500 hover:text-gray-900"
+            }`}
+          >
+            Transit Time Comparison
+          </button>
+
+          <div className="ml-auto flex items-center pr-4">
+            <span className="text-xs text-gray-500 mr-2">
+              Currency:
+            </span>
+
+            <select className="text-xs font-bold border-gray-200 rounded px-2 py-1">
+              <option>INR</option>
+              <option>USD</option>
+            </select>
+          </div>
+        </div>
+
+        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          {activeCards.map((card) => (
+            <FreightCard
+              key={card.title}
+              {...card}
+            />
+          ))}
         </div>
       </div>
 
-      {/* Cards */}
-      <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-        {cards.map((card) => (
-          <FreightCard key={card.badge} {...card} />
-        ))}
-      </div>
-
-      {/* Footer note */}
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex items-center gap-2 text-[10px] text-gray-500">
-        <Icon d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" className="w-4 h-4" />
+        <Icon
+          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 11-18 0z"
+          className="w-4 h-4"
+        />
         Rates are subject to change based on actual booking date, availability, and market conditions.
       </div>
     </section>
