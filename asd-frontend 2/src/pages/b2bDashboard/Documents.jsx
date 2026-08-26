@@ -12,7 +12,7 @@ import {
   getDashboardExpiringDocuments,
   getDashboardRecentUploads,
   getDocumentFilterOptions,
-  getStorage,
+  getStorage
 } from "../../api/DocumentApi";
 import {
   CalendarDays,
@@ -31,6 +31,7 @@ import {
   AlertTriangle,
   FileCheck,
   Sparkles,
+  Eye,X
 } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import DateRangeModal from "../../components/b2bComponent/DateRange";
@@ -207,7 +208,34 @@ const [appliedDocFilters, setAppliedDocFilters] = useState({
   startDate: null,
   endDate: null,
 });
+const [selectedDocument, setSelectedDocument] = useState(null);
+const [documentViewModal, setDocumentViewModal] = useState(false);
+const handleViewDocument = (document) => {
+  setSelectedDocument(document);
+  setDocumentViewModal(true);
+};
+const getDocumentFileUrl = (fileUrl) => {
+  if (!fileUrl) return "";
 
+  // Agar already complete URL hai
+  if (
+    fileUrl.startsWith("http://") ||
+    fileUrl.startsWith("https://")
+  ) {
+    return fileUrl;
+  }
+
+  // API URL se /api hata do
+  const serverUrl = (
+    import.meta.env.VITE_API_URL || ""
+  )
+    .replace(/\/api\/?$/, "")
+    .replace(/\/$/, "");
+
+  return `${serverUrl}${
+    fileUrl.startsWith("/") ? fileUrl : `/${fileUrl}`
+  }`;
+};
   const fetchDashboard = async () => {
     try {
      const res = await getDocumentDashboard();
@@ -639,6 +667,7 @@ const visibleDocumentPages = Array.from(
                   <th className="text-left py-2 font-bold">Upload Date</th>
                   {/*<th className="text-left py-2 font-bold">Expiry Date</th>*/}
                   <th className="text-left py-2 font-bold">Status</th>
+                  <th className="text-right py-2 font-bold">Action</th>
                   {/*<th className="text-right py-2 font-bold">Actions</th>*/}
                 </tr>
               </thead>
@@ -666,6 +695,15 @@ const visibleDocumentPages = Array.from(
                     <td className="py-3 text-slate-500 font-bold whitespace-nowrap">{new Date(d.createdAt).toLocaleDateString()}</td>
                     {/*<td className="py-3 text-slate-500 font-bold whitespace-nowrap">{d.expiry  ? new Date(d.expiryDate).toLocaleDateString() : "-"}</td>*/}
                     <td className="py-3"><StatusBadge status={d.status} /></td>
+                    <td className="py-3 text-right">
+  <button
+    onClick={() => handleViewDocument(d)}
+    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-600 text-[10px] font-bold hover:bg-blue-100 transition"
+  >
+    <Eye size={13} />
+    View
+  </button>
+</td>
                     {/*<td className="py-3 text-right">
                       <button className="text-slate-400 hover:text-slate-600">
                         <MoreVertical size={15} />
@@ -894,7 +932,7 @@ const visibleDocumentPages = Array.from(
                       </td>
                       <td className="py-2.5 text-slate-600 whitespace-nowrap">{u.documentType}</td>
                       <td className="py-2.5 text-slate-500 whitespace-nowrap">{u.createdAt && new Date(u.createdAt).toLocaleDateString()}</td>
-                      <td className="py-2.5 text-slate-600 whitespace-nowrap">{u.userId?.name}</td>
+                      <td className="py-2.5 text-slate-600 whitespace-nowrap">{u.uploadedBy?.name}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -920,7 +958,288 @@ const visibleDocumentPages = Array.from(
           <AllRecentUploadsModal onClose={() => setRecentUpload(false)} />
          )}
 
-        
+        {documentViewModal && selectedDocument && (
+  <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-3 sm:p-5">
+    <div className="bg-white w-full max-w-6xl max-h-[92vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      
+      {/* HEADER */}
+      <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-100 shrink-0">
+        <div className="flex items-center gap-3 min-w-0">
+          <DocIcon type={selectedDocument.documentType} />
+
+          <div className="min-w-0">
+            <h2 className={`text-base sm:text-lg font-bold truncate ${HEADING}`}>
+              {selectedDocument.documentName ||
+                selectedDocument.fileName ||
+                "Document Details"}
+            </h2>
+
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              {selectedDocument.documentType || "Document"}
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => {
+            setDocumentViewModal(false);
+            setSelectedDocument(null);
+          }}
+          className="w-9 h-9 rounded-xl hover:bg-slate-100 flex items-center justify-center text-slate-500 transition shrink-0"
+        >
+          <X size={19} />
+        </button>
+      </div>
+
+      {/* CONTENT */}
+      <div className="overflow-y-auto p-4 sm:p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-5">
+
+          {/* DOCUMENT PREVIEW */}
+          <div className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 min-h-[500px] flex flex-col">
+            
+            <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-slate-200">
+              <div className="flex items-center gap-2 min-w-0">
+                <FileText size={16} className="text-blue-600 shrink-0" />
+
+                <span className={`text-xs font-bold truncate ${HEADING}`}>
+                  {selectedDocument.documentName ||
+                    selectedDocument.fileName ||
+                    "Document Preview"}
+                </span>
+              </div>
+
+              {selectedDocument.fileUrl && (
+                <button
+                  onClick={() =>
+                    window.open(getDocumentFileUrl(selectedDocument.fileUrl), "_blank")
+                  }
+                  className="shrink-0 ml-3 flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold transition"
+                >
+                  <Eye size={12} />
+                  Open Document
+                </button>
+              )}
+            </div>
+
+            <div className="flex-1 min-h-[450px] bg-slate-100">
+              {selectedDocument.fileUrl ? (
+                selectedDocument.fileUrl
+                  .toLowerCase()
+                  .match(/\.(jpg|jpeg|png|webp)$/i) ? (
+                  <div className="w-full h-full min-h-[450px] flex items-center justify-center p-4">
+                    <img
+                      src={getDocumentFileUrl(selectedDocument.fileUrl)}
+                      alt={selectedDocument.documentName || "Document"}
+                      className="max-w-full max-h-[650px] object-contain rounded-lg shadow-sm"
+                    />
+                  </div>
+                ) : (
+                  <iframe
+                    src={getDocumentFileUrl(selectedDocument.fileUrl)}
+                    title={selectedDocument.documentName || "Document Preview"}
+                    className="w-full min-h-[500px] border-0"
+                  />
+                )
+              ) : (
+                <div className="min-h-[450px] flex flex-col items-center justify-center text-center p-6">
+                  <div className="w-16 h-16 rounded-2xl bg-slate-200 flex items-center justify-center mb-4">
+                    <FileText size={28} className="text-slate-400" />
+                  </div>
+
+                  <p className={`font-bold text-sm ${HEADING}`}>
+                    Document preview unavailable
+                  </p>
+
+                  <p className="text-xs text-slate-400 mt-1">
+                    No document file is available for this record.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* DOCUMENT DETAILS */}
+          <div className="border border-slate-200 rounded-2xl bg-white h-fit">
+            
+            <div className="px-5 py-4 border-b border-slate-100">
+              <h3 className={`text-sm font-bold ${HEADING}`}>
+                Document Details
+              </h3>
+
+              <p className="text-[10px] text-slate-400 mt-1">
+                Complete information for this document
+              </p>
+            </div>
+
+            <div className="p-5 space-y-4">
+
+              <div>
+                <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                  Document Name
+                </p>
+
+                <p className={`text-xs font-bold break-words ${HEADING}`}>
+                  {selectedDocument.documentName ||
+                    selectedDocument.fileName ||
+                    "-"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                  Document Type
+                </p>
+
+                <p className="text-xs font-semibold text-slate-700">
+                  {selectedDocument.documentType || "-"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                  Shipment / Ref No.
+                </p>
+
+                <p className={`text-xs font-bold ${HEADING}`}>
+                  {selectedDocument.shipmentId?.sbNumber ||
+                    selectedDocument.shipmentId?.shipmentNumber ||
+                    "-"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                  Related To
+                </p>
+
+                <p className="text-xs font-semibold text-slate-700">
+                  {selectedDocument.relatedTo || "-"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                  Country
+                </p>
+
+                <div className="flex items-center gap-2">
+                  {selectedDocument.country && (
+                    <Flag
+                      country={selectedDocument.country}
+                      size={16}
+                    />
+                  )}
+
+                  <span className="text-xs font-semibold text-slate-700">
+                    {selectedDocument.country || "-"}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                  Upload Date
+                </p>
+
+                <p className="text-xs font-semibold text-slate-700">
+                  {selectedDocument.createdAt
+                    ? new Date(
+                        selectedDocument.createdAt
+                      ).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "-"}
+                </p>
+              </div>
+
+              {selectedDocument.expiryDate && (
+                <div>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                    Expiry Date
+                  </p>
+
+                  <p className="text-xs font-semibold text-slate-700">
+                    {new Date(
+                      selectedDocument.expiryDate
+                    ).toLocaleDateString("en-IN", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+              )}
+
+              <div>
+                <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                  Status
+                </p>
+
+                <StatusBadge
+                  status={selectedDocument.status}
+                />
+              </div>
+
+              <div>
+                <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                  Uploaded By
+                </p>
+
+                <p className="text-xs font-semibold text-slate-700">
+                  {selectedDocument.uploadedBy?.name ||
+                    selectedDocument.createdBy?.name ||
+                    "-"}
+                </p>
+              </div>
+
+              {selectedDocument.fileName && (
+                <div>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                    File Name
+                  </p>
+
+                  <p className="text-xs font-semibold text-slate-700 break-all">
+                    {selectedDocument.fileName}
+                  </p>
+                </div>
+              )}
+
+              {selectedDocument.fileSize && (
+                <div>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 mb-1">
+                    File Size
+                  </p>
+
+                  <p className="text-xs font-semibold text-slate-700">
+                    {(selectedDocument.fileSize / 1024).toFixed(2)} KB
+                  </p>
+                </div>
+              )}
+
+              {selectedDocument.fileUrl && (
+                <button
+                  onClick={() =>
+                    window.open(
+                      getDocumentFileUrl(selectedDocument.fileUrl),
+                      "_blank"
+                    )
+                  }
+                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-3 rounded-xl transition"
+                >
+                  <Download size={15} />
+                  Open Document
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
          
     </div>
   );
