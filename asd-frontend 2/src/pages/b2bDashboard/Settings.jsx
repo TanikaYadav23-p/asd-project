@@ -8,6 +8,8 @@ import {
   updateSecurity,
 } from "../../api/SettingsApi";
 
+import API from "../../api/axios";
+
 import {
   Globe,
   Calendar,
@@ -27,7 +29,46 @@ import {
   ToggleLeft,
   ToggleRight,
   FileText,
+  Upload,
+  User,
+  Briefcase,
+  CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
+
+
+const REQUIRED_KYC_DOCUMENTS = [
+  {
+    type: "GST Certificate",
+    title: "GST Certificate",
+    required: true,
+  },
+  {
+    type: "IEC Certificate",
+    title: "Import Export Code (IEC) Certificate",
+    required: true,
+  },
+  {
+    type: "PAN Card",
+    title: "PAN Card",
+    required: true,
+  },
+  {
+    type: "Company Registration",
+    title: "Company Registration Certificate",
+    required: true,
+  },
+  {
+    type: "Address Proof",
+    title: "Business Address Proof",
+    required: true,
+  },
+  {
+    type: "Authorized Signatory ID",
+    title: "Authorized Signatory ID Proof",
+    required: false,
+  },
+];
 
 
 export default function SettingsDashboard() {
@@ -37,6 +78,14 @@ export default function SettingsDashboard() {
   const [settings, setSettings] = useState({});
   const [activity, setActivity] = useState([]);
   const [accountSummary, setAccountSummary] = useState({});
+
+  // =========================
+  // KYC STATE
+  // =========================
+
+  const [selectedDocuments, setSelectedDocuments] = useState({});
+  const [uploading, setUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState("");
 
 
   // =========================
@@ -128,10 +177,148 @@ export default function SettingsDashboard() {
   const tabs = [
     "General",
     "Company Profile",
+    "KYC Documents",
     "Security",
     "Billing",
     "Notifications"
   ];
+
+
+  // =========================
+  // KYC HELPERS
+  // =========================
+
+  const handleFileChange = (documentType, file) => {
+    if (!file) return;
+
+    setSelectedDocuments((prev) => ({
+      ...prev,
+      [documentType]: file,
+    }));
+  };
+
+  const getKycStatusStyle = () => {
+    switch (accountSummary?.user?.kycStatus) {
+      case "Verified":
+        return "bg-green-100 text-green-700 border-green-200";
+
+      case "Rejected":
+        return "bg-red-100 text-red-700 border-red-200";
+
+      case "Re-upload Required":
+        return "bg-orange-100 text-orange-700 border-orange-200";
+
+      case "Under Review":
+        return "bg-blue-100 text-blue-700 border-blue-200";
+
+      case "Submitted":
+        return "bg-yellow-100 text-yellow-700 border-yellow-200";
+
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-200";
+    }
+  };
+
+  const handleUploadDocuments = async () => {
+    const files = Object.values(selectedDocuments);
+
+    if (!files.length) {
+      setUploadMessage("Please select at least one document.");
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setUploadMessage("");
+
+      const formData = new FormData();
+
+      Object.entries(selectedDocuments).forEach(([documentType, file]) => {
+        formData.append("documents", file);
+        formData.append("documentTypes", documentType);
+
+        const doc = REQUIRED_KYC_DOCUMENTS.find(
+          (item) => item.type === documentType
+        );
+
+        formData.append("documentTitles", doc?.title || documentType);
+      });
+
+      const response = await API.post("/settings/kyc-documents", formData);
+
+      if (response.data?.status === 1) {
+        setUploadMessage(
+          response.data.message || "Documents uploaded successfully."
+        );
+
+        setSelectedDocuments({});
+
+        await fetchAccountSummary();
+      } else {
+        setUploadMessage(
+          response.data?.message || "Failed to upload documents."
+        );
+      }
+    } catch (error) {
+      console.error("KYC upload failed:", error);
+
+      setUploadMessage(
+        error?.response?.data?.message || "Failed to upload documents."
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSubmitKYC = async () => {
+    try {
+      setUploadMessage("");
+
+      const requiredDocuments = REQUIRED_KYC_DOCUMENTS.filter(
+        (doc) => doc.required
+      );
+
+      const uploadedDocuments = accountSummary?.user?.kycDocuments || [];
+
+      const missingDocuments = requiredDocuments.filter(
+        (req) => !uploadedDocuments.some((up) => up.type === req.type)
+      );
+
+      if (missingDocuments.length > 0) {
+        setUploadMessage(
+          `Please upload: ${missingDocuments.map((d) => d.title).join(", ")}`
+        );
+        return;
+      }
+
+      const response = await API.post("/settings/kyc-submit");
+
+      console.log("KYC submit response:", response.data);
+
+      if (response.data?.status === 1) {
+        setUploadMessage(
+          response.data?.message || "KYC submitted successfully."
+        );
+
+        await fetchAccountSummary();
+
+        return;
+      }
+
+      setUploadMessage(response.data?.message || "Failed to submit KYC.");
+
+    } catch (error) {
+      console.error("KYC submit failed:", error);
+
+      console.log("Error response:", error?.response?.data);
+
+      setUploadMessage(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Failed to submit KYC."
+      );
+    }
+  };
 
 
   return (
@@ -363,6 +550,34 @@ export default function SettingsDashboard() {
 
 
               <ProfileItem
+                icon={<User size={15} />}
+                label="Full Name"
+                value={accountSummary?.user?.name}
+              />
+
+
+              <ProfileItem
+                icon={<Mail size={15} />}
+                label="Email"
+                value={accountSummary?.user?.email}
+              />
+
+
+              <ProfileItem
+                icon={<Phone size={15} />}
+                label="Phone"
+                value={accountSummary?.user?.phone}
+              />
+
+
+              <ProfileItem
+                icon={<Briefcase size={15} />}
+                label="Designation"
+                value={accountSummary?.user?.designation}
+              />
+
+
+              <ProfileItem
                 icon={<Building2 size={15} />}
                 label="Company Name"
                 value={accountSummary?.user?.companyName}
@@ -494,6 +709,231 @@ export default function SettingsDashboard() {
               </div>
 
             </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* =====================================
+          KYC DOCUMENTS
+      ===================================== */}
+
+      {activeTab === "KYC Documents" && (
+
+        <div className="space-y-6">
+
+          {/* KYC STATUS */}
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+              <div>
+                <h3 className="font-bold text-sm text-slate-900">
+                  KYC Verification Status
+                </h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Your business verification status
+                </p>
+              </div>
+
+              <span
+                className={`px-4 py-2 rounded-full border text-xs font-semibold ${getKycStatusStyle()}`}
+              >
+                {accountSummary?.user?.kycStatus || "Not Submitted"}
+              </span>
+
+            </div>
+
+            {accountSummary?.user?.kycStatus === "Verified" && (
+              <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-green-700 font-semibold text-sm flex items-center gap-1.5">
+                  <CheckCircle2 size={16} /> Your KYC has been successfully verified.
+                </p>
+                {accountSummary?.user?.kycVerifiedAt && (
+                  <p className="text-xs text-green-600 mt-1">
+                    Verified on: {new Date(accountSummary.user.kycVerifiedAt).toLocaleDateString()}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {accountSummary?.user?.kycStatus === "Rejected" && (
+              <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-700 font-semibold text-sm">
+                  Your KYC has been rejected.
+                </p>
+
+                {accountSummary?.user?.kycRejectionReasons?.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold text-slate-700">Rejection Reasons:</p>
+                    <ul className="list-disc pl-5 mt-2 space-y-1">
+                      {accountSummary.user.kycRejectionReasons.map((reason, index) => (
+                        <li key={index} className="text-xs text-red-600">{reason}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {accountSummary?.user?.kycRejectionNote && (
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold text-slate-700">Admin Note:</p>
+                    <p className="text-xs text-red-600 mt-1">{accountSummary.user.kycRejectionNote}</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {accountSummary?.user?.kycStatus === "Re-upload Required" && (
+              <div className="mt-4 bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <p className="text-orange-700 font-semibold text-sm flex items-center gap-1.5">
+                  <AlertTriangle size={16} /> Some KYC documents require re-upload.
+                </p>
+
+                {accountSummary?.user?.kycRejectionReasons?.length > 0 && (
+                  <ul className="list-disc pl-5 mt-2">
+                    {accountSummary.user.kycRejectionReasons.map((reason, index) => (
+                      <li key={index} className="text-xs text-orange-600">{reason}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+
+          </div>
+
+          {/* KYC DOCUMENTS LIST */}
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="font-bold text-sm text-slate-900">KYC Documents</h3>
+                <p className="text-xs text-slate-500 mt-1">
+                  Upload the documents required for business verification.
+                </p>
+              </div>
+
+              <span className="text-xs text-slate-500">
+                {accountSummary?.user?.kycDocuments?.length || 0} uploaded
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {REQUIRED_KYC_DOCUMENTS.map((requiredDocument) => {
+                const uploadedDocument = accountSummary?.user?.kycDocuments?.find(
+                  (document) => document.type === requiredDocument.type
+                );
+
+                return (
+                  <div key={requiredDocument.type} className="border border-slate-200 rounded-xl p-4">
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <FileText size={15} className="text-slate-500" />
+                          <p className="font-semibold text-xs text-slate-800">{requiredDocument.title}</p>
+                          {requiredDocument.required && (
+                            <span className="text-[10px] text-red-500 font-semibold">Required</span>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-slate-500 mt-2">
+                          {uploadedDocument ? "Document uploaded" : "Not uploaded"}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {uploadedDocument?.url && (
+                          <a
+                            href={uploadedDocument.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-2 text-xs font-semibold text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50"
+                          >
+                            View
+                          </a>
+                        )}
+
+                        <label className="cursor-pointer px-3 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg">
+                          <Upload size={13} className="inline mr-1" />
+                          {uploadedDocument ? "Replace" : "Choose File"}
+                          <input
+                            type="file"
+                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx"
+                            className="hidden"
+                            onChange={(event) =>
+                              handleFileChange(requiredDocument.type, event.target.files?.[0])
+                            }
+                          />
+                        </label>
+                      </div>
+
+                    </div>
+
+                    {selectedDocuments[requiredDocument.type] && (
+                      <div className="mt-3 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
+                        <p className="text-xs text-blue-700">
+                          Selected: <span className="font-semibold">{selectedDocuments[requiredDocument.type].name}</span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {Object.keys(selectedDocuments).length > 0 && (
+              <div className="mt-5">
+                <button
+                  type="button"
+                  onClick={handleUploadDocuments}
+                  disabled={uploading}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white px-4 py-3 rounded-xl text-sm font-semibold"
+                >
+                  {uploading ? "Uploading Documents..." : "Upload Selected Documents"}
+                </button>
+              </div>
+            )}
+
+            {uploadMessage && (
+              <p className="text-sm text-center mt-3 text-slate-600">{uploadMessage}</p>
+            )}
+
+            {(() => {
+              const requiredDocuments = REQUIRED_KYC_DOCUMENTS.filter((doc) => doc.required);
+              const uploadedDocuments = accountSummary?.user?.kycDocuments || [];
+
+              const allRequiredUploaded = requiredDocuments.every((req) =>
+                uploadedDocuments.some((up) => up.type === req.type)
+              );
+
+              return (
+                accountSummary?.user?.kycStatus !== "Verified" &&
+                accountSummary?.user?.kycStatus !== "Submitted" && (
+                  <div className="mt-5">
+                    <button
+                      type="button"
+                      onClick={handleSubmitKYC}
+                      disabled={!allRequiredUploaded}
+                      className={`w-full px-4 py-3 rounded-xl text-sm font-semibold text-white ${
+                        allRequiredUploaded
+                          ? "bg-blue-600 hover:bg-blue-700"
+                          : "bg-gray-300 cursor-not-allowed"
+                      }`}
+                    >
+                      {allRequiredUploaded ? "Submit KYC for Verification" : "Upload All Required Documents First"}
+                    </button>
+
+                    {!allRequiredUploaded && (
+                      <p className="text-xs text-slate-500 text-center mt-2">
+                        Please upload all required documents before submitting your KYC.
+                      </p>
+                    )}
+                  </div>
+                )
+              );
+            })()}
 
           </div>
 
