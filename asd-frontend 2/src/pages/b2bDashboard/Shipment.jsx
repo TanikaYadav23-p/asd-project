@@ -16,6 +16,11 @@ import {
   getShipmentDetails,
   getShipmentTracker,
 } from "../../api/ShipmentApi";
+import {
+  getQuotationByShipment,
+  acceptQuotation,
+  rejectQuotation
+} from "../../api/QuotationApi";
 import B2BQuotation from "../../components/b2bComponent/B2BQuotation";
 import ViewShipment from "../../components/b2bComponent/ShipmentView";
 import {
@@ -147,6 +152,8 @@ const [selectedShipment, setSelectedShipment] = useState(null);
 const [showShipmentView, setShowShipmentView] = useState(false);
 const [viewShipmentId, setViewShipmentId] = useState(null);
 const [showQuotation, setShowQuotation] = useState(false);
+const [selectedQuotation, setSelectedQuotation] = useState(null);
+const [quotationLoading, setQuotationLoading] = useState(false);
 const [appliedFilters, setAppliedFilters] = useState({
   search: "",
   status: "",
@@ -583,7 +590,67 @@ useEffect(() => {
   document.addEventListener("click", handleClickOutside);
   return () => document.removeEventListener("click", handleClickOutside);
 }, []);
+const handleOpenQuotation = async (shipmentData) => {
+  try {
+    setQuotationLoading(true);
 
+    const shipmentId =
+      shipmentData?._id ||
+      shipmentData?.shipmentId;
+
+    if (!shipmentId) {
+      alert("Shipment ID not found");
+      return;
+    }
+
+    console.log(
+      "Fetching quotation for shipment:",
+      shipmentId
+    );
+
+    const res = await getQuotationByShipment(shipmentId);
+
+    console.log(
+      "Quotation API Response:",
+      res.data
+    );
+
+    const quotations =
+      res.data?.data || [];
+
+    const sharedQuotation =
+      quotations.find(
+        (quotation) =>
+          quotation.status === "Shared"
+      );
+
+    if (!sharedQuotation) {
+      alert(
+        "No shared quotation available for this shipment"
+      );
+      return;
+    }
+
+    setSelectedShipment(shipmentData);
+    setSelectedQuotation(sharedQuotation);
+    setShowQuotation(true);
+    setOpenMenu(null);
+
+  } catch (error) {
+    console.error(
+      "FETCH QUOTATION ERROR:",
+      error
+    );
+
+    alert(
+      error?.response?.data?.message ||
+      "Failed to fetch quotation"
+    );
+
+  } finally {
+    setQuotationLoading(false);
+  }
+};
 useEffect(() => {
   console.log("showQuotation:", showQuotation);
   console.log("selectedShipment:", selectedShipment);
@@ -847,9 +914,7 @@ useEffect(() => {
 
     console.log("Quotation clicked:", s);
 
-    setSelectedShipment(s);
-    setShowQuotation(true);
-    setOpenMenu(null);
+   handleOpenQuotation(s);
   }}
   className="w-full py-1.5 px-2.5 rounded-lg bg-blue-50 text-green-600 font-medium text-xs text-left hover:bg-green-100 transition-colors"
 >
@@ -1367,15 +1432,102 @@ const bg =
             <ShipmentForm setActiveTab={setActiveTab} setShipment={setShipment} currentTab={"Shipments"} editId={editShipmentId} />
           )}
       
-      {showQuotation && selectedShipment && (
-  <B2BQuotation
-    shipment={selectedShipment}
-    onClose={() => {
-      setShowQuotation(false);
-      setSelectedShipment(null);
-    }}
-  />
-)}
+     {showQuotation &&
+  selectedShipment &&
+  selectedQuotation && (
+    <B2BQuotation
+      shipment={selectedShipment}
+      quotation={selectedQuotation}
+      onClose={() => {
+        setShowQuotation(false);
+        setSelectedShipment(null);
+        setSelectedQuotation(null);
+      }}
+      onAccept={async () => {
+        try {
+          const quotationId =
+            selectedQuotation?._id;
+
+          if (!quotationId) {
+            alert("Quotation ID not found");
+            return;
+          }
+
+          const res =
+            await acceptQuotation(
+              quotationId
+            );
+
+          console.log(
+            "Quotation accepted:",
+            res.data
+          );
+
+          const updatedQuotation =
+            res.data?.data;
+
+          setSelectedQuotation(
+            updatedQuotation
+          );
+
+          alert(
+            res.data?.message ||
+            "Quotation accepted successfully"
+          );
+
+        } catch (error) {
+          console.error(
+            "ACCEPT QUOTATION ERROR:",
+            error
+          );
+
+          throw error;
+        }
+      }}
+      onReject={async (rejectionReason) => {
+        try {
+          const quotationId =
+            selectedQuotation?._id;
+
+          if (!quotationId) {
+            alert("Quotation ID not found");
+            return;
+          }
+
+          const res =
+            await rejectQuotation(
+              quotationId,
+              rejectionReason
+            );
+
+          console.log(
+            "Quotation rejected:",
+            res.data
+          );
+
+          const updatedQuotation =
+            res.data?.data;
+
+          setSelectedQuotation(
+            updatedQuotation
+          );
+
+          alert(
+            res.data?.message ||
+            "Quotation denied successfully"
+          );
+
+        } catch (error) {
+          console.error(
+            "REJECT QUOTATION ERROR:",
+            error
+          );
+
+          throw error;
+        }
+      }}
+    />
+  )}
 {showShipmentView && viewShipmentId && (
   <ViewShipment
     shipmentId={viewShipmentId}

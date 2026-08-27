@@ -42,6 +42,7 @@ const alertsNotificationRoutes = require("./routes/alertsNotificationRoutes");
 const settingsRoutes = require("./routes/settingsRoutes");
 const adminSettingsRoutes = require("./routes/adminSettingsRoutes");
 const usersRolesRoutes = require("./routes/usersRolesRoutes");
+const quotationRoutes = require("./routes/quotationRoutes");
 app.use(cors());
 app.use(express.json());
 
@@ -100,6 +101,7 @@ app.use("/api/alerts-notifications", alertsNotificationRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/users-roles", usersRolesRoutes);
 app.use("/api/admin-settings", adminSettingsRoutes);
+app.use("/api/quotations", quotationRoutes);
 mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log(err));

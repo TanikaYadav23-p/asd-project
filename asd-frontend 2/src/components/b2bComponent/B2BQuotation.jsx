@@ -1,21 +1,16 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
-  ArrowLeft,
-  FileText,
-  CheckCircle2,
-  XCircle,
-  Clock,
-  Truck,
-  Building2,
-  User,
-  Mail,
-  Phone,
-  IndianRupee,
-  Send,
-  MessageSquare,
-} from "lucide-react";
-
-const HEADING = "text-[#07156B]";
+  LuFileText,
+  LuBuilding2,
+  LuUser,
+  LuMapPin,
+  LuCircleCheck,
+  LuCircleX,
+  LuSend,
+  LuLoaderCircle,
+  LuFileCheck,
+  LuClock,
+} from "react-icons/lu";
 
 export default function B2BQuotation({
   shipment,
@@ -24,52 +19,167 @@ export default function B2BQuotation({
   onAccept,
   onReject,
 }) {
-
-    console.log("B2BQuotation RENDERED");
-    console.log("Received shipment:", shipment);
-  
   const [showRejectBox, setShowRejectBox] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Temporary quotation data
-  // Backend integration ke time API se replace karenge
-  const quotationData = quotation || {
-    quotationNumber: "QT-2026-001",
-    status: "Shared",
-    validTill: "30 Aug 2026",
+  console.log("B2B QUOTATION:", quotation);
+  console.log("B2B SHIPMENT:", shipment);
 
-    charges: {
-      freight: 25000,
-      customs: 5000,
-      documentation: 2500,
-      insurance: 3000,
-      other: 1500,
-    },
+  // ==========================================
+  // NORMALIZE DATA
+  // ==========================================
 
-    currency: "INR",
-    notes:
-      "This quotation is subject to final shipment details and applicable government taxes.",
-  };
+  const shipmentData =
+    shipment?.data ||
+    shipment?.shipment ||
+    shipment?.shipmentData ||
+    shipment ||
+    {};
 
-  const charges = quotationData.charges || {};
+    const quotationData =
+    quotation?.data?.quotation ||
+    quotation?.data ||
+    quotation?.quotation ||
+    quotation ||
+    {};
 
-  const freight = Number(charges.freight || 0);
-  const customs = Number(charges.customs || 0);
-  const documentation = Number(charges.documentation || 0);
-  const insurance = Number(charges.insurance || 0);
-  const other = Number(charges.other || 0);
+    const quotationId =
+  quotationData?._id ||
+  quotationData?.quotationId ||
+  quotationData?.id ||
+  "-";
+
+const quotationNumber =
+  quotationData?.quotationNumber ||
+  quotationData?.quoteNumber ||
+  quotationData?.quotationNo ||
+  quotationId;
+  // ==========================================
+  // SHIPMENT DETAILS
+  // ==========================================
+
+  const exporter =
+    shipmentData?.parties?.exporter ||
+    shipmentData?.exporter ||
+    {};
+
+  const route =
+    shipmentData?.route ||
+    shipmentData?.header?.route ||
+    {};
+
+  const shipmentInfo =
+    shipmentData?.shipmentInfo ||
+    shipmentData?.shipmentInfoData ||
+    {};
+
+  const overview =
+    shipmentData?.overview ||
+    {};
+
+  const header =
+    shipmentData?.header ||
+    {};
+
+  const activity =
+    shipmentData?.activity ||
+    [];
+
+  const submittedActivity = activity.find(
+    (item) =>
+      item.type === "SHIPMENT_SUBMITTED"
+  );
+
+  const approvedActivity = activity.find(
+    (item) =>
+      item.type === "SHIPMENT_APPROVED"
+  );
+
+  const shipmentReferenceId =
+    header?.shipmentId ||
+    shipmentData?.shipmentId ||
+    shipmentInfo?.shipmentId ||
+    shipmentData?.sbNumber ||
+    "-";
+
+  // ==========================================
+  // QUOTATION DATA
+  // ==========================================
+
+  const charges =
+  quotationData?.charges ||
+  quotationData?.chargeDetails ||
+  quotationData?.pricing?.charges ||
+  [];
+
+  const subtotal = useMemo(() => {
+    if (quotationData?.subtotal !== undefined) {
+      return Number(quotationData.subtotal || 0);
+    }
+
+    return charges.reduce(
+      (total, item) =>
+        total +
+        Number(
+          item.amount ||
+          item.price ||
+          item.value ||
+          0
+        ),
+      0
+    );
+  }, [quotationData, charges]);
+
+  const discount = Number(
+    quotationData?.discount || 0
+  );
+
+  const tax = Number(
+    quotationData?.tax || 0
+  );
 
   const totalAmount =
-    freight + customs + documentation + insurance + other;
+    quotationData?.totalAmount !== undefined
+      ? Number(quotationData.totalAmount || 0)
+      : subtotal - discount + tax;
+
+  const currency =
+    quotationData?.currency ||
+    "INR";
+
+  // ==========================================
+  // FORMAT CURRENCY
+  // ==========================================
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: quotationData.currency || "INR",
+      currency,
       maximumFractionDigits: 2,
-    }).format(amount);
+    }).format(Number(amount || 0));
   };
+
+  // ==========================================
+  // FORMAT DATE
+  // ==========================================
+
+  const formatDate = (date) => {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
+
+  // ==========================================
+  // ACCEPT
+  // ==========================================
 
   const handleAccept = async () => {
     try {
@@ -77,19 +187,33 @@ export default function B2BQuotation({
 
       if (onAccept) {
         await onAccept();
-      } else {
-        console.log("Quotation Accepted", quotationData);
       }
+
     } catch (error) {
-      console.error("Accept quotation error:", error);
+      console.error(
+        "ACCEPT QUOTATION ERROR:",
+        error
+      );
+
+      alert(
+        error?.response?.data?.message ||
+        "Failed to accept quotation"
+      );
+
     } finally {
       setLoading(false);
     }
   };
 
+  // ==========================================
+  // REJECT
+  // ==========================================
+
   const handleReject = async () => {
     if (!rejectReason.trim()) {
-      alert("Please enter rejection reason");
+      alert(
+        "Please enter rejection reason"
+      );
       return;
     }
 
@@ -97,422 +221,868 @@ export default function B2BQuotation({
       setLoading(true);
 
       if (onReject) {
-        await onReject(rejectReason);
-      } else {
-        console.log("Quotation Rejected:", {
-          quotation: quotationData,
-          reason: rejectReason,
-        });
+        await onReject(
+          rejectReason.trim()
+        );
       }
+
     } catch (error) {
-      console.error("Reject quotation error:", error);
+      console.error(
+        "REJECT QUOTATION ERROR:",
+        error
+      );
+
+      alert(
+        error?.response?.data?.message ||
+        "Failed to reject quotation"
+      );
+
     } finally {
       setLoading(false);
     }
   };
 
+  // ==========================================
+  // STATUS COLOR
+  // ==========================================
+
+  const getStatusStyle = () => {
+    switch (quotationData?.status) {
+      case "Accepted":
+        return "bg-green-100 text-green-600";
+
+      case "Rejected":
+        return "bg-red-100 text-red-600";
+
+      case "Shared":
+        return "bg-purple-100 text-purple-600";
+
+      default:
+        return "bg-gray-100 text-gray-500";
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-[9999] bg-[#F8FAFC] overflow-y-auto p-3 sm:p-5 md:p-6">
-      <div className="max-w-[1100px] mx-auto">
-        
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div className="fixed inset-0 z-[9999] bg-black/50 backdrop-blur-sm p-3 sm:p-5 flex items-center justify-center">
+
+      {/* MAIN POPUP */}
+
+      <div className="w-full max-w-6xl h-[92vh] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden">
+
+        {/* ========================================= */}
+        {/* HEADER */}
+        {/* ========================================= */}
+
+        <div className="shrink-0 px-5 sm:px-8 py-5 border-b border-gray-200 flex items-center justify-between">
+
           <div className="flex items-center gap-3">
-            <button
-              onClick={onClose}
-              className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:bg-slate-50 transition"
-            >
-              <ArrowLeft size={19} />
-            </button>
+
+            <LuFileText
+              size={24}
+              className="text-blue-600"
+            />
 
             <div>
-              <h1 className={`text-xl sm:text-2xl font-bold ${HEADING}`}>
-                Shipment Quotation
+              <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
+                Quotation
               </h1>
 
-              <p className="text-xs text-slate-400 mt-1">
-                Review quotation details and confirm your response.
-              </p>
+              <p className="text-xs text-gray-400 mt-1">
+  {quotationNumber}
+</p>
             </div>
+
           </div>
 
-          <div className="flex items-center gap-2">
-            <span
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold ${
-                quotationData.status === "Accepted"
-                  ? "bg-green-100 text-green-600"
-                  : quotationData.status === "Rejected"
-                  ? "bg-red-100 text-red-600"
-                  : "bg-blue-100 text-blue-600"
-              }`}
-            >
-              {quotationData.status || "Shared"}
-            </span>
-          </div>
+          <span
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusStyle()}`}
+          >
+            {quotationData?.status || "Shared"}
+          </span>
+
         </div>
 
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-5">
-          
-          {/* Left Side */}
-          <div className="space-y-5">
 
-            {/* Quotation Header */}
-            <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-4">
-                
-                <div className="flex gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                    <FileText size={22} />
-                  </div>
+        {/* ========================================= */}
+        {/* SCROLLABLE CONTENT */}
+        {/* ========================================= */}
 
-                  <div>
-                    <p className="text-[11px] text-slate-400 font-medium">
-                      Quotation Number
-                    </p>
+        <div className="flex-1 overflow-y-auto px-5 sm:px-8 py-5">
 
-                    <h2 className={`text-lg font-bold ${HEADING}`}>
-                      {quotationData.quotationNumber || "-"}
-                    </h2>
-                  </div>
-                </div>
+          {/* ========================================= */}
+          {/* QUOTATION TOP INFO */}
+          {/* ========================================= */}
 
-                <div className="sm:text-right">
-                  <p className="text-[11px] text-slate-400">
-                    Valid Till
-                  </p>
+          <div className="border border-gray-200 rounded-xl p-4 sm:p-5 mb-4">
 
-                  <p className="text-sm font-bold text-orange-500 mt-1">
-                    {quotationData.validTill || "-"}
-                  </p>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center">
+
+              {/* QUOTATION NUMBER */}
+
+              <div>
+                <p className="text-xs text-gray-400">
+                  Quotation No.
+                </p>
+
+                <p className="text-sm font-semibold text-gray-800 mt-1">
+                  {quotationData?.quotationNumber || "-"}
+                </p>
+
+                <p className="text-xs text-gray-400 mt-2">
+                  Sent on{" "}
+                  {formatDate(
+                    quotationData?.sharedAt ||
+                    quotationData?.createdAt
+                  )}
+                </p>
               </div>
+
+
+              {/* TOTAL */}
+
+              <div className="text-left md:text-center">
+
+                <p className="text-xl sm:text-2xl font-bold text-blue-700">
+                  {formatCurrency(totalAmount)}
+                </p>
+
+                <p className="text-xs text-gray-400 mt-1">
+                  Total Amount
+                </p>
+
+              </div>
+
+
+              {/* VALIDITY */}
+
+              <div className="md:text-right">
+
+                <p className="text-xs text-gray-400">
+                  Status{" "}
+
+                  <span className="font-semibold text-purple-600">
+                    {quotationData?.status || "Shared"}
+                  </span>
+                </p>
+
+                <p className="text-xs text-gray-500 mt-2">
+                  Valid till{" "}
+
+                  <span className="font-semibold text-gray-700">
+                    {formatDate(
+                      quotationData?.validUntil
+                    )}
+                  </span>
+                </p>
+
+              </div>
+
             </div>
 
-            {/* Shipment Details */}
-            <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <Truck size={17} className="text-blue-600" />
-
-                <h3 className={`font-bold text-sm ${HEADING}`}>
-                  Shipment Details
-                </h3>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                
-                <div>
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
-                    Shipment Reference
-                  </p>
-
-                  <p className={`text-sm font-bold mt-1 ${HEADING}`}>
-                    {shipment?.referenceNumber ||
-                      shipment?.sbNumber ||
-                      "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
-                    Transport Mode
-                  </p>
-
-                  <p className="text-sm font-semibold text-slate-700 mt-1">
-                    {shipment?.route?.mode || "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
-                    Origin
-                  </p>
-
-                  <p className="text-sm font-semibold text-slate-700 mt-1">
-                    {shipment?.route?.originCity || "-"}
-                    {shipment?.route?.originCountry &&
-                      `, ${shipment.route.originCountry}`}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
-                    Destination
-                  </p>
-
-                  <p className="text-sm font-semibold text-slate-700 mt-1">
-                    {shipment?.route?.destinationCity || "-"}
-                    {shipment?.route?.destinationCountry &&
-                      `, ${shipment.route.destinationCountry}`}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
-                    Commodity
-                  </p>
-
-                  <p className="text-sm font-semibold text-slate-700 mt-1">
-                    {shipment?.cargo?.productName || "-"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[10px] text-slate-400 uppercase font-semibold">
-                    HS Code
-                  </p>
-
-                  <p className="text-sm font-semibold text-slate-700 mt-1">
-                    {shipment?.cargo?.hsCode?.hsCode || "-"}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Charges */}
-            <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <IndianRupee size={17} className="text-blue-600" />
-
-                <h3 className={`font-bold text-sm ${HEADING}`}>
-                  Quotation Charges
-                </h3>
-              </div>
-
-              <div className="divide-y divide-slate-100">
-                
-                <ChargeRow
-                  title="Freight Charges"
-                  amount={formatCurrency(freight)}
-                />
-
-                <ChargeRow
-                  title="Customs Charges"
-                  amount={formatCurrency(customs)}
-                />
-
-                <ChargeRow
-                  title="Documentation Charges"
-                  amount={formatCurrency(documentation)}
-                />
-
-                <ChargeRow
-                  title="Insurance Charges"
-                  amount={formatCurrency(insurance)}
-                />
-
-                <ChargeRow
-                  title="Other Charges"
-                  amount={formatCurrency(other)}
-                />
-              </div>
-
-              {/* Total */}
-              <div className="mt-4 pt-4 border-t-2 border-slate-100 flex justify-between items-center">
-                <div>
-                  <p className="text-xs text-slate-400">
-                    Total Quotation Amount
-                  </p>
-
-                  <p className={`text-xl font-bold mt-1 ${HEADING}`}>
-                    {formatCurrency(totalAmount)}
-                  </p>
-                </div>
-
-                <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <IndianRupee size={21} />
-                </div>
-              </div>
-            </div>
-
-            {/* Notes */}
-            {quotationData.notes && (
-              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4">
-                <div className="flex gap-3">
-                  <MessageSquare
-                    size={17}
-                    className="text-blue-600 shrink-0 mt-0.5"
-                  />
-
-                  <div>
-                    <p className="text-xs font-bold text-blue-700">
-                      Additional Notes
-                    </p>
-
-                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                      {quotationData.notes}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Right Side */}
-          <div className="space-y-5">
 
-            {/* Exporter */}
-            <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <Building2 size={17} className="text-blue-600" />
+          {/* ========================================= */}
+          {/* FROM / TO */}
+          {/* ========================================= */}
 
-                <h3 className={`font-bold text-sm ${HEADING}`}>
-                  Exporter Details
-                </h3>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
 
-              <ContactDetails
-                company={shipment?.exporter?.companyName}
-                person={shipment?.exporter?.contactPerson}
-                email={shipment?.exporter?.email}
-                mobile={shipment?.exporter?.mobile}
-              />
-            </div>
+            {/* FROM */}
 
-            {/* Action Card */}
-            <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-              
-              <div className="flex items-center gap-2 mb-2">
-                <Clock size={17} className="text-orange-500" />
+            <div className="border border-gray-200 rounded-xl p-5">
 
-                <h3 className={`font-bold text-sm ${HEADING}`}>
-                  Your Decision
-                </h3>
-              </div>
+              <p className="flex items-center gap-2 text-xs text-gray-400 mb-3">
 
-              <p className="text-xs text-slate-400 leading-relaxed mb-5">
-                Please review the quotation carefully before accepting or
-                rejecting it.
+                <LuBuilding2 size={14} />
+
+                From
+
               </p>
 
-              {!showRejectBox ? (
-                <div className="space-y-3">
-                  
+              <p className="text-blue-600 font-semibold text-sm mb-2">
+                ASD Company
+              </p>
+
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Admin / Company Details
+              </p>
+
+            </div>
+
+
+            {/* TO */}
+
+            <div className="border border-gray-200 rounded-xl p-5">
+
+              <p className="flex items-center gap-2 text-xs text-gray-400 mb-3">
+
+                <LuUser size={14} />
+
+                To
+
+              </p>
+
+              <p className="text-blue-600 font-semibold text-sm mb-2">
+
+                {exporter?.companyName ||
+                  exporter?.contactPerson ||
+                  "-"}
+
+              </p>
+
+              <div className="text-xs text-gray-500 space-y-1">
+
+                {exporter?.contactPerson && (
+                  <p>
+                    {exporter.contactPerson}
+                  </p>
+                )}
+
+                {exporter?.email && (
+                  <p>
+                    {exporter.email}
+                  </p>
+                )}
+
+                {exporter?.mobile && (
+                  <p>
+                    {exporter.mobile}
+                  </p>
+                )}
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* ========================================= */}
+          {/* SHIPMENT DETAILS */}
+          {/* ========================================= */}
+
+          <div className="border border-gray-200 rounded-xl p-5 mb-4">
+
+            <p className="flex items-center gap-2 text-sm font-semibold text-gray-900 mb-5">
+
+              <LuMapPin size={16} />
+
+              Shipment Details
+
+            </p>
+
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5 text-xs">
+
+              <DetailItem
+                label="Shipment Route"
+                value={`${route?.originCountry || "-"} → ${
+                  route?.destinationCountry || "-"
+                }`}
+              />
+
+              <DetailItem
+                label="Shipment Type"
+                value={
+                  shipmentInfo?.shipmentType ||
+                  shipmentData?.shipmentType ||
+                  "-"
+                }
+              />
+
+              <DetailItem
+                label="Submitted On"
+                value={
+                  submittedActivity?.createdAt
+                    ? formatDate(
+                        submittedActivity.createdAt
+                      )
+                    : overview?.createdOn
+                    ? formatDate(
+                        overview.createdOn
+                      )
+                    : "-"
+                }
+              />
+
+              <DetailItem
+                label="Port of Loading"
+                value={
+                  route?.portOfLoading ||
+                  shipmentInfo?.portOfLoading ||
+                  "-"
+                }
+              />
+
+              <DetailItem
+                label="Shipment Mode"
+                value={
+                  shipmentInfo?.mode ||
+                  shipmentInfo?.shipmentMode ||
+                  shipmentData?.mode ||
+                  "-"
+                }
+              />
+
+              <DetailItem
+                label="Approved On"
+                value={
+                  approvedActivity?.createdAt
+                    ? formatDate(
+                        approvedActivity.createdAt
+                      )
+                    : overview?.approvedAt
+                    ? formatDate(
+                        overview.approvedAt
+                      )
+                    : "-"
+                }
+              />
+
+              <DetailItem
+                label="Port of Discharge"
+                value={
+                  route?.portOfDischarge ||
+                  shipmentInfo?.portOfDischarge ||
+                  "-"
+                }
+              />
+
+              <DetailItem
+                label="Incoterm"
+                value={
+                  shipmentInfo?.incoterm ||
+                  shipmentData?.incoterm ||
+                  "-"
+                }
+              />
+
+              <DetailItem
+                label="Requested ID"
+                value={shipmentReferenceId}
+              />
+
+            </div>
+
+          </div>
+
+
+          {/* ========================================= */}
+          {/* CHARGES + SUMMARY */}
+          {/* ========================================= */}
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+
+            {/* CHARGES */}
+
+            <div className="lg:col-span-2 border border-gray-200 rounded-xl p-5">
+
+              <p className="text-sm font-semibold text-gray-900 mb-4">
+                Charges Breakdown
+              </p>
+
+
+              <div className="overflow-x-auto">
+
+                <table className="w-full min-w-[650px] text-xs">
+
+                  <thead>
+
+                    <tr className="text-left text-gray-400 border-b border-gray-200">
+
+                      <th className="pb-3 w-10">
+                        #
+                      </th>
+
+                      <th className="pb-3">
+                        Description
+                      </th>
+
+                      <th className="pb-3">
+                        Details
+                      </th>
+
+                      <th className="pb-3 text-right">
+                        Amount ({currency})
+                      </th>
+
+                    </tr>
+
+                  </thead>
+
+
+                  <tbody>
+
+                    {charges?.length > 0 ? (
+
+                      charges.map(
+                        (charge, index) => (
+
+                          <tr
+                            key={
+                              charge?._id ||
+                              index
+                            }
+                            className="border-b border-gray-100"
+                          >
+
+                            <td className="py-3 text-gray-400">
+                              {index + 1}
+                            </td>
+
+                           <td className="py-3 text-gray-500">
+  {charge?.details ||
+    charge?.remark ||
+    charge?.notes ||
+    charge?.description ||
+    "-"}
+</td>
+
+                            <td className="py-3 text-gray-500">
+                              {charge?.description || "-"}
+                            </td>
+
+                            <td className="py-3 text-right font-semibold text-gray-700">
+  {formatCurrency(
+    charge?.amount ||
+    charge?.price ||
+    charge?.value ||
+    0
+  )}
+</td>
+
+                          </tr>
+
+                        )
+                      )
+
+                    ) : (
+
+                      <tr>
+
+                        <td
+                          colSpan="4"
+                          className="py-6 text-center text-gray-400"
+                        >
+                          No charges available
+                        </td>
+
+                      </tr>
+
+                    )}
+
+                  </tbody>
+
+                </table>
+
+              </div>
+
+
+              <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+
+                <p className="text-sm font-semibold text-blue-600">
+                  Total {currency}
+                </p>
+
+                <p className="text-sm font-bold text-blue-600">
+                  {formatCurrency(totalAmount)}
+                </p>
+
+              </div>
+
+            </div>
+
+
+            {/* SUMMARY */}
+
+            <div className="border border-gray-200 rounded-xl p-5 h-fit">
+
+              <p className="text-sm font-semibold text-gray-900 mb-5">
+                Summary
+              </p>
+
+
+              <div className="space-y-4 text-xs">
+
+                <div className="flex justify-between text-gray-500">
+
+                  <span>
+                    Sub Total
+                  </span>
+
+                  <span>
+                    {formatCurrency(subtotal)}
+                  </span>
+
+                </div>
+
+
+                <div className="flex justify-between text-gray-500">
+
+                  <span>
+                    Discount
+                  </span>
+
+                  <span className="text-green-600">
+                    -{formatCurrency(discount)}
+                  </span>
+
+                </div>
+
+
+                <div className="flex justify-between text-gray-500">
+
+                  <span>
+                    Tax
+                  </span>
+
+                  <span>
+                    {formatCurrency(tax)}
+                  </span>
+
+                </div>
+
+
+                <div className="flex justify-between font-bold text-blue-600 pt-4 border-t border-gray-200">
+
+                  <span>
+                    Total Amount
+                  </span>
+
+                  <span>
+                    {formatCurrency(totalAmount)}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          {/* ========================================= */}
+          {/* NOTES */}
+          {/* ========================================= */}
+
+          {quotationData?.notes && (
+
+            <div className="border border-gray-200 rounded-xl p-5 mb-4">
+
+              <p className="text-sm font-semibold text-gray-900 mb-3">
+                Notes
+              </p>
+
+              <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-line">
+
+                {quotationData.notes}
+
+              </p>
+
+            </div>
+
+          )}
+
+
+          {/* ========================================= */}
+          {/* QUOTATION DETAILS */}
+          {/* ========================================= */}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+
+            <InfoCard
+              label="Quote Version"
+              value={
+                quotationData?.quoteVersion ||
+                "-"
+              }
+            />
+
+            <InfoCard
+              label="Freight Quote"
+              value={formatCurrency(
+                quotationData?.freightQuote
+              )}
+            />
+
+            <InfoCard
+              label="Valid From"
+              value={formatDate(
+                quotationData?.validFrom
+              )}
+            />
+
+            <InfoCard
+              label="Valid Until"
+              value={formatDate(
+                quotationData?.validUntil
+              )}
+            />
+
+          </div>
+
+
+          {/* ========================================= */}
+          {/* TERMS */}
+          {/* ========================================= */}
+
+          {quotationData?.termsAndConditions && (
+
+            <div className="border border-gray-200 rounded-xl p-5 mb-4">
+
+              <p className="flex items-center gap-2 text-sm font-semibold text-gray-900 mb-3">
+
+                <LuFileCheck size={16} />
+
+                Terms & Conditions
+
+              </p>
+
+
+              <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-line">
+
+                {quotationData.termsAndConditions}
+
+              </p>
+
+            </div>
+
+          )}
+
+
+          {/* ========================================= */}
+          {/* REJECT BOX */}
+          {/* ========================================= */}
+
+          {showRejectBox && (
+
+            <div className="border border-red-200 bg-red-50 rounded-xl p-5 mb-4">
+
+              <p className="text-sm font-semibold text-red-600 mb-3">
+                Reason for denying quotation
+              </p>
+
+
+              <textarea
+                value={rejectReason}
+                onChange={(e) =>
+                  setRejectReason(
+                    e.target.value
+                  )
+                }
+                rows={4}
+                placeholder="Enter your reason..."
+                className="w-full border border-red-200 bg-white rounded-lg p-3 text-sm outline-none focus:border-red-400 resize-none"
+              />
+
+            </div>
+
+          )}
+
+        </div>
+
+
+        {/* ========================================= */}
+        {/* STICKY FOOTER */}
+        {/* ========================================= */}
+
+        <div className="shrink-0 border-t border-gray-200 bg-white px-5 sm:px-8 py-4">
+
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+
+            <button
+              onClick={onClose}
+              disabled={loading}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 flex items-center justify-center gap-2"
+            >
+              <LuMapPin size={15} />
+
+              Back to Shipment
+            </button>
+
+
+            {/* ONLY SHOW ACTIONS IF SHARED */}
+
+            {quotationData?.status === "Shared" && (
+
+              <div className="flex w-full sm:w-auto gap-3">
+
+                {!showRejectBox ? (
+
                   <button
                     onClick={handleAccept}
                     disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white py-3 rounded-xl text-sm font-bold transition"
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60"
                   >
-                    <CheckCircle2 size={17} />
+
+                    {loading ? (
+
+                      <LuLoaderCircle
+                        className="animate-spin"
+                        size={16}
+                      />
+
+                    ) : (
+
+                      <LuCircleX
+                        size={16}
+                      />
+
+                    )}
 
                     {loading
                       ? "Processing..."
                       : "Accept Quotation"}
+
                   </button>
 
-                  <button
-                    onClick={() => setShowRejectBox(true)}
-                    disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 py-3 rounded-xl text-sm font-bold transition"
-                  >
-                    <XCircle size={17} />
-
-                    Reject Quotation
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  
-                  <textarea
-                    value={rejectReason}
-                    onChange={(e) =>
-                      setRejectReason(e.target.value)
-                    }
-                    placeholder="Please enter rejection reason..."
-                    rows={4}
-                    className="w-full border border-slate-200 rounded-xl p-3 text-xs outline-none focus:ring-2 focus:ring-red-100 focus:border-red-300 resize-none"
-                  />
+                ) : (
 
                   <button
                     onClick={handleReject}
                     disabled={loading}
-                    className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white py-3 rounded-xl text-sm font-bold transition"
+                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold flex items-center justify-center gap-2 disabled:opacity-60"
                   >
-                    <Send size={16} />
+
+                    {loading ? (
+
+                      <LuLoaderCircle
+                        className="animate-spin"
+                        size={16}
+                      />
+
+                    ) : (
+
+                      <LuSend size={16} />
+
+                    )}
 
                     {loading
                       ? "Submitting..."
-                      : "Submit Rejection"}
+                      : "Submit Denial"}
+
                   </button>
 
-                  <button
-                    onClick={() => setShowRejectBox(false)}
-                    disabled={loading}
-                    className="w-full text-xs font-semibold text-slate-400 hover:text-slate-600 py-2"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              )}
-            </div>
+                )}
 
-            {/* Help */}
-            <div className="bg-slate-100 rounded-2xl p-4">
-              <p className="text-xs font-bold text-slate-700">
-                Need changes?
-              </p>
 
-              <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                You can reject the quotation and mention the reason or required
-                changes.
-              </p>
-            </div>
+                <button
+                  onClick={() => {
+
+                    if (showRejectBox) {
+                      setShowRejectBox(false);
+                      setRejectReason("");
+                    } else {
+                      setShowRejectBox(true);
+                    }
+
+                  }}
+                  disabled={loading}
+                  className={`flex-1 sm:flex-none px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 ${
+                    showRejectBox
+                      ? "border border-gray-300 text-gray-600"
+                      : "bg-red-500 hover:bg-red-600 text-white"
+                  }`}
+                >
+
+                  <LuCircleX size={16} />
+
+                  {showRejectBox
+                    ? "Cancel"
+                    : "Deny Quotation"}
+
+                </button>
+
+              </div>
+
+            )}
+
+
+            {/* ACCEPTED STATUS */}
+
+            {quotationData?.status === "Accepted" && (
+
+              <div className="px-5 py-2.5 bg-green-100 text-green-600 rounded-lg text-sm font-semibold flex items-center gap-2">
+
+                <LuCircleX size={16} />
+
+                Quotation Accepted
+
+              </div>
+
+            )}
+
+
+            {/* REJECTED STATUS */}
+
+            {quotationData?.status === "Rejected" && (
+
+              <div className="px-5 py-2.5 bg-red-100 text-red-600 rounded-lg text-sm font-semibold flex items-center gap-2">
+
+                <LuCircleX size={16} />
+
+                Quotation Denied
+
+              </div>
+
+            )}
+
           </div>
+
         </div>
+
       </div>
+
     </div>
   );
 }
 
-function ChargeRow({ title, amount }) {
-  return (
-    <div className="flex items-center justify-between py-3">
-      <span className="text-xs text-slate-500">
-        {title}
-      </span>
 
-      <span className="text-sm font-semibold text-slate-700">
-        {amount}
-      </span>
-    </div>
-  );
-}
+// ==========================================
+// DETAIL ITEM
+// ==========================================
 
-function ContactDetails({
-  company,
-  person,
-  email,
-  mobile,
+function DetailItem({
+  label,
+  value,
 }) {
   return (
-    <div className="space-y-3">
-      
-      <div>
-        <p className="text-sm font-bold text-slate-700">
-          {company || "-"}
-        </p>
-      </div>
+    <div>
 
-      {person && (
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <User size={13} />
-          {person}
-        </div>
-      )}
+      <p className="text-gray-400 mb-1">
+        {label}
+      </p>
 
-      {email && (
-        <div className="flex items-center gap-2 text-xs text-slate-500 break-all">
-          <Mail size={13} />
-          {email}
-        </div>
-      )}
+      <p className="text-gray-900 font-medium">
+        {value || "-"}
+      </p>
 
-      {mobile && (
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <Phone size={13} />
-          {mobile}
-        </div>
-      )}
+    </div>
+  );
+}
+
+
+// ==========================================
+// INFO CARD
+// ==========================================
+
+function InfoCard({
+  label,
+  value,
+}) {
+  return (
+    <div className="border border-gray-200 rounded-xl p-4">
+
+      <p className="text-xs text-gray-400 mb-2">
+        {label}
+      </p>
+
+      <p className="text-sm font-semibold text-gray-800">
+        {value || "-"}
+      </p>
+
     </div>
   );
 }
