@@ -22,7 +22,7 @@ const Icon = ({ d, d2, className = "w-4 h-4", viewBox = "0 0 24 24", fill = "non
 function HeaderActions({setShipment, setActiveTab}) {
   return (
     <div className="flex flex-wrap gap-2">
-      <button className="px-4 py-2 bg-white border border-gray-200 rounded-md text-xs font-bold flex items-center gap-2 hover:bg-gray-50">
+      {/* <button className="px-4 py-2 bg-white border border-gray-200 rounded-md text-xs font-bold flex items-center gap-2 hover:bg-gray-50">
         <Icon d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         New Query
       </button>
@@ -33,7 +33,7 @@ function HeaderActions({setShipment, setActiveTab}) {
       <button className="px-4 py-2 bg-white border border-gray-200 rounded-md text-xs font-bold flex items-center gap-2 hover:bg-gray-50">
         <Icon d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
         Download Report (PDF)
-      </button>
+      </button> */}
       <button  onClick={() => {
                 setShipment("shipment")
                 setActiveTab("")
@@ -92,10 +92,10 @@ function SearchSummary() {
           <span className="text-xs">• 24 Apr 2025, 09:25 AM</span>
           <span className="text-xs">• User: Arjun Soni</span>
         </div>
-        <button className="flex items-center gap-1 border border-gray-200 px-2 py-1 rounded hover:bg-gray-50">
+        {/* <button className="flex items-center gap-1 border border-gray-200 px-2 py-1 rounded hover:bg-gray-50">
           <Icon d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" className="w-3 h-3" />
           Copy Query
-        </button>
+        </button> */}
       </div>
     </section>
   );
@@ -490,9 +490,9 @@ function DataSources() {
               <span className="text-xs  text-[#475569] font-semibold">{label}</span>
           </div>
         ))}
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <a href="#" className="text-[#059669] text-xs font-bold hover:underline">View All Sources</a>
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -624,7 +624,7 @@ function PageFooter() {
           <p className="text-xs text-gray-500 leading-relaxed max-w-lg">
             Freight rates are indicative and subject to change without prior notice. Please verify with shipping lines or freight forwarders before booking.
           </p>
-          <a href="#" className="text-teal-600 text-xs font-bold mt-2 inline-block">Read Full Disclaimer</a>
+          {/* <a href="#" className="text-teal-600 text-xs font-bold mt-2 inline-block">Read Full Disclaimer</a> */}
         </div> 
       </div>
 

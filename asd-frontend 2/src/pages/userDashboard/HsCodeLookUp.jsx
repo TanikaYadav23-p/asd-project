@@ -109,15 +109,12 @@ export default function HSCodeLookup() {
             <p className="text-xs font-normal text-gray-500 mt-0.5">Find the right HS code and get duty, tax, and trade insights.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
-              <FiArrowLeft size={12} /> Back to Dashboard
-            </button>
-            <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
+            {/* <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
               <FiSave size={12} /> Save Report
-            </button>
-            <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
+            </button> */}
+            {/* <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
               <FiDownload size={12} /> Download Report (PDF)
-            </button>
+            </button> */}
             <button   onClick={() => {
                 setShipment("shipment")
                 setActiveTab("")
@@ -153,18 +150,18 @@ export default function HSCodeLookup() {
             </div>
 
             <div className="mt-3">
-              <p className="text-xs sm:text-sm font-bold     mb-2">Additional Details (Optional)</p>
+              <p className="text-xs sm:text-sm font-bold  mb-2">Additional Details (Optional)</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div>
                   <label className="text-xs text-[#9CA3AF] font-bold mb-1 block">Country of Export</label>
                   <div className="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#1E293B] cursor-pointer hover:border-gray-300 bg-white">
-                    🇮🇳 India <FiChevronDown size={12} className="text-gray-400" />
+                   India <FiChevronDown size={12} className="text-gray-400" />
                   </div>
                 </div>
                 <div>
                   <label className="text-xs text-[#9CA3AF] font-bold mb-1 block">Country of Import</label>
                   <div className="flex items-center justify-between border border-gray-200 rounded-lg px-3 py-2 text-sm text-[#1E293B] cursor-pointer hover:border-gray-300 bg-white">
-                    🇦🇪 United Arab Emirates <FiChevronDown size={12} className="text-gray-400" />
+                   United Arab Emirates <FiChevronDown size={12} className="text-gray-400" />
                   </div>
                 </div>
                 <div>

@@ -347,7 +347,7 @@ const AiCargoMateAssistant = () => {
                 </p>
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-9 h-9 bg-blue-50 rounded-full hidden sm:flex items-center justify-center flex-shrink-0">
                       <FiMap className="text-blue-500 text-base" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -369,9 +369,9 @@ const AiCargoMateAssistant = () => {
                         <span>• User: Arjun Soni</span>
                       </div>
                     </div>
-                    <button className="flex-shrink-0 flex items-center text-xs gap-1 border border-gray-200 bg-white text-gray-500 text-[10px] px-2 py-1 rounded-md hover:bg-gray-50">
+                    {/* <button className="flex-shrink-0 flex items-center text-xs gap-1 border border-gray-200 bg-white text-gray-500 text-[10px] px-2 py-1 rounded-md hover:bg-gray-50">
                       <FiCopy size={14} /> Copy Query
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>
@@ -626,9 +626,9 @@ const AiCargoMateAssistant = () => {
                     </span>
                   </div>
                 ))}
-                <button onClick={() => setDownloadReport(true)} className="mt-3 w-full flex items-center justify-center gap-2 border text-sm  border-gray-200 bg-white text-gray-700 t s font-medium py-2 rounded-lg hover:bg-gray-50">
+                {/* <button onClick={() => setDownloadReport(true)} className="mt-3 w-full flex items-center justify-center gap-2 border text-sm  border-gray-200 bg-white text-gray-700 t s font-medium py-2 rounded-lg hover:bg-gray-50">
                   <FiDownload size={13} /> Download Report (PDF)
-                </button>
+                </button> */}
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-4">

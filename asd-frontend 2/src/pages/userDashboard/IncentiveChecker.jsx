@@ -104,15 +104,15 @@ export default function IncentiveChecker() {
             <p className="text-xs text-gray-500 mt-0.5">Find applicable incentives and estimated benefits for your shipment.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
+            {/* <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
               <FiArrowLeft size={12} /> New Search
-            </button>
-            <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
+            </button> */}
+            {/* <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
               <FiSave size={12} /> Save Report
             </button>
             <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
               <FiDownload size={12} /> Download Report (PDF)
-            </button>
+            </button> */}
             <button  onClick={() => {
                 setShipment("shipment")
                 setActiveTab("")
@@ -217,7 +217,7 @@ export default function IncentiveChecker() {
 
           <div className="bg-white border border-gray-200 rounded-xl p-4">
          
-              <div className=" flex justify-between items-center ">
+              <div className=" flex justify-between items-center mb-3">
                    <p className="text-base pl-3 font-semibold text-gray-800 ">Incentive Breakdown</p>
               <button className="flex items-center  border border-gray-200 text-teal-600 text-xs font-medium px-2 py-2 rounded-lg hover:bg-teal-50  justify-center">
                 View Scheme Details & Eligibility 
@@ -326,8 +326,8 @@ export default function IncentiveChecker() {
             <p className="text-sm font-semibold text-gray-900 mb-1">Save & Share</p>
             <p className="text-[11px] text-gray-500 mb-3">Save this report for future reference or share with your team.</p>
             <div className="grid grid-cols-2 gap-2">
-              <button className="flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-[11px] font-medium py-2 rounded-lg hover:bg-gray-50">
-                <FiBookmark size={12} /> Save to Saved Reports
+              <button className="flex items-center justify-center gap-1 border border-gray-200 bg-white text-gray-700 text-[11px] font-medium py-2 rounded-lg hover:bg-gray-50">
+                <FiBookmark size={14} /> Save to Saved Reports
               </button>
               <button className="flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-[11px] font-medium py-2 rounded-lg hover:bg-gray-50">
                 <FiShare2 size={12} /> Share Report
@@ -351,8 +351,8 @@ export default function IncentiveChecker() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 min-w-0 mx-6">
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 min-w-0 mx-6 mb-4">
+            <div className="bg-white border border-gray-200 rounded-xl p-4  ">
               <p className="text-sm font-semibold text-gray-800 mb-3">Data Sources Used</p>
               <div className="grid grid-cols-2 gap-y-2 gap-x-3">
                 {dataSources.map(({ icon: Icon, label }) => (
@@ -361,9 +361,9 @@ export default function IncentiveChecker() {
                   </div>
                 ))}
               </div>
-              <button className="mt-3 text-teal-500 text-xs font-medium hover:underline flex items-center gap-1">
+              {/* <button className="mt-3 text-teal-500 text-xs font-medium hover:underline flex items-center gap-1">
                 View All Sources <FiChevronRight size={12} />
-              </button>
+              </button> */}
             </div>
 
             <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -390,16 +390,16 @@ export default function IncentiveChecker() {
 
             <div className="bg-white border border-gray-200 rounded-xl p-4">
                 <p className="text-sm font-semibold text-gray-800 mb-1">Need Help?</p>
-                <p className="text-xs text-gray-500 mb-2">Our trade experts are here to help you.</p>
-                <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-1">
-                  <FiPhone size={11} className="text-teal-500" /> +91 22 1234 5678
+                <p className="text-xs text-gray-500 mb-2 pt-3">Our trade experts are here to help you.</p>
+                <div className="flex items-center gap-1.5 text-xs pt-2 text-gray-600 mb-1">
+                  <FiPhone size={11} className="text-teal-500 " /> +91 22 1234 5678
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-gray-600 mb-3">
+                <div className="flex items-center gap-1.5 text-xs pt-2 text-gray-600 mb-3">
                   <FiMail size={11} className="text-teal-500" /> support@asdcargomate.com
                 </div>
-                <button className="w-full border border-gray-200 text-gray-700 text-xs font-medium py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1.5">
+                {/* <button className="w-full border border-gray-200 text-gray-700 text-xs font-medium py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1.5">
                   <FiMessageSquare size={12} /> Chat with Expert
-                </button>
+                </button> */}
               </div>
           </div>
            <div className="min-w-0 mx-6"> 

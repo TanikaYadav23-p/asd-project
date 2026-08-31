@@ -84,7 +84,7 @@ import PlanSummary from "../../components/userComponent/PlanSummary";
 
 
 
-export default function ShipmentPlanning() {
+export default function ShipmentPlanning({setActiveTab: setParentActiveTab }) {
   const [activeTab, setActiveTab] = useState(1);
   const [mainTab, setMainTab] = useState("Shipment Planning")
   const [savePlan, setSavePlan] = useState(false)
@@ -170,18 +170,16 @@ const handleCancelParties = () => {
             <p className="text-xs text-gray-500 mt-0.5 font-medium">Plan your shipment from origin to destination with all costs, timelines, and compliance in one place.</p>
           </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <button className="flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold px-3 py-1.5 rounded-lg hover:bg-gray-50">
-            <FiArrowLeft size={15} /> Back to Dashboard
-          </button>
+        <div className="grid grid-cols-2 sm:grid-cols-2 gap-2">
+         
 
-          <button onClick={() => setMainTab && setMainTab("Saved")} className="flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold px-3 py-1.5 rounded-lg hover:bg-gray-50">
+          <button onClick={() => setParentActiveTab && setParentActiveTab("Saved")} className=" flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold px-3 py-2 rounded-lg hover:bg-gray-50">
             <FiSave size={15} /> Save Plan
           </button>
 
-          <button className="flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold px-3 py-1.5 rounded-lg hover:bg-gray-50">
+          {/* <button className="flex items-center justify-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold px-3 py-1.5 rounded-lg hover:bg-gray-50">
             <FiDownload size={15} /> Download Plan (PDF)
-          </button>
+          </button> */}
 
           <button  onClick={() => {
                 setShipment("shipment")
