@@ -59,7 +59,7 @@ import Shipment from "../../components/ShipmentForm"
 import calculator from "../../assets/Images/webp/calculator.webp"
 import checker from "../../assets/Images/webp/checker.webp"
 import shipment from "../../assets/Images/webp/shipment.webp"
-
+import Chatbot from "../../components/Chatbot"
 
 import { BsAirplane } from "react-icons/bs";
 import { MdOutlineRocketLaunch } from "react-icons/md";
@@ -357,6 +357,11 @@ const sidebarSections = [
   {
     title: "AI & Trade Tools",
     items: [
+      //  {
+      //   icon: FiCpu,
+      //   label: "AI CargoMate Chatbot",
+      //   badgeColor: "bg-teal-500",
+      // },
       {
         icon: FiCpu,
         label: "AI CargoMate Assistant",
@@ -794,8 +799,9 @@ export default function UserDashboard() {
         `}
       >
         <nav className="flex-1 overflow-y-auto py-3  bg-gray-900 pr-2">
-           <button className="w-full hover:bg-teal-500 hover:text-white px-4 py-2 flex items-center gap-2 text-[#8aa0bc] rounded-r-lg text-xs text-left transition-colors" onClick={() => navigate("/chatbot")}>
-              AI CargoMate   Chatbot</button>
+           <button className="w-full hover:bg-teal-500 hover:text-white px-4 py-2 flex items-center gap-2 text-[#8aa0bc] rounded-r-lg text-xs text-left transition-colors" onClick={() => setActiveTab("AI CargoMate Chatbot")} >
+              AI CargoMate Chatbot</button>
+
           {sidebarSections.map((section) => (
             <div key={section.title} className="  " >
               
@@ -877,7 +883,7 @@ export default function UserDashboard() {
         {activeTab === "Saved" && <Saved />}
          {/* {activeTab === "Audit Logs" && <AuditLogs />}
         {activeTab === "Analytics & Trends" && <AnalyticsTrends />} */}
-
+        {activeTab === "AI CargoMate Chatbot" && <Chatbot />}
       
        
 

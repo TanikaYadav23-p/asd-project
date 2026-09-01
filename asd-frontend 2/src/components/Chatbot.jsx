@@ -33,7 +33,7 @@ import {
   Ship,
   GitCompare,
   Clock,
-  FileSearch,
+  FileSearch,  BadgeCheck, Globe2,     BadgePercent
 } from "lucide-react";
 import {
   AreaChart,
@@ -44,7 +44,24 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import chatbot from "../assets/Images/webp/chatbot.webp";
-
+const services = [
+  {
+    icon: ShieldCheck,
+    iconBg: "bg-blue-500/20",
+    iconColor: "text-blue-400",
+    title: "GLOBAL LOGISTICS CORP - Global Trade Insurance",
+    desc: "Protect your cargo globally. Instant quotes.",
+    cta: "Learn More",
+  },
+  {
+    icon: BadgePercent,
+    iconBg: "bg-teal-500/20",
+    iconColor: "text-teal-400",
+    title: "TRADE FINANCE SOLUTIONS - Import/Export Financing",
+    desc: "Specialized pre-shipment and post-shipment finance up to ₹10 Crores.",
+    cta: "Apply Now",
+  },
+];
 const trendData = [
   { date: "10 May", rate: 1.95 },
   { date: "12 May", rate: 2.05 },
@@ -255,59 +272,50 @@ function FreightCard() {
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-1">
+          {/* <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-medium text-gray-700">
               Historical Freight Trend (30 Days)
             </span>
             <span className="text-xs font-semibold text-red-500 bg-red-50 px-2 py-0.5 rounded-full">
               +12.5%
             </span>
-          </div>
-          <div className="h-40 sm:h-44">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={trendData} margin={{ top: 8, right: 4, left: -18, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="rateFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2563eb" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#2563eb" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 10, fill: "#9ca3af" }}
-                  interval={3}
-                  axisLine={false}
-                  tickLine={false}
+          </div> */}
+          
+              <div className="relative overflow-hidden rounded-xl bg-[#0f2333] p-4 text-white h-full sm:h- border-2 border-black">
+                <div className="flex items-center gap-2 mb-3 ">
+                  <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center shrink-0">
+                    <Globe2 size={13} className="text-white" />
+                  </div>
+                  <p className="text-xs font-medium text-slate-200 leading-tight">
+                    GLOBAL EXPORT PARTNERS - Preferred Vendor
+                  </p>
+                  <BadgeCheck size={14} className="text-blue-400 shrink-0" />
+                </div>
+          
+                <h3 className="text-lg font-medium leading-snug mb-4 max-w-[230px] relative z-10">
+                  Fast-Track Your UK/EU Exports with Custom Solutions and Exclusive
+                  Rates!
+                </h3>
+          
+                <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors relative z-10">
+                  Explore Services
+                </button>
+          
+                <Ship
+                  size={80}
+                  className="absolute bottom-2 right-3 text-white/10"
+                  strokeWidth={1.5}
                 />
-                <YAxis
-                  tick={{ fontSize: 10, fill: "#9ca3af" }}
-                  tickFormatter={(v) => `$${v.toFixed(2)}`}
-                  axisLine={false}
-                  tickLine={false}
-                  width={40}
-                />
-                <Tooltip
-                  formatter={(v) => [`$${v.toFixed(2)}`, "Rate"]}
-                  contentStyle={{ fontSize: 12, borderRadius: 8 }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="rate"
-                  stroke="#2563eb"
-                  strokeWidth={2}
-                  fill="url(#rateFill)"
-                  dot={{ r: 2, fill: "#2563eb" }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-2 bg-green-50 border border-green-100 rounded-lg px-3 py-2 text-xs text-green-800 flex gap-1.5">
+              </div>
+
+       
+          {/* <div className="mt-2 bg-green-50 border border-green-100 rounded-lg px-3 py-2 text-xs text-green-800 flex gap-1.5">
             <span>💡</span>
             <span>
               <strong>Tip:</strong> Rates to London are likely to increase
               further. Pre-book now to save more!
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
@@ -523,7 +531,7 @@ export default function CargoMateChat() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pt-14">
       {/* <header className="flex items-center justify-between gap-3 px-3 sm:px-5 py-3 border-b border-gray-200 shrink-0">
         <div className="flex">
           <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
@@ -668,8 +676,33 @@ export default function CargoMateChat() {
                 </div>
               </div>
             )}
-          </main>
 
+             <div>
+      <p className="text-xs font-medium text-slate-500 tracking-wide mb-3">
+        FEATURED SERVICES
+      </p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {services.map(({ icon: Icon, iconBg, iconColor, title, desc, cta }) => (
+          <div
+            key={title}
+            className="bg-[#0f1b2d] rounded-xl p-4 text-white flex flex-col gap-2"
+          >
+            <div className={`w-8 h-8 rounded-lg ${iconBg} flex items-center justify-center`}>
+              <Icon size={16} className={iconColor} />
+            </div>
+            <p className="text-sm font-medium leading-snug">{title}</p>
+            <p className="text-xs text-slate-400 leading-snug">{desc}</p>
+            <button className="mt-2 bg-white hover:bg-slate-100 text-slate-900 text-sm font-medium py-2 rounded-lg transition-colors">
+              {cta}
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+
+          </main>
+ 
+          
           <div className="border-t border-gray-200 px-3 sm:px-5 py-3 shrink-0">
             <div className="relative flex items-center gap-2 max-w-4xl mx-auto">
               {plusOpen && (
