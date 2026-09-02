@@ -3,20 +3,29 @@ const Shipment = require("../models/Shipment");
 
 exports.getDashboard=async(req,res)=>{
     try{
-    
-    const totalDocuments=await ShipmentDocument.countDocuments();
+
+    const shipments = await Shipment.find({
+      userId: req.user._id
+    }).select("_id");
+
+    const shipmentIds = shipments.map((shipment) => shipment._id);
+
+    const totalDocuments=await ShipmentDocument.countDocuments({shipmentId:{ $in:shipmentIds }});
     
     const uploadedThisMonth=await ShipmentDocument.countDocuments({
+    shipmentId:{ $in:shipmentIds },
     createdAt:{
     $gte:new Date(new Date().getFullYear(),new Date().getMonth(),1)
     }
     });
     
     const pendingVerification=await ShipmentDocument.countDocuments({
+    shipmentId:{ $in:shipmentIds },
     status:"Pending"
     });
     
     const expiringSoon=await ShipmentDocument.countDocuments({
+    shipmentId:{ $in:shipmentIds },
     expiryDate:{
     $gte:new Date(),
     $lte:new Date(Date.now()+30*24*60*60*1000)
@@ -24,6 +33,7 @@ exports.getDashboard=async(req,res)=>{
     });
     
     const verifiedDocuments=await ShipmentDocument.countDocuments({
+    shipmentId:{ $in:shipmentIds },
     status:"Verified"
     });
     
@@ -50,8 +60,13 @@ exports.getDashboard=async(req,res)=>{
 
     exports.getDocuments=async(req,res)=>{
         try{
-        
-        const documents=await ShipmentDocument.find()
+        const shipments = await Shipment.find({
+  userId: req.user._id
+}).select("_id");
+
+const shipmentIds = shipments.map((shipment) => shipment._id);
+
+        const documents=await ShipmentDocument.find({shipmentId:{ $in:shipmentIds }})
         .populate("shipmentId","sbNumber")
         .populate("uploadedBy","name")
         .sort({
@@ -75,8 +90,18 @@ exports.getDashboard=async(req,res)=>{
 
         exports.getDocumentsByType=async(req,res)=>{
             try{
-            
+             const shipments = await Shipment.find({
+      userId: req.user._id
+    }).select("_id");
+
+    const shipmentIds = shipments.map((shipment) => shipment._id);
+
             const types=await ShipmentDocument.aggregate([
+            {
+      $match:{
+        shipmentId:{ $in:shipmentIds }
+      }
+    },
             {
             $group:{
             _id:"$documentType",
@@ -109,8 +134,18 @@ exports.getDashboard=async(req,res)=>{
 
             exports.getDocumentStatusOverview=async(req,res)=>{
                 try{
-                
+                const shipments = await Shipment.find({
+      userId: req.user._id
+    }).select("_id");
+
+    const shipmentIds = shipments.map((shipment) => shipment._id);
+    
                 const overview=await ShipmentDocument.aggregate([
+                    {
+      $match:{
+        shipmentId:{ $in:shipmentIds }
+      }
+    },
                 {
                 $group:{
                 _id:{
@@ -181,18 +216,26 @@ exports.getDashboard=async(req,res)=>{
 
                 exports.getDocumentInsights=async(req,res)=>{
                     try{
-                    
-                    const total=await ShipmentDocument.countDocuments();
+                    const shipments = await Shipment.find({
+      userId: req.user._id
+    }).select("_id");
+
+    const shipmentIds = shipments.map((shipment) => shipment._id);
+
+                    const total=await ShipmentDocument.countDocuments({shipmentId:{ $in:shipmentIds }});
                     
                     const verified=await ShipmentDocument.countDocuments({
+                    shipmentId:{ $in:shipmentIds },
                     status:"Verified"
                     });
                     
                     const pending=await ShipmentDocument.countDocuments({
+                    shipmentId:{ $in:shipmentIds },
                     status:"Pending"
                     });
                     
                     const expired=await ShipmentDocument.countDocuments({
+                    shipmentId:{ $in:shipmentIds },
                     status:"Expired"
                     });
                     
@@ -257,8 +300,13 @@ exports.getDashboard=async(req,res)=>{
 
                         exports.getRecentUploads=async(req,res)=>{
                             try{
-                            
-                            const uploads=await ShipmentDocument.find()
+                             const shipments = await Shipment.find({
+      userId: req.user._id
+    }).select("_id");
+
+    const shipmentIds = shipments.map((shipment) => shipment._id);
+
+                            const uploads=await ShipmentDocument.find({shipmentId:{ $in:shipmentIds }})
                             .populate("shipmentId","sbNumber")
                             .populate("uploadedBy","name")
                             .sort({
@@ -283,14 +331,19 @@ exports.getDashboard=async(req,res)=>{
 
                             exports.getFilterOptions=async(req,res)=>{
                                 try{
+                                const shipmentss = await Shipment.find({
+      userId: req.user._id
+    }).select("_id");
+
+    const shipmentIds = shipmentss.map((shipment) => shipment._id);
+
+                                const status=await ShipmentDocument.distinct("status",{shipmentId:{ $in:shipmentIds }});
                                 
-                                const status=await ShipmentDocument.distinct("status");
+                                const documentTypes=await ShipmentDocument.distinct("documentType",{shipmentId:{ $in:shipmentIds }});
                                 
-                                const documentTypes=await ShipmentDocument.distinct("documentType");
+                                const countries=await ShipmentDocument.distinct("country",{shipmentId:{ $in:shipmentIds }});
                                 
-                                const countries=await ShipmentDocument.distinct("country");
-                                
-                                const shipments=await Shipment.find({},{
+                                const shipments=await Shipment.find({ _id:{ $in:shipmentIds }},{
                                 _id:1,
                                 sbNumber:1
                                 });

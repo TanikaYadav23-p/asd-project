@@ -72,7 +72,8 @@ import {
   FaStar,
   FaChevronRight,
   FaRobot,
-  FaAngleUp 
+  FaAngleUp,
+  FaCalculator
 } from "react-icons/fa6";
 import { TbContract } from "react-icons/tb";
 import {
@@ -183,6 +184,10 @@ import settings from "../../assets/icon/settings.png";
 import TradeIntelligenceImport from "./TradeIntelligenceImport";
 import ExportIntelligence from "./ExportIntelligence"
 import ShipmentDatabase from "./ShipmentDatabase";
+import FreightCalculator from "../userDashboard/FreightCalculator";
+import AiCargoMateAssistant from "../userDashboard/AiCargoMateAssistant";
+import HSCodeLookup from "../userDashboard/HsCodeLookUp";
+import IncentiveChecker from "../userDashboard/IncentiveChecker";
 import alert from '../../assets/icon/alert.png'
 
 import graph from '../../assets/icon/graph.png'
@@ -312,6 +317,15 @@ const sidebarSections = [
       { icon: FiHash, label: "Export Intelligence" },
       { icon: TbChartBar , label: "HS code Intelligence" },
       { icon: FiMap, label: "Shipment Database" },
+      {
+        icon: FiCpu,
+        label: "AI CargoMate Assistant",
+        badge: "Core",
+        badgeColor: "bg-teal-500",
+      },
+      { icon: FiHash, label: "HS Code Lookup" },
+      { icon: FiGift, label: "Incentive Checker" },
+      { icon: FaCalculator, label: "Freight Calculator" },
       { icon: FiTruck, label: "Risk Analysis" },
       { icon: FaRobot , label: "Ai Insight" },
     ],
@@ -447,7 +461,7 @@ const [accountSummary, setAccountSummary] = useState({});
              </div>
      
              <div className="flex-1 w-full sm:max-w-sm md:max-w-md">
-               <div className="relative sm:w-full w-20">
+              {/* <div className="relative sm:w-full w-20">
                  <FiSearch
                    className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400"
                    size={14}
@@ -457,7 +471,7 @@ const [accountSummary, setAccountSummary] = useState({});
                    placeholder="Search"
                    className="sm:w-full w-14 pl-8 pr-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-teal-400"
                  />
-               </div>
+               </div>*/}
              </div>
      
              <div className="flex items-center gap-1.5 ml-auto">
@@ -603,6 +617,12 @@ const [accountSummary, setAccountSummary] = useState({});
          {activeTab === "Shipment Database" && (
            <ShipmentDatabase   />
           )}
+
+          {activeTab === "AI CargoMate Assistant" && <AiCargoMateAssistant />}
+
+        {activeTab === "HS Code Lookup" && <HSCodeLookup />}
+        {activeTab === "Incentive Checker" && <IncentiveChecker />}
+        {activeTab === "Freight Calculator" && <FreightCalculator />}
 
              {activeTab === "Risk Analysis" && (
               <RiskAnalysis />

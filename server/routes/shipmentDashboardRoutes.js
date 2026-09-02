@@ -1,6 +1,6 @@
 const express=require("express");
 const router=express.Router();
-
+const { protect } = require("../middleware/authMiddleware");
 const{
 
 getDashboard,
@@ -15,15 +15,15 @@ getFilterOptions
 
 }=require("../controllers/shipmentDashboardController");
 
-router.get("/dashboard",getDashboard);
+router.get("/dashboard",protect,getDashboard);
 
-router.get("/shipments",getShipments);
+router.get("/shipments",protect,getShipments);
 
-router.get("/tracker/:id",getShipmentTracker);
+router.get("/tracker/:id",protect,getShipmentTracker);
 
-router.get("/status-overview",getShipmentStatusOverview);
+router.get("/status-overview",protect,getShipmentStatusOverview);
 
-router.get("/shipment-modes",getShipmentsByMode);
+router.get("/shipment-modes",protect,getShipmentsByMode);
 
 router.get("/origin-countries",getTopOriginCountries);
 
@@ -31,6 +31,6 @@ router.get("/recent-alerts",getRecentAlerts);
 
 router.get("/destination-countries",getTopDestinationCountries);
 
-router.get("/filters",getFilterOptions);
+router.get("/filters",protect,getFilterOptions);
 
 module.exports=router;
