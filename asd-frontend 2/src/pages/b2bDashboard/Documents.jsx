@@ -480,7 +480,7 @@ const visibleDocumentPages = Array.from(
   );
 });
   return (
-    <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600 font-sans antialiased py-5">
+    <div className="min-h-screen w-full overflow-y-auto bg-[#F8FAFC] text-slate-600  antialiased py-5">
       <div className="max-w-[1500px] mx-auto p-3 sm:p-4 md:p-6">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-3 mb-4">
           <div>

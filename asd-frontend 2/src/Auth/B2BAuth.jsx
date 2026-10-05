@@ -656,7 +656,7 @@ export default function B2BAuth() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6 font-sans">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6 ">
       {(tab === "signup" || tab === "login") && (
         <div className="w-full max-w-5xl bg-white rounded-3xl shadow-xl overflow-hidden">
           <div className="flex flex-col md:flex-row   p-5">

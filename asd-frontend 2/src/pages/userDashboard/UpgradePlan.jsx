@@ -106,7 +106,7 @@ export default function UpgradePlan() {
   const [yearly, setYearly] = useState(true);
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans pt-10">
+    <div className="min-h-screen bg-gray-50  pt-10">
       <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-8">
 
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-8">

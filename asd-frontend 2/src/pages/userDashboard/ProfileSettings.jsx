@@ -43,7 +43,7 @@ export default function ProfileSettingsDashboard() {
       icon: 'success',
       confirmButtonColor: '#0f766e',
       background: '#ffffff',
-      customClass: { popup: 'rounded-2xl font-sans' }
+      customClass: { popup: 'rounded-2xl ' }
     });
   };
 
@@ -54,12 +54,12 @@ export default function ProfileSettingsDashboard() {
       icon: 'info',
       confirmButtonColor: '#0f766e',
       background: '#ffffff',
-      customClass: { popup: 'rounded-2xl font-sans' }
+      customClass: { popup: 'rounded-2xl ' }
     });
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans p-6 pt-20">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800  p-6 pt-20">
       
       <div className="text-xs text-slate-400 mb-3 flex items-center gap-1.5 tracking-wide">
         <span>Dashboard</span>

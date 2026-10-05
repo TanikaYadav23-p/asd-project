@@ -52,6 +52,11 @@ const Footer = () => {
           <p className="text-gray-500 text-xs text-center sm:text-left">
             2026 ASD Cargomate . A product of ASD Logistics (MSME). All rights reserved
           </p>
+             <a href="https://technoviaan.com/" target="_blank" rel="noreferrer">
+                <button className="hover:underline  text-gray-500 text-xs text-center"> Designed and Developed by Technoviaan Software Solutions</button>
+              </a>
+         
+
           <div className="flex items-center gap-4">
             {["Privacy", "Terms", "Security"].map((item) => (
               <a key={item} href="#" className="text-gray-400 hover:text-white text-xs transition-colors">

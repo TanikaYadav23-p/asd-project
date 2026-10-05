@@ -29,7 +29,7 @@ export default function HelpSupportDashboard() {
       confirmButtonColor: '#0f766e',
       cancelButtonColor: '#64748b',
       background: '#ffffff',
-      customClass: { popup: 'rounded-2xl font-sans' },
+      customClass: { popup: 'rounded-2xl ' },
       preConfirm: () => {
         const subject = document.getElementById('swal-input-sub').value;
         const msg = document.getElementById('swal-input-msg').value;
@@ -59,7 +59,7 @@ export default function HelpSupportDashboard() {
     Swal.fire({
       title: ticket.id,
       html: `
-        <div class="text-left p-2 font-sans">
+        <div class="text-left p-2 ">
           <p class="font-bold text-slate-800 text-base mb-2">${ticket.subject}</p>
           <div class="flex gap-4 text-xs text-slate-500 mt-4">
             <span><strong>Status:</strong> ${ticket.status}</span>
@@ -84,7 +84,7 @@ export default function HelpSupportDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 font-sans p-6 pt-20">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800  p-6 pt-20">
       
       <div className="text-xs text-slate-400 mb-3 flex items-center gap-1.5 tracking-wide">
         <span>Dashboard</span>

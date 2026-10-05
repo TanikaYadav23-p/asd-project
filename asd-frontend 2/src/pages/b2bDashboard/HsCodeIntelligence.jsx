@@ -290,7 +290,7 @@ const fetchFilterOptions = async () => {
 }, [hsCodeDetails, filters]);
 
   return (
-    <div className="overflow-y-auto bg-[#f8fafc] p-5 font-sans text-slate-600 antialiased flex flex-col justify-between pt-14">
+    <div className="overflow-y-auto bg-[#f8fafc] p-5  text-slate-600 antialiased flex flex-col justify-between pt-14">
       
       {/* TOP HEADER */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-5">

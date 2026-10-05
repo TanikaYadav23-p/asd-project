@@ -352,7 +352,7 @@ const PIE_COLORS = ["#2563EB", "#10B981", "#8B5CF6", "#F59E0B", "#6366F1", "#94A
   }, [dynamicPieData]);
 
   return (
-    <div className="min-h-screen overflow-y-auto bg-[#f8fafc] p-6 text-slate-700 antialiased font-sans pt-14">
+    <div className="min-h-screen overflow-y-auto bg-[#f8fafc] p-6 text-slate-700 antialiased  pt-14">
       
       {/* HEADER SECTION */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">

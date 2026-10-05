@@ -109,7 +109,7 @@ export default function SharePlan({ onClose }) {
  
   return (
     <ModalShell>
-      <div className="flex flex-col max-h-[85vh]">
+      <div className="flex flex-col">
         <div className="flex items-start justify-between pb-4 border-b border-gray-100 shrink-0">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-gray-900">Share Plan</h2>
@@ -122,7 +122,7 @@ export default function SharePlan({ onClose }) {
           </button>
         </div>
 
-        <div className="overflow-y-auto pr-1">
+        <div className="pr-1">
           <form onSubmit={handleSubmit}>
             <p className="text-sm font-bold text-gray-900 mt-4 mb-2">Latest Update</p>
             <div className="border border-gray-100 rounded-xl p-3 flex items-center gap-3">
@@ -134,13 +134,13 @@ export default function SharePlan({ onClose }) {
                 <p className="text-xs text-gray-500">PLN-2025-04-24-000123</p>
                 <p className="text-xs text-gray-500">Nhava Sheva (IN) → Dubai (AE)</p>
               </div>
-              <button
+              {/* <button
                 type="button"
                 className="inline-flex items-center gap-1.5 border border-gray-200 text-xs font-medium text-gray-700 px-3 py-1.5 rounded-lg shrink-0"
               >
                 <FiEye size={12} />
                 Preview Plan
-              </button>
+              </button> */}
             </div>
 
             <p className="text-sm font-bold text-gray-900 mt-5 mb-2">Share With</p>

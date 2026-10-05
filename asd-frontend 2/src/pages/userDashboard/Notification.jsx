@@ -77,7 +77,7 @@ export default function NotificationDashboard() {
         icon: 'info',
         confirmButtonColor: '#0f766e',
         background: '#ffffff',
-        customClass: { popup: 'rounded-xl font-sans' }
+        customClass: { popup: 'rounded-xl ' }
       });
       return;
     }
@@ -91,7 +91,7 @@ export default function NotificationDashboard() {
       cancelButtonColor: '#e11d48',
       confirmButtonText: 'Yes, clear all!',
       background: '#ffffff',
-      customClass: { popup: 'rounded-xl font-sans' }
+      customClass: { popup: 'rounded-xl ' }
     }).then((result) => {
       if (result.isConfirmed) {
         setAlerts([]);
@@ -101,7 +101,7 @@ export default function NotificationDashboard() {
           icon: 'success',
           confirmButtonColor: '#0f766e',
           background: '#ffffff',
-          customClass: { popup: 'rounded-xl font-sans' }
+          customClass: { popup: 'rounded-xl ' }
         });
       }
     });
@@ -141,7 +141,7 @@ export default function NotificationDashboard() {
       confirmButtonColor: btnColor,
       background: '#ffffff',
       customClass: {
-        popup: 'rounded-xl font-sans',
+        popup: 'rounded-xl ',
         title: 'text-slate-900 font-bold',
       }
     });
@@ -198,7 +198,7 @@ export default function NotificationDashboard() {
       confirmButtonText: 'Awesome',
       background: '#ffffff',
       customClass: {
-        popup: 'rounded-xl font-sans',
+        popup: 'rounded-xl ',
         title: 'text-slate-900 font-bold',
         htmlContainer: 'text-slate-600 text-sm',
       }
@@ -206,7 +206,7 @@ export default function NotificationDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans p-6 pt-20">
+    <div className="min-h-screen bg-slate-50 text-slate-800  p-6 pt-20">
       <div className="text-sm text-slate-500 mb-4 flex items-center gap-2">
         <span>Dashboard</span>
         <span>&gt;</span>

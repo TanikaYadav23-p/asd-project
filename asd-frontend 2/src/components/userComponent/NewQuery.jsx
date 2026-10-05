@@ -101,8 +101,11 @@ export default function NewQueryModal({ onClose }) {
   return (
     <ModalShell>
       <div className="flex items-start justify-between">
-        <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+        {/* <h2 className="text-lg sm:text-xl font-bold text-gray-900">
           New Query
+        </h2> */}
+         <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+          Product details
         </h2>
         <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
           <FiX size={20} />
@@ -273,6 +276,7 @@ export default function NewQueryModal({ onClose }) {
           </button>
         </div>
       </form>
+
     </ModalShell>
   );
 }

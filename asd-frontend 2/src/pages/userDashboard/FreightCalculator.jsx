@@ -39,7 +39,7 @@ function HeaderActions({setShipment, setActiveTab}) {
                 setActiveTab("")
          }}
        className="px-4 py-2 bg-teal-600 text-white rounded-md text-xs font-bold hover:bg-teal-700">
-        Create Shipment from this Result
+        Create Shipment 
       </button>
     </div>
   );
@@ -530,7 +530,7 @@ function ResultSummary({setActiveTab, setShipment}) {
                 setActiveTab("")
               }} 
         className="w-full bg-teal-600 text-white font-bold py-3  text-xs rounded-lg mt-6 hover:bg-teal-700">
-        Create Shipment from this Result
+        Create Shipment 
       </button>
     </section>
   );
@@ -643,7 +643,7 @@ export default function FreightCalculatorResult() {
 
 
   return (
-    <div className="bg-gray-50 font-sans text-gray-900 antialiased overflow-y-auto pt-10 ">
+    <div className="bg-gray-50  text-gray-900 antialiased overflow-y-auto pt-10 ">
     {activeTab === "Freight Calculator" && ( 
        <div className="max-w-[1440px] mx-auto p-4 md:p-6 lg:p-8">
 
@@ -658,7 +658,7 @@ export default function FreightCalculatorResult() {
           </div>
         </header>
 
-        <AiBanner />
+        {/* <AiBanner /> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 

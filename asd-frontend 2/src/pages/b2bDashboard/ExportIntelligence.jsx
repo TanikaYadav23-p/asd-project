@@ -317,7 +317,7 @@ export default function ExportIntelligenceDashboard({setMainTab}) {
   }, [lineChartData]);
 
   return (
-    <div className="min-h-screen  overflow-y-auto bg-[#f8fafc] p-6 text-slate-700 antialiased font-sans flex flex-col justify-between pt-14">
+    <div className="min-h-screen  overflow-y-auto bg-[#f8fafc] p-6 text-slate-700 antialiased  flex flex-col justify-between pt-14">
       <div>
         {/* HEADER */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">

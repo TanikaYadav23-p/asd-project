@@ -323,7 +323,7 @@ export default function SettingsDashboard() {
 
   return (
 
-    <div className="min-h-screen overflow-y-auto bg-slate-50 text-slate-800 font-sans p-6">
+    <div className="min-h-screen overflow-y-auto bg-slate-50 text-slate-800  p-6">
 
 
       {/* =====================================

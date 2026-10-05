@@ -111,7 +111,7 @@ export default function AlertsNotificationsDashboard() {
   };
 
   return (
-   <div className="w-full min-h-screen bg-[#f8fafc] p-6 text-slate-700 font-sans text-xs antialiased selection:bg-blue-100">
+   <div className="w-full min-h-screen bg-[#f8fafc] p-6 text-slate-700  text-xs antialiased selection:bg-blue-100">
       
      <div className="w-full mt-10">
         

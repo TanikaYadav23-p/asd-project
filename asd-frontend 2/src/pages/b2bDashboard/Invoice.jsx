@@ -271,7 +271,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
   ];*/
 
   return (
-    <div className="overflow-y-auto bg-[#f8fafc] text-slate-700 p-6 font-sans antialiased text-xs selection:bg-blue-100">
+    <div className="overflow-y-auto bg-[#f8fafc] text-slate-700 p-6  antialiased text-xs selection:bg-blue-100">
       
       {/* --- HEADER BAR --- */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-10">

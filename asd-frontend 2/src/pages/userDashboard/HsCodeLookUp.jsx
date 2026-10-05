@@ -95,12 +95,13 @@ export default function HSCodeLookup() {
   const [activeTab, setActiveTab] = useState("HS Code Lookup");
   const [query, setQuery] = useState("Cotton T-shirt 100% cotton, knitted, for men");
    const [shipment, setShipment] = useState("")
-
+ 
+   const [showDetails, setShowDetails] = useState(false)
   return (
-    <div className=" bg-gray-50 font-sans  flex-1 overflow-y-auto pt-14">
+    <div className=" bg-gray-50   flex-1  pt-14">
      {
       activeTab === "HS Code Lookup"  && (
-      <div> 
+      <div className=""> 
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
       
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -109,23 +110,18 @@ export default function HSCodeLookup() {
             <p className="text-xs font-normal text-gray-500 mt-0.5">Find the right HS code and get duty, tax, and trade insights.</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {/* <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
-              <FiSave size={12} /> Save Report
-            </button> */}
-            {/* <button className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50">
-              <FiDownload size={12} /> Download Report (PDF)
-            </button> */}
+           
             <button   onClick={() => {
                 setShipment("shipment")
                 setActiveTab("")
               }} className="flex items-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">
-              <FiPlus size={12} /> Create Shipment from this Result
+              <FiPlus size={12} /> Create Shipment
             </button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 py-4 grid grid-cols-1 xl:grid-cols-[1fr_290px] gap-4 ">
+      <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6  grid grid-cols-1 xl:grid-cols-[1fr_290px] gap-4 ">
         <div className="flex flex-col gap-4 min-w-0">
 
           <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -249,6 +245,8 @@ export default function HSCodeLookup() {
                       <td className="px-3 py-3 text-xs text-gray-600">{row.duty}</td>
                       <td className="px-3 py-3">
                         <button  onClick={() => {
+
+                        setShowDetails(true)
                         setTimeout(() => {
                           document.getElementById("sectionId")?.scrollIntoView({
                             behavior: "smooth",
@@ -271,8 +269,8 @@ export default function HSCodeLookup() {
               <p className="text-[10px] text-gray-400">Data Sources: DGFT (India), UAE Customs, WCO HS</p>
             </div>
           </div>
-
-          <div className="bg-white border border-gray-200 rounded-xl p-4" id="sectionId">
+ 
+        {showDetails && (  <div className="bg-white border border-gray-200 rounded-xl p-4" id="sectionId">
             <div className="flex overflow-x-auto border-b border-gray-200 mb-4 gap-0">
               {detailTabs.map((tab) => (
                 <button
@@ -332,7 +330,7 @@ export default function HSCodeLookup() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> )}
 
           {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -473,9 +471,7 @@ export default function HSCodeLookup() {
                        <h3 className="text-xs  font-bold text-gray-900 ">
                       Data Sources Used
                     </h3>
-                      {/* <button className=" text-teal-500 text-xs  font-medium hover:underline">
-                      View All Sources
-                    </button> */}
+                    
                    </div>
                    
     

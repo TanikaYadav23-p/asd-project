@@ -4,7 +4,7 @@ import {
   FiChevronRight, FiExternalLink, FiDatabase, FiPhone,
   FiMail, FiCheckCircle, FiXCircle, FiShare2, FiBookmark,
   FiMessageSquare, FiInfo, FiAlertTriangle, FiAlertCircle,
-  FiBell, FiGrid
+  FiBell, FiGrid, FiX
 } from "react-icons/fi";
 import { MdOutlineAccountBalance, MdOutlineLocationOn, MdOutlineOpenInNew } from "react-icons/md";
 import { BsGraphUpArrow } from "react-icons/bs";
@@ -83,19 +83,160 @@ const dataSources = [
   { icon: FiDatabase, label: "Public Schemes Database" },
 ];
 
+const emptySearch = {
+  hsCode: "",
+  product: "",
+  origin: "",
+  destination: "",
+  value: "",
+  quantity: "",
+};
+
+function SearchPopup({ onClose, onSubmit, initial }) {
+  const [form, setForm] = useState(initial);
+  const [error, setError] = useState("");
+
+  function handleChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    if (error) setError("");
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    if (!form.hsCode.trim()) {
+      setError("HS Code is required");
+      return;
+    }
+    onSubmit(form);
+  }
+
+  const fields = [
+    { name: "hsCode", label: "HS Code", placeholder: "e.g. 6109.10.00", required: true },
+    { name: "product", label: "Product", placeholder: "e.g. T-shirts, singlets and other vests, of cotton" },
+    { name: "origin", label: "Origin Country", placeholder: "e.g. India" },
+    { name: "destination", label: "Destination Country", placeholder: "e.g. United Arab Emirates (UAE)" },
+    { name: "value", label: "Shipment Value", placeholder: "e.g. ₹1,24,680" },
+    { name: "quantity", label: "Quantity", placeholder: "e.g. 500 kg" },
+  ];
+ 
+ 
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+      onClick={onClose}
+    >
+      <form
+        onSubmit={handleSubmit}
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-xl border border-gray-200 shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto "
+      >
+        <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 bg-blue-50 rounded-full flex items-center justify-center flex-shrink-0">
+              <FiDatabase className="text-blue-500 text-base" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-gray-900">Your Search</p>
+              <p className="text-[11px] text-gray-500">Enter shipment details to check applicable incentives.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100"
+          >
+            <FiX size={16} />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 sm:px-5 py-4">
+          {fields.map(({ name, label, placeholder, required }) => (
+            <div key={name} className={name === "product" ? "sm:col-span-2" : ""}>
+              <label htmlFor={name} className="block text-[10px] text-gray-400 font-medium mb-1">
+                {label}{required && <span className="text-red-400"> *</span>}
+              </label>
+              <input
+                id={name}
+                name={name}
+                value={form[name]}
+                onChange={handleChange}
+                placeholder={placeholder}
+                autoFocus={name === "hsCode"}
+                className={`w-full border rounded-lg px-3 py-2 text-xs font-semibold text-gray-800 placeholder:font-normal placeholder:text-gray-400 outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 ${
+                  name === "hsCode" && error ? "border-red-300" : "border-gray-200"
+                }`}
+              />
+              {name === "hsCode" && error && (
+                <p className="text-[10px] text-red-500 mt-1">{error}</p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-end gap-2 px-4 sm:px-5 py-3 border-t border-gray-100">
+          <button
+            type="button"
+            onClick={onClose}
+            className="border border-gray-200 bg-white text-gray-700 text-xs font-medium px-4 py-2 rounded-lg hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold px-4 py-2 rounded-lg"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
 export default function IncentiveChecker() {
   const [copied, setCopied] = useState(false);
+  const [showPopup, setShowPopup] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
+  const [search, setSearch] = useState({
+    hsCode: "6109.10.00",
+    product: "T-shirts, singlets and other vests, of cotton",
+    origin: "India",
+    destination: "United Arab Emirates (UAE)",
+    value: "₹1,24,680",
+    quantity: "500 kg",
+  });
    const [shipment, setShipment] = useState("")
    const [activeTab, setActiveTab] = useState("Incentive Checker");
 
-  function handleCopy() {
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  // function handleCopy() {
+  //   setCopied(true);
+  //   setTimeout(() => setCopied(false), 1500);
+  // }
+
+   const showView = () => {
+    setShowDetails(true);
+    setTimeout(() => {
+      document.getElementById("sectionId")?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }, 100);
   }
 
   return (
-    <div className=" bg-gray-50 font-sans flex-1 overflow-y-auto pt-14">
-     {activeTab === "Incentive Checker" && ( <div> 
+    <div className=" bg-gray-50  flex-1 overflow-y-auto pt-14">
+     {activeTab === "Incentive Checker" && showPopup && (
+       <SearchPopup
+         initial={emptySearch}
+         onClose={() => setShowPopup(false)}
+         onSubmit={(data) => {
+           setSearch(data);
+           setShowPopup(false);
+         }}
+       />
+     )}
+     {activeTab === "Incentive Checker" && ( <div>
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
        
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -118,7 +259,7 @@ export default function IncentiveChecker() {
                 setActiveTab("")
               }}
             className="flex items-center gap-1.5 bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg">
-              <FiPlus size={12} /> Create Shipment from this Result
+              <FiPlus size={12} /> Create Shipment 
             </button>
           </div>
         </div>
@@ -141,16 +282,16 @@ export default function IncentiveChecker() {
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-3">
               {[
-                ["HS Code", "6109.10.00"],
-                ["Product", "T-shirts, singlets and other vests, of cotton"],
-                ["Origin Country", "India"],
-                ["Destination Country", "United Arab Emirates (UAE)"],
-                ["Shipment Value", "₹1,24,680"],
-                ["Quantity", "500 kg"],
+                ["HS Code", search.hsCode],
+                ["Product", search.product],
+                ["Origin Country", search.origin],
+                ["Destination Country", search.destination],
+                ["Shipment Value", search.value],
+                ["Quantity", search.quantity],
               ].map(([k, v]) => (
                 <div key={k}>
                   <p className="text-[10px] text-gray-400 font-medium mb-0.5">{k}</p>
-                  <p className="text-xs font-semibold text-gray-800 leading-tight">{v}</p>
+                  <p className="text-xs font-semibold text-gray-800 leading-tight">{v || "-"}</p>
                 </div>
               ))}
             </div>
@@ -159,11 +300,10 @@ export default function IncentiveChecker() {
                 Search ID: INC-2025-04-24-000123 &nbsp;•&nbsp; 24 Apr 2025, 09:25 AM &nbsp;•&nbsp; User: Arjun Soni
               </p>
               <button
-                onClick={handleCopy}
+                onClick={showView}
                 className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-600 text-[11px] font-medium px-3 py-1.5 rounded-lg hover:bg-gray-50 w-fit"
               >
-                <FiCopy size={11} /> {copied ? "Copied!" : "Copy Search"}
-              </button>
+                 View Detail   </button>
             </div>
           </div>
 
@@ -215,13 +355,14 @@ export default function IncentiveChecker() {
             </p>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-xl p-4">
+          {showDetails && (
+          <div className="bg-white border border-gray-200 rounded-xl p-4" id="sectionId">
          
               <div className=" flex justify-between items-center mb-3">
                    <p className="text-base pl-3 font-semibold text-gray-800 ">Incentive Breakdown</p>
-              <button className="flex items-center  border border-gray-200 text-teal-600 text-xs font-medium px-2 py-2 rounded-lg hover:bg-teal-50  justify-center">
+              {/* <button className="flex items-center  border border-gray-200 text-teal-600 text-xs font-medium px-2 py-2 rounded-lg hover:bg-teal-50  justify-center">
                 View Scheme Details & Eligibility 
-              </button>
+              </button> */}
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[600px]">
@@ -274,6 +415,7 @@ export default function IncentiveChecker() {
             </div>
           
           </div>
+          )}
 
           
         </div>
@@ -299,7 +441,7 @@ export default function IncentiveChecker() {
                 setShipment("shipment")
                 setActiveTab("")
               }} className="mt-3 w-full bg-teal-500 hover:bg-teal-600 text-white text-xs font-semibold py-2.5 rounded-xl">
-              Create Shipment from this Result
+              Create Shipment 
             </button>
           </div>
 

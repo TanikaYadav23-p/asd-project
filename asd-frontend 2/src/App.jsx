@@ -14,8 +14,10 @@ import AdminLogin from './pages/admin/auth/AdminLogin'
 import B2BDashboard from './pages/b2bDashboard/B2BDashboard'
 import UserDashboard from './pages/userDashboard/UserDashboard'
 import Chatbot from './components/Chatbot'
-function App() {
+import NotFound from "./pages/NotFound"
 
+function App() {
+      
   return (
     <div>
         <Routes>
@@ -31,8 +33,8 @@ function App() {
            <Route path='b2b-dashboard' element={<B2BDashboard/>} />
             <Route path='user-dashboard' element={<UserDashboard/>} />
            <Route path='chatbot' element={<Chatbot/>} />
+             <Route path='*' element={<NotFound/>} />
            
-          
 
         </Route>
       </Routes>

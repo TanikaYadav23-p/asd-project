@@ -424,7 +424,7 @@ const [accountSummary, setAccountSummary] = useState({});
 }, []);
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden font-sans ">
+    <div className="flex h-screen bg-gray-100 overflow-hidden  ">
       {/* Overlay for mobile */}
 
       {sidebarOpen && (
@@ -896,7 +896,7 @@ const regionMarkers = {
 };
 
     return (
-        <div className="min-h-screen bg-[#F7F9FC] text-[#334155] p-6 font-sans antialiased pt-14 ">
+        <div className="min-h-screen bg-[#F7F9FC] text-[#334155] p-6  antialiased pt-14 ">
 
             {/* --- HEADER --- */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">

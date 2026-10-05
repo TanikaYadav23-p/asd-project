@@ -64,7 +64,7 @@ export default function SavedReports() {
   const [viewMode, setViewMode] = useState("list");
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans pt-14">
+    <div className="min-h-screen bg-gray-50  pt-14">
       <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 md:px-6 py-4 md:py-6">
 
         <nav className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 mb-3 md:mb-4">

@@ -142,7 +142,7 @@ export default function ReportsDashboard() {
   const shipmentAreaPath = shipmentLinePath !== "" ? `${shipmentLinePath} L100,100 L0,100 Z` : "";
 
   return (
-    <div className="overflow-y-auto bg-slate-50 text-slate-800 font-sans p-6 selection:bg-blue-100">
+    <div className="overflow-y-auto bg-slate-50 text-slate-800  p-6 selection:bg-blue-100">
       
       {/* HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 mt-10">

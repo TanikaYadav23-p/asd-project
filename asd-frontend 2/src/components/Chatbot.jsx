@@ -33,7 +33,7 @@ import {
   Ship,
   GitCompare,
   Clock,
-  FileSearch,  BadgeCheck, Globe2,     BadgePercent
+  FileSearch, Calculator, BadgeCheck, Globe2,     BadgePercent
 } from "lucide-react";
 import {
   AreaChart,
@@ -44,6 +44,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import chatbot from "../assets/Images/webp/chatbot.webp";
+import Shipment from "./ShipmentForm";
 const services = [
   {
     icon: ShieldCheck,
@@ -133,33 +134,27 @@ const badges = [
 
 const alertCards = [
   {
-    icon: TrendingUp,
-    color: "red",
-    title: "Rate Alert",
-    desc: "London routes rates increasing by 12%",
-    action: "Book Early & Save",
+    icon: FileSearch,
+    color: "blue",
+    title: "HS Code Lookup",
+    desc: "Find the right HS code for your product instantly",
+    action: "Search HS Code",
   },
   {
-    icon: Wallet,
+    icon: BadgePercent,
     color: "green",
-    title: "Finance Tip",
-    desc: "Pre-Shipment Credit up to ₹ 10 Lakhs",
+    title: "Incentive checker",
+    desc: "Check RoDTEP, Drawback & state incentives for your shipment",
     action: "Check Eligibility",
   },
   {
-    icon: Radar,
-    color: "blue",
-    title: "Shipment Tracking",
-    desc: "EK521 to New York ETA: 24 Hrs",
-    action: "Track Now",
-  },
-  {
-    icon: ShieldAlert,
+    icon: Calculator,
     color: "orange",
-    title: "Risk Alert",
-    desc: "HS Code verification recommended",
-    action: "Check Now",
+    title: "Freight Calculator",
+    desc: "Estimate air, sea & road freight cost before you book",
+    action: "Calculate Now",
   },
+  
 ];
 
 const colorMap = {
@@ -206,7 +201,7 @@ function Badge({ icon: Icon, label, value, check }) {
   );
 }
 
-function FreightCard() {
+function FreightCard({ onBookShipment }) {
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 shadow-sm">
       <div className="flex items-center justify-between mb-4">
@@ -259,15 +254,10 @@ function FreightCard() {
           </dl>
 
           <div className="flex flex-wrap gap-2 mt-4">
-            <button className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-blue-700 transition">
+            <button onClick={onBookShipment} className="px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-blue-700 transition">
               Book Shipment
             </button>
-            <button className="px-4 py-2 border border-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-gray-50 transition">
-              Compare Options
-            </button>
-            <button className="px-4 py-2 border border-gray-300 text-gray-700 text-xs sm:text-sm font-medium rounded-lg hover:bg-gray-50 transition">
-              View Details
-            </button>
+           
           </div>
         </div>
 
@@ -346,6 +336,7 @@ export default function CargoMateChat() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState(initialMessages);
   const [typing, setTyping] = useState(false);
+  const [shipment, setShipment] = useState("");
   const scrollRef = useRef(null);
   const plusRef = useRef(null);
 
@@ -488,7 +479,7 @@ export default function CargoMateChat() {
     if (m.kind === "freight-card") {
       return (
         <div key={m.id}>
-          <FreightCard />
+          <FreightCard onBookShipment={() => setShipment("shipment")} />
         </div>
       );
     }
@@ -530,6 +521,16 @@ export default function CargoMateChat() {
     return null;
   };
 
+  if (shipment === "shipment") {
+    return (
+      <Shipment
+        setActiveTab={() => {}}
+        setShipment={setShipment}
+        currentTab={"AI CargoMate Assistant"}
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col pt-14">
       {/* <header className="flex items-center justify-between gap-3 px-3 sm:px-5 py-3 border-b border-gray-200 shrink-0">
@@ -568,7 +569,7 @@ export default function CargoMateChat() {
         </div>
       </header> */}
 
-      <div className="flex h-screen w-full bg-white text-gray-900 overflow-hidden font-sans">
+      <div className="flex h-screen w-full bg-white text-gray-900 overflow-hidden ">
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black/40 z-40 lg:hidden"
@@ -755,7 +756,7 @@ export default function CargoMateChat() {
               </button>
             </div>
             <p className="text-center text-[11px] text-gray-400 mt-2">
-              ASD CargoMate AI may provide inaccurate info. Please verify with official sources.
+              Chatbot can make mistake.
             </p>
           </div>
         </div>

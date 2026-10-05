@@ -52,7 +52,7 @@ export default function AuditLogs() {
   const [currentPage, setCurrentPage] = useState(1);
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans pt-14 overflow-hidden">
+    <div className="min-h-screen bg-gray-50  pt-14 overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
 
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-5">

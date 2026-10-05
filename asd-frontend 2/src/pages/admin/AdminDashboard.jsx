@@ -435,7 +435,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-100 font-sans">
+    <div className="flex min-h-screen bg-gray-100 ">
       {/* Overlay for mobile */}
 
       {sidebarOpen && (

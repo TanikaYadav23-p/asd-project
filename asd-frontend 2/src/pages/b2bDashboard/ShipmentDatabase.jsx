@@ -428,7 +428,7 @@ useEffect(() => {
   selectedPort,
 ]);
   return (
-    <div className="overflow-y-auto  bg-[#f8fafc] p-6 font-sans text-slate-700 pt-14">
+    <div className="overflow-y-auto  bg-[#f8fafc] p-6  text-slate-700 pt-14">
       {/* --- HEADER SECTION --- */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>

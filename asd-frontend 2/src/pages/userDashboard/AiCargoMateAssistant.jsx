@@ -47,7 +47,7 @@ import ShareReportModal from '../../components/userComponent/ShareReport';
 import DataSourceModal from '../../components/userComponent/DataSource';
 import poster from "../../assets/Images/webp/poster3.webp"
 import poster2 from "../../assets/Images/webp/poster2.webp"
-
+import ProductDetails from '../../components/userComponent/ProductDetails';
 
 const recCards = [
   {
@@ -188,7 +188,7 @@ const tabContent = {
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
     
-    buttonText: "Create Shipment from this Result",
+    buttonText: "Create Shipment ",
   },
   "Incentive Analysis": {
     left: [
@@ -204,7 +204,7 @@ const tabContent = {
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
     
-    buttonText: "Create Shipment from this Result",
+    buttonText: "Create Shipment ",
   },
   "Freight Analysis": {
     left: [
@@ -220,7 +220,7 @@ const tabContent = {
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
     
-    buttonText: "Create Shipment from this Result",
+    buttonText: "Create Shipment ",
   },
   "Landed Cost Breakdown": {
     left: [
@@ -237,7 +237,7 @@ const tabContent = {
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
     
-    buttonText: "Create Shipment from this Result",
+    buttonText: "Create Shipment ",
   },
   "Compliance & Documents": {
     left: [
@@ -253,7 +253,7 @@ const tabContent = {
       "Product is 100% cotton, knitted. Shipment weight is 500kg. Prices and duties are based on current available data and may change.",
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
-    buttonText: "Create Shipment from this Result",
+    buttonText: "Create Shipment",
   },
   "Market Insights": {
     left: [
@@ -269,7 +269,7 @@ const tabContent = {
     disclaimer:
       "All results are for reference only. Please verify with official government and customs sources before making business decisions.",
     
-    buttonText: "Create Shipment from this Result",
+    buttonText: "Create Shipment",
   },
 };
 
@@ -280,6 +280,8 @@ const AiCargoMateAssistant = () => {
   const [analysisTab, setAnalysisTab] = useState("HS Code Analysis");
   const content = tabContent[analysisTab];
   const [newQuery, setNewQuery] = useState(false)
+   const [showProductDetails, setShowProductDetails] = useState(false)
+
   const [saveReportPopup, setSaveReportPopup] = useState(false)
   const [downloadReport, setDownloadReport] = useState(false)
   const [shipment, setShipment] = useState("")
@@ -288,7 +290,8 @@ const AiCargoMateAssistant = () => {
   const [dataSource, setDataSource] = useState(false)
   
   useEffect(() => {
-  setNewQuery(true)
+  // setNewQuery(true)
+  setShowProductDetails(true)
   },[]) 
   return (
     <div className="flex-1 flex flex-col min-w-0 overflow-hidden pt-14">
@@ -311,7 +314,7 @@ const AiCargoMateAssistant = () => {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button onClick={() => setNewQuery(true)} className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold  px-3 py-1.5 rounded-lg hover:bg-gray-50">
+              <button onClick={() => setShowProductDetails(true)} className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold  px-3 py-1.5 rounded-lg hover:bg-gray-50">
                 <FiArrowLeft size={13} /> New Query
               </button>
               <button onClick={() => setSaveReportPopup(true)} className="flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 text-xs  font-bold  px-3 py-1.5 rounded-lg hover:bg-gray-50">
@@ -323,13 +326,13 @@ const AiCargoMateAssistant = () => {
               <button onClick={() => {
                 setShipment("shipment")
                 setActiveTab("")
-              }} className="flex items-center gap-1.5 bg-[#0D9488] text-white text-xs  font-bold px-3 py-1.5 rounded-lg">
-                <FiPlus size={13} /> Create Shipment from this Result
+              }} className="flex items-center gap-1.5 bg-[#0D9488] text-white text-xs font-bold px-3 py-1.5 rounded-lg">
+                <FiPlus size={13} /> Create Shipment 
               </button>
             </div>
           </div>
 
-          <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5 mb-4 text-xs font-medium text-blue-800">
+          {/* <div className="flex items-start gap-2 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5 mb-4 text-xs font-medium text-blue-800">
             <FiInfo
               size={14}
               className="text-blue-500 flex-shrink-0 mt-0.5"
@@ -337,7 +340,7 @@ const AiCargoMateAssistant = () => {
             This result is AI-generated based on the data sources and
             assumptions listed below. Please review before making any trade
             decisions.
-          </div>
+          </div> */}
 
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-4">
             <div className="flex flex-col gap-4">
@@ -466,7 +469,7 @@ const AiCargoMateAssistant = () => {
                         setShipment("shipment")
                         setActiveTab("")
                       }} className="mt-2 w-full border border-teal-500 text-teal-500 text-xs    font-semibold py-1.5 rounded-lg hover:bg-teal-50">
-                        Create Shipment from this Result
+                        Create Shipment 
                       </button>
                     </div>
                   ))}
@@ -599,7 +602,7 @@ const AiCargoMateAssistant = () => {
                   setShipment("shipment")
                   setActiveTab("")
                 }} className="mt-3 w-full bg-[#0D9488] text-white text-sm   font-semibold py-2.5 rounded-xl">
-                  Create Shipment from this Result
+                  Create Shipment 
                 </button>
               </div>
 
@@ -764,7 +767,8 @@ const AiCargoMateAssistant = () => {
       }
 
       {downloadReport && (<DownloadReportModal onClose={() => setDownloadReport(false)} />)}
-      {newQuery && (<NewQueryModal onClose={() => setNewQuery(false)} />)}
+      {/* {newQuery && (<NewQueryModal onClose={() => setNewQuery(false)} />)} */}
+      {showProductDetails && (<ProductDetails onClose={() => setShowProductDetails(false)} /> )}
       {saveReportPopup && (<SaveReportPopup onClose={() => setSaveReportPopup(false)} />)}
       {saveReport && (<SaveReportModal onClose={() => setSaveReport(false)} />)}
       {shareReport && (<ShareReportModal onClose={() => setShareReport(false)} />)}

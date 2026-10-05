@@ -102,7 +102,7 @@ export default function BookShipmentModal({ onClose }) {
  
   return (
     <ModalShell width="max-w-lg">
-      <div className="flex flex-col max-h-[85vh]">
+      <div className="flex flex-col">
         <div className="flex items-start justify-between pb-4 border-b border-gray-100 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center shrink-0">
@@ -120,7 +120,7 @@ export default function BookShipmentModal({ onClose }) {
           </button>
         </div>
 
-        <div className="overflow-y-auto pr-1">
+        <div className="pr-1">
           <p className="text-sm font-bold text-gray-900 mt-4 mb-2">Shipment Summary</p>
           <div className="bg-gray-50 rounded-xl p-4 space-y-2.5">
             {summary.map((s) => (

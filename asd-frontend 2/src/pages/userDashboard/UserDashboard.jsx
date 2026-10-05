@@ -745,7 +745,7 @@ export default function UserDashboard() {
  
 
   return (
-    <div className="flex h-screen bg-gray-100  font-sans">
+    <div className="flex h-screen bg-gray-100  ">
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
