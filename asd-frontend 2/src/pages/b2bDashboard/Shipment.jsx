@@ -485,7 +485,7 @@ const STATUS_OVERVIEW = statusOverview.map((item) => ({
   color:
     item._id === "In Transit"
       ? "#6366F1"
-      : item._id === "Delivered"
+      : item._id === "Submitted"
       ? "#10B981"
       : item._id === "Pending"
       ? "#F59E0B"

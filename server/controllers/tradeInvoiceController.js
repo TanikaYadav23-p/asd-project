@@ -3,21 +3,26 @@ const TradeInvoice = require("../models/TradeInvoice");
 exports.getDashboard = async (req,res)=>{
     try{
     
-    const totalInvoices=await TradeInvoice.countDocuments();
+    const totalInvoices=await TradeInvoice.countDocuments({createdBy:req.user._id});
     
-    const paidInvoices=await TradeInvoice.countDocuments({
+    const paidInvoices=await TradeInvoice.countDocuments({createdBy:req.user._id,
     status:"Paid"
     });
     
-    const pendingInvoices=await TradeInvoice.countDocuments({
+    const pendingInvoices=await TradeInvoice.countDocuments({createdBy:req.user._id,
     status:"Pending"
     });
     
-    const overdueInvoices=await TradeInvoice.countDocuments({
+    const overdueInvoices=await TradeInvoice.countDocuments({createdBy:req.user._id,
     status:"Overdue"
     });
     
     const invoiceStats=await TradeInvoice.aggregate([
+    {
+$match:{
+createdBy:req.user._id
+}
+},
     {
     $group:{
     _id:null,
@@ -54,7 +59,7 @@ exports.getDashboard = async (req,res)=>{
         
         const {search,status,type,country}=req.query;
         
-        let filter={};
+        let filter={createdBy:req.user._id};
         
         if(search){
         
@@ -106,6 +111,11 @@ exports.getDashboard = async (req,res)=>{
             
             const data=await TradeInvoice.aggregate([
             {
+$match:{
+createdBy:req.user._id
+}
+},
+            {
             $group:{
             _id:"$status",
             count:{
@@ -134,6 +144,11 @@ exports.getDashboard = async (req,res)=>{
                 try{
                 
                 const trend=await TradeInvoice.aggregate([
+                {
+$match:{
+createdBy:req.user._id
+}
+},
                 {
                 $group:{
                 _id:{
@@ -171,7 +186,7 @@ exports.getDashboard = async (req,res)=>{
                 exports.getRecentInvoices=async(req,res)=>{
                     try{
                     
-                    const invoices=await TradeInvoice.find()
+                    const invoices=await TradeInvoice.find({createdBy:req.user._id})
                     .sort({
                     invoiceDate:-1
                     })
@@ -196,6 +211,11 @@ exports.getDashboard = async (req,res)=>{
                         try{
                         
                         const parties=await TradeInvoice.aggregate([
+                            {
+$match:{
+createdBy:req.user._id
+}
+},
                         {
                         $group:{
                         _id:"$party",
@@ -233,6 +253,7 @@ exports.getDashboard = async (req,res)=>{
                             try{
                             
                             const invoices=await TradeInvoice.find({
+                            createdBy:req.user._id,
                             status:"Overdue"
                             })
                             .sort({
@@ -258,16 +279,19 @@ exports.getDashboard = async (req,res)=>{
                                 try{
                                 
                                 const paid=await TradeInvoice.countDocuments({
+                                createdBy:req.user._id,
                                 status:"Paid"
                                 });
                                 
                                 const overdue=await TradeInvoice.countDocuments({
+                                createdBy:req.user._id,
                                 status:"Overdue"
                                 });
                                 
                                 const pendingAmount=await TradeInvoice.aggregate([
                                 {
                                 $match:{
+                                createdBy:req.user._id,
                                 status:"Pending"
                                 }
                                 },
@@ -303,11 +327,11 @@ exports.getDashboard = async (req,res)=>{
                                 exports.getFilterOptions=async(req,res)=>{
                                     try{
                                     
-                                    const countries=await TradeInvoice.distinct("country");
+                                    const countries=await TradeInvoice.distinct("country",{createdBy:req.user._id});
                                     
-                                    const types=await TradeInvoice.distinct("type");
+                                    const types=await TradeInvoice.distinct("type",{createdBy:req.user._id});
                                     
-                                    const statuses=await TradeInvoice.distinct("status");
+                                    const statuses=await TradeInvoice.distinct("status",{createdBy:req.user._id});
                                     
                                     res.json({
                                     status:1,

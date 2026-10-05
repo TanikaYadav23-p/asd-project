@@ -1,4 +1,4 @@
-import React,{ useState,useEffect,useMemo } from 'react';
+import React,{ useState,useEffect,useMemo,useRef } from 'react';
 import {
   getDashboard,
   getInvoices,
@@ -13,12 +13,13 @@ import {
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ExportReport from "../../components/b2bComponent/ExportReport";
+import ViewInvoiceModal from "../../components/b2bComponent/viewInvoice";
 
 import { 
   FileText, CheckCircle2, AlertCircle, Clock, BarChart3, Wallet, 
   Search, Calendar, ChevronDown, SlidersHorizontal, Sliders, Download, 
   Plus, MoreVertical, ChevronLeft, ChevronRight, ArrowUpRight, ArrowRight, 
-  Info, HelpCircle, FileJson, ArrowRightLeft, User2, CalendarDays
+  Info, HelpCircle, FileJson, ArrowRightLeft, User2, CalendarDays, Eye
 } from 'lucide-react';
 import {
   PieChart,
@@ -58,7 +59,14 @@ export default function InvoicesDashboard() {
   country: "",
   status: "",
 });
-    
+
+  // --- VIEW INVOICE ACTION STATES ---
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [viewInvoiceModal, setViewInvoiceModal] = useState(false);
+  const [openActionMenu, setOpenActionMenu] = useState(null);
+  const actionRef = useRef(null);
+  const [currentPage, setCurrentPage] = useState(1);
+const itemsPerPage = 5;
   const fetchDashboard = async () => {  
     try {
       const res = await getDashboard();
@@ -156,6 +164,7 @@ export default function InvoicesDashboard() {
   ];
 
   useEffect(() => {
+    setCurrentPage(1);
   fetchInvoices();
 }, [
   filters.search,
@@ -173,6 +182,22 @@ export default function InvoicesDashboard() {
     fetchInsights();
     fetchFilterOptions();
   }, []);
+
+  // --- CLOSE ACTION MENU ON OUTSIDE CLICK ---
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (actionRef.current && !actionRef.current.contains(event.target)) {
+        setOpenActionMenu(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
 const valueTrend = useMemo(() => {
   const monthlyData = {};
 
@@ -218,6 +243,14 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
     count,
   }));
 }, [invoices]);
+const totalPages = Math.ceil(invoices.length / itemsPerPage);
+
+const paginatedInvoices = useMemo(() => {
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+
+  return invoices.slice(startIndex, endIndex);
+}, [invoices, currentPage]);
   // --- TOP 6 METRIC CARDS DATA ---
   /*const metrics = [
     { label: "Total Invoice", value: "3,145", change: "▲ 14.8% vs last month", icon: FileText, color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
@@ -333,7 +366,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
       </div>
 
       {/* --- SEARCH & FILTERS CONTROLS --- */}
-      <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm mb-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-3 items-end">
+      <div className="bg-white p-3 rounded-xl border border-slate-100 shadow-sm mb-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 items-end">
         <div>
           <label className="text-[10px] font-bold text-[#06155F] uppercase block mb-1">Search Invoice</label>
           <div className="relative">
@@ -367,7 +400,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
          
           { label:"Invoice Type", val:"All Type", options:filterOptions.types, key:"type" },
           { label:"Country / Region", val:"All Countries", options:filterOptions.countries, key:"country" },
-          { label:"Party Type", val:"All Parties", options:filterOptions.partyTypes, key:"partyType" },
+  
           { label:"Status", val:"All Status", options:filterOptions.statuses, key:"status" },
         ].map((f, i) => (
           <div key={i}>
@@ -408,7 +441,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
         <div className="lg:col-span-8 space-y-6">
           
           {/* INVOICE DATA TABLE */}
-          <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
+          <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-visible">
             <div className="p-4 flex items-center justify-between border-b border-slate-50">
               <h2 className="text-sm font-bold text-slate-900">Invoice List <span className="text-slate-400 font-medium">({invoices.length})</span></h2>
               <button className="flex items-center gap-1 text-blue-600 border border-blue-50/80 bg-blue-50/30 rounded-lg px-2.5 py-1 text-xs font-semibold hover:bg-blue-50 transition-colors">
@@ -433,7 +466,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-slate-600">
-                  {invoices.map((row, idx) => (
+                  {paginatedInvoices.map((row, idx) => (
                     <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
                       <td className="p-3 pl-4"><input type="checkbox" className="rounded border-slate-300 accent-blue-600" /></td>
                       <td className="p-3 font-semibold text-blue-600 hover:underline cursor-pointer whitespace-nowrap">{row.invoiceNumber}</td>
@@ -442,7 +475,7 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
                       {/*<td className="p-3 text-slate-400 whitespace-nowrap">{row.type}</td>*/}
                       <td className="p-3 text-slate-600 whitespace-nowrap"> <ReactCountryFlag countryCode={row.countryCode} svg style={{ width: "18px", height: "13px" }}/>{row.country}</td>
                       <td className="p-3 text-slate-400 whitespace-nowrap">{new Date(row.dueDate).toLocaleDateString("en-GB")}</td>
-                      <td className="p-3 font-bold text-slate-800 text-right whitespace-nowrap">₹ {row.amount?.toLocaleString("en-IN")}</td>
+                      <td className="p-3 font-bold text-slate-800 text-right whitespace-nowrap">₹ {row.invoiceValue?.toLocaleString("en-IN")}</td>
                       <td className="p-3 text-center">
                         <span className={`inline-block px-2.5 py-0.5 rounded-full font-bold text-[10px] leading-tight uppercase tracking-wide ${
                           row.status === "Paid" ? "bg-emerald-50 text-emerald-600"
@@ -454,7 +487,34 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
                         </span>
                       </td>
                       <td className="p-3 pr-4 text-center">
-                        <MoreVertical size={14} className="text-slate-400 mx-auto cursor-pointer hover:text-slate-600" />
+                        <div className="relative inline-block" ref={openActionMenu === (row._id || idx) ? actionRef : null}>
+                          <button
+                            onClick={() =>
+                              setOpenActionMenu(
+                                openActionMenu === (row._id || idx) ? null : (row._id || idx)
+                              )
+                            }
+                            className="p-1 rounded-md hover:bg-slate-100"
+                          >
+                            <MoreVertical size={14} className="text-slate-400 hover:text-slate-600" />
+                          </button>
+
+                          {openActionMenu === (row._id || idx) && (
+                            <div className="absolute right-0 top-8 z-50 w-36 bg-white border border-slate-200 rounded-lg shadow-lg py-1 text-left">
+                              <button
+                                onClick={() => {
+                                  setSelectedInvoice(row);
+                                  setViewInvoiceModal(true);
+                                  setOpenActionMenu(null);
+                                }}
+                                className="w-full text-left px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                              >
+                                <Eye size={14} />
+                                View Invoice
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -463,18 +523,67 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
             </div>
 
             {/* TABLE PAGINATION ROW */}
-            <div className="p-3.5 border-t border-slate-100 bg-[#f8fafc]/50 flex items-center justify-between text-xs text-slate-500 font-medium">
-              <span>Showing {invoices.length > 0 ? 1 : 0} to {invoices.length} of {invoices.length} invoices</span>
-              <div className="flex items-center gap-1">
-                <button className="p-1 rounded border bg-white text-slate-400 cursor-not-allowed opacity-50"><ChevronLeft size={14} /></button>
-                <button className="px-2.5 py-1 rounded font-bold bg-blue-600 text-white shadow-sm">1</button>
-                <button className="px-2.5 py-1 rounded font-semibold bg-white border border-slate-200 hover:bg-slate-50">2</button>
-                <button className="px-2.5 py-1 rounded font-semibold bg-white border border-slate-200 hover:bg-slate-50">3</button>
-                <span className="px-1 text-slate-400">...</span>
-                <button className="px-2 py-1 rounded font-semibold bg-white border border-slate-200 hover:bg-slate-50">255</button>
-                <button className="p-1 rounded border bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"><ChevronRight size={14} /></button>
-              </div>
-            </div>
+<div className="p-3.5 border-t border-slate-100 bg-[#f8fafc]/50 flex items-center justify-between text-xs text-slate-500 font-medium">
+
+  <span>
+    Showing{" "}
+    {invoices.length > 0
+      ? (currentPage - 1) * itemsPerPage + 1
+      : 0}{" "}
+    to{" "}
+    {Math.min(currentPage * itemsPerPage, invoices.length)}{" "}
+    of {invoices.length} invoices
+  </span>
+
+  <div className="flex items-center gap-1">
+
+    {/* PREVIOUS */}
+    <button
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+      className={`p-1 rounded border ${
+        currentPage === 1
+          ? "bg-white text-slate-300 cursor-not-allowed opacity-50"
+          : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+      }`}
+    >
+      <ChevronLeft size={14} />
+    </button>
+
+    {/* PAGE NUMBERS */}
+    {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+      (page) => (
+        <button
+          key={page}
+          onClick={() => setCurrentPage(page)}
+          className={`px-2.5 py-1 rounded font-semibold ${
+            currentPage === page
+              ? "bg-blue-600 text-white shadow-sm"
+              : "bg-white border border-slate-200 text-slate-600 hover:bg-slate-50"
+          }`}
+        >
+          {page}
+        </button>
+      )
+    )}
+
+    {/* NEXT */}
+    <button
+      onClick={() =>
+        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+      }
+      disabled={currentPage === totalPages || totalPages === 0}
+      className={`p-1 rounded border ${
+        currentPage === totalPages || totalPages === 0
+          ? "bg-white text-slate-300 cursor-not-allowed opacity-50"
+          : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+      }`}
+    >
+      <ChevronRight size={14} />
+    </button>
+
+  </div>
+</div>
           </div>
 
           {/* TWO BOTTOM PANELS ROW */}
@@ -750,6 +859,17 @@ const maxValue = Math.max(...valueTrend.map(item => item.value), 1);
 
       {invoiceInsight && (
         <InvoiceInsights onClose={() => setInvoiceInsight(false)} />
+      )}
+
+      {/* --- VIEW INVOICE MODAL --- */}
+      {viewInvoiceModal && selectedInvoice && (
+        <ViewInvoiceModal
+          invoice={selectedInvoice}
+          onClose={() => {
+            setViewInvoiceModal(false);
+            setSelectedInvoice(null);
+          }}
+        />
       )}
     </div>
   );

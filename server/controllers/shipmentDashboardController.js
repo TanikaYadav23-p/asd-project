@@ -3,38 +3,43 @@ const ShipmentAlert = require("../models/ShipmentAlert");
 
 exports.getDashboard=async(req,res)=>{
     try{
+    const userId = req.user._id;
+    const totalShipments=await Shipment.countDocuments({userId});
     
-    const totalShipments=await Shipment.countDocuments();
-    
-    const inTransit=await Shipment.countDocuments({
+    const inTransit=await Shipment.countDocuments({userId,
     shipmentStatus:"In Transit"
     });
     
-    const delivered=await Shipment.countDocuments({
-    shipmentStatus:"Delivered"
+    const delivered=await Shipment.countDocuments({userId,
+    shipmentStatus:"Submitted"
     });
     
-    const pending = await Shipment.countDocuments({
+    const pending = await Shipment.countDocuments({userId,
       approvalStatus: "Pending"
     });
 
-    const delayed=await Shipment.countDocuments({
+    const delayed=await Shipment.countDocuments({userId,
     exceptionStatus:"Delayed"
     });
     
-    const exception=await Shipment.countDocuments({
+    const exception=await Shipment.countDocuments({userId,
     exceptionStatus:{ $ne: "None" }
     });
     
     const shipmentValue=await Shipment.aggregate([
-    {
-    $group:{
-    _id:null,
-    total:{
-    $sum:"$cargo.value"
-    }
-    }
-    }
+     {
+        $match: {
+          userId: userId
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: {
+            $sum: "$cargo.value"
+          }
+        }
+      }
     ]);
     
     res.json({
@@ -63,7 +68,7 @@ exports.getDashboard=async(req,res)=>{
     exports.getShipments=async(req,res)=>{
         try{
         
-        const shipments=await Shipment.find()
+        const shipments=await Shipment.find({userId: req.user._id})
         .populate("cargo.hsCode","hsCode productName")
         .sort({
         shipmentDate:-1
@@ -86,8 +91,11 @@ exports.getDashboard=async(req,res)=>{
 
         exports.getShipmentTracker=async(req,res)=>{
             try{
-            
-            const shipment=await Shipment.findById(req.params.id)
+            const userId = req.user._id;
+            const shipment=await Shipment.findOne({
+      _id: req.params.id,
+      userId
+    })
             .populate("cargo.hsCode","hsCode productName");
             
             res.json({
@@ -107,17 +115,22 @@ exports.getDashboard=async(req,res)=>{
 
             exports.getShipmentStatusOverview=async(req,res)=>{
                 try{
-                
+                const userId = req.user._id;
                 const overview=await Shipment.aggregate([
                 {
-                $group:{
-                _id:"$status",
-                count:{
-                $sum:1
-                }
-                }
-                }
-                ]);
+        $match: {
+          userId: userId
+        }
+      },
+      {
+        $group: {
+          _id: "$shipmentStatus",
+          count: {
+            $sum: 1
+          }
+        }
+      }
+    ]);
                 
                 res.json({
                 status:1,
@@ -136,25 +149,30 @@ exports.getDashboard=async(req,res)=>{
 
                 exports.getShipmentsByMode=async(req,res)=>{
                     try{
-                    
+                    const userId = req.user._id;
                     const modes=await Shipment.aggregate([
                     {
-                    $group:{
-                    _id:"$route.mode",
-                    count:{
-                    $sum:1
-                    },
-                    value:{
-                    $sum:"$cargo.value"
-                    }
-                    }
-                    },
-                    {
-                    $sort:{
-                    count:-1
-                    }
-                    }
-                    ]);
+        $match: {
+          userId: userId
+        }
+      },
+      {
+        $group: {
+          _id: "$route.mode",
+          count: {
+            $sum: 1
+          },
+          value: {
+            $sum: "$cargo.value"
+          }
+        }
+      },
+      {
+        $sort: {
+          count: -1
+        }
+      }
+    ]);
                     
                     res.json({
                     status:1,
@@ -278,16 +296,51 @@ exports.getDashboard=async(req,res)=>{
 
                                 exports.getFilterOptions=async(req,res)=>{
                                     try{
-                                    
-                                    const status=await Shipment.distinct("status");
-                                    
-                                    const modes=await Shipment.distinct("route.mode");
-                                    
-                                    const origins=await Shipment.distinct("route.origin");
-                                    
-                                    const destinations=await Shipment.distinct("route.destination");
-                                    
-                                    const hsCodes=await Shipment.distinct("cargo.productName");
+                                    const userId = req.user._id;
+                                     const userShipments = await Shipment.find({
+      userId
+    });
+
+    const status = [
+      ...new Set(
+        userShipments
+          .map(item => item.shipmentStatus)
+          .filter(Boolean)
+      )
+    ];
+
+    const modes = [
+      ...new Set(
+        userShipments
+          .map(item => item.route?.mode)
+          .filter(Boolean)
+      )
+    ];
+
+    const origins = [
+      ...new Set(
+        userShipments
+          .map(item => item.route?.originCountry)
+          .filter(Boolean)
+      )
+    ];
+
+    const destinations = [
+      ...new Set(
+        userShipments
+          .map(item => item.route?.destinationCountry)
+          .filter(Boolean)
+      )
+    ];
+
+    const hsCodes = [
+      ...new Set(
+        userShipments
+          .map(item => item.cargo?.productName)
+          .filter(Boolean)
+      )
+    ];
+
                                     
                                     res.json({
                                     status:1,
