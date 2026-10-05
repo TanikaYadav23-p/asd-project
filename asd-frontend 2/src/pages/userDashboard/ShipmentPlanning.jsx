@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   FiArrowLeft, FiSave, FiDownload, FiPlus, FiInfo,
   FiChevronRight, FiCheckCircle, FiAlertCircle, FiFileText,
@@ -158,11 +158,16 @@ const handleCancelParties = () => {
   setPartiesInfo(originalPartiesInfo);
   setIsEditingParties(false);
 };
+
+useEffect(() => {
+     setShipment("shipment")
+     setMainTab("")
+},[])
   return (
     <div className="h-auto bg-gray-50  flex-1 overflow-y-auto pt-14">
      { mainTab === "Shipment Planning" && (
       <div className=" flex-1 overflow-y-auto"> 
-       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
+       <div className=" border-gray-200 px-4 sm:px-6 py-3">
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>

@@ -237,7 +237,7 @@ export default function IncentiveChecker() {
        />
      )}
      {activeTab === "Incentive Checker" && ( <div>
-      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-3">
+      <div className=" border-gray-200 px-4 sm:px-6 py-3">
        
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>

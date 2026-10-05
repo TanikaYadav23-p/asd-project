@@ -629,7 +629,7 @@ function PageFooter() {
       </div>
 
        <div className="bg-white flex rounded-xl border border-gray-200 px-4">
-          <NeedHelp mobile={"+91 22 1234 5678"} para={" Our trade experts are here to help you."} heading={"Need help ?"}  />     
+          <div className="w-full"><NeedHelp mobile={"+91 22 1234 5678"} para={" Our trade experts are here to help you."} heading={"Need help ?"}  /></div>     
         </div>
 
     </footer>
