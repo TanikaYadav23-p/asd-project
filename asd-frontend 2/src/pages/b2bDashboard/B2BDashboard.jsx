@@ -184,10 +184,10 @@ import settings from "../../assets/icon/settings.png";
 import TradeIntelligenceImport from "./TradeIntelligenceImport";
 import ExportIntelligence from "./ExportIntelligence"
 import ShipmentDatabase from "./ShipmentDatabase";
-import FreightCalculator from "../userDashboard/FreightCalculator";
-import AiCargoMateAssistant from "../userDashboard/AiCargoMateAssistant";
-import HSCodeLookup from "../userDashboard/HsCodeLookUp";
-import IncentiveChecker from "../userDashboard/IncentiveChecker";
+// import FreightCalculator from "../userDashboard/FreightCalculator";
+// import AiCargoMateAssistant from "../userDashboard/AiCargoMateAssistant";
+// import HSCodeLookup from "../userDashboard/HsCodeLookUp";
+// import IncentiveChecker from "../userDashboard/IncentiveChecker";
 import alert from '../../assets/icon/alert.png'
 
 import graph from '../../assets/icon/graph.png'
@@ -317,15 +317,7 @@ const sidebarSections = [
       { icon: FiHash, label: "Export Intelligence" },
       { icon: TbChartBar , label: "HS code Intelligence" },
       { icon: FiMap, label: "Shipment Database" },
-      {
-        icon: FiCpu,
-        label: "AI CargoMate Assistant",
-        badge: "Core",
-        badgeColor: "bg-teal-500",
-      },
-      { icon: FiHash, label: "HS Code Lookup" },
-      { icon: FiGift, label: "Incentive Checker" },
-      { icon: FaCalculator, label: "Freight Calculator" },
+
       { icon: FiTruck, label: "Risk Analysis" },
       { icon: FaRobot , label: "Ai Insight" },
     ],
@@ -448,7 +440,7 @@ const [accountSummary, setAccountSummary] = useState({});
              />
            )}
 
-           <header className="fixed top-0 w-full z-[20] pr-3 bg-white border-b border-gray-200     py-0 flex items-center gap-3  ">
+           <header className="fixed top-0 w-full z-30 pr-3 bg-white border-b border-gray-200     py-0 flex items-center gap-3  ">
              <button
                className="lg:hidden p-1.5 pl-4 rounded-md hover:bg-gray-100 text-gray-600"
                onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -618,11 +610,11 @@ const [accountSummary, setAccountSummary] = useState({});
            <ShipmentDatabase   />
           )}
 
-          {activeTab === "AI CargoMate Assistant" && <AiCargoMateAssistant />}
+          {/* {activeTab === "AI CargoMate Assistant" && <AiCargoMateAssistant />}
 
         {activeTab === "HS Code Lookup" && <HSCodeLookup />}
         {activeTab === "Incentive Checker" && <IncentiveChecker />}
-        {activeTab === "Freight Calculator" && <FreightCalculator />}
+        {activeTab === "Freight Calculator" && <FreightCalculator />} */}
 
              {activeTab === "Risk Analysis" && (
               <RiskAnalysis />

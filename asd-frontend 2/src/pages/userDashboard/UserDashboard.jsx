@@ -365,7 +365,7 @@ const sidebarSections = [
       {
         icon: FiCpu,
         label: "AI CargoMate Assistant",
-        badge: "Core",
+        badge: "",
         badgeColor: "bg-teal-500",
       },
       { icon: FiHash, label: "HS Code Lookup" },
@@ -752,7 +752,7 @@ export default function UserDashboard() {
           onClick={() => setSidebarOpen(false)}
         />
       )}
-      <header className="fixed top-0 w-full z-[20] pr-3 bg-white border-b border-gray-200     py-0 flex items-center gap-3  ">
+      <header className="fixed top-0 w-full z-30 pr-3 bg-white border-b border-gray-200     py-0 flex items-center gap-3  ">
         <button
           className="lg:hidden p-1.5 pl-4 rounded-md hover:bg-gray-100 text-gray-600"
           onClick={() => setSidebarOpen(!sidebarOpen)}

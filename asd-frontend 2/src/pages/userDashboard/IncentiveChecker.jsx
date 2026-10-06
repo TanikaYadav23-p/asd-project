@@ -417,6 +417,57 @@ export default function IncentiveChecker() {
           </div>
           )}
 
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 min-w-0  mb-4">
+            <div className="bg-white border border-gray-200 rounded-xl p-4  ">
+              <p className="text-sm font-semibold text-gray-800 mb-3">Data Sources Used</p>
+              <div className="grid grid-cols-2 gap-y-2 gap-x-3">
+                {dataSources.map(({ icon: Icon, label }) => (
+                  <div key={label} className="flex items-center gap-1.5 text-xs text-gray-600">
+                    <Icon size={12} className="text-gray-400 flex-shrink-0" /> {label}
+                  </div>
+                ))}
+              </div>
+              {/* <button className="mt-3 text-teal-500 text-xs font-medium hover:underline flex items-center gap-1">
+                View All Sources <FiChevronRight size={12} />
+              </button> */}
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-4">
+              <p className="text-sm font-semibold text-gray-800 mb-3">Assumptions</p>
+              <ul className="flex flex-col gap-1.5">
+                {assumptions.map((a, i) => (
+                  <li key={i} className="flex items-start gap-1.5 text-xs text-gray-600">
+                    <span className="text-gray-400 mt-0.5 flex-shrink-0">•</span> {a}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col justify-between">
+              <div>
+                <p className="text-sm font-semibold text-gray-800 mb-2">Disclaimer</p>
+                <p className="text-xs text-gray-600 leading-relaxed">
+                  Incentives are subject to change as per government notifications. Please verify with official sources before making any business decisions.
+                </p>
+                {/* <button className="mt-2 text-blue-500 text-xs font-medium hover:underline">Read Full Disclaimer</button> */}
+              </div>
+           
+            </div>
+
+            <div className="bg-white border border-gray-200 rounded-xl p-4">
+                <p className="text-sm font-semibold text-gray-800 mb-1">Need Help?</p>
+                <p className="text-xs text-gray-500 mb-2 pt-3">Our trade experts are here to help you.</p>
+                <div className="flex items-center gap-1.5 text-xs pt-2 text-gray-600 mb-1">
+                  <FiPhone size={11} className="text-teal-500 " /> +91 22 1234 5678
+                </div>
+                <div className="flex items-center gap-1.5 text-xs pt-2 text-gray-600 mb-3">
+                  <FiMail size={11} className="text-teal-500" /> support@asdcargomate.com
+                </div>
+                {/* <button className="w-full border border-gray-200 text-gray-700 text-xs font-medium py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1.5">
+                  <FiMessageSquare size={12} /> Chat with Expert
+                </button> */}
+              </div>
+      </div>
           
         </div>
 
@@ -493,57 +544,8 @@ export default function IncentiveChecker() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 min-w-0 mx-6 mb-4">
-            <div className="bg-white border border-gray-200 rounded-xl p-4  ">
-              <p className="text-sm font-semibold text-gray-800 mb-3">Data Sources Used</p>
-              <div className="grid grid-cols-2 gap-y-2 gap-x-3">
-                {dataSources.map(({ icon: Icon, label }) => (
-                  <div key={label} className="flex items-center gap-1.5 text-xs text-gray-600">
-                    <Icon size={12} className="text-gray-400 flex-shrink-0" /> {label}
-                  </div>
-                ))}
-              </div>
-              {/* <button className="mt-3 text-teal-500 text-xs font-medium hover:underline flex items-center gap-1">
-                View All Sources <FiChevronRight size={12} />
-              </button> */}
-            </div>
+    
 
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-              <p className="text-sm font-semibold text-gray-800 mb-3">Assumptions</p>
-              <ul className="flex flex-col gap-1.5">
-                {assumptions.map((a, i) => (
-                  <li key={i} className="flex items-start gap-1.5 text-xs text-gray-600">
-                    <span className="text-gray-400 mt-0.5 flex-shrink-0">•</span> {a}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col justify-between">
-              <div>
-                <p className="text-sm font-semibold text-gray-800 mb-2">Disclaimer</p>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Incentives are subject to change as per government notifications. Please verify with official sources before making any business decisions.
-                </p>
-                {/* <button className="mt-2 text-blue-500 text-xs font-medium hover:underline">Read Full Disclaimer</button> */}
-              </div>
-           
-            </div>
-
-            <div className="bg-white border border-gray-200 rounded-xl p-4">
-                <p className="text-sm font-semibold text-gray-800 mb-1">Need Help?</p>
-                <p className="text-xs text-gray-500 mb-2 pt-3">Our trade experts are here to help you.</p>
-                <div className="flex items-center gap-1.5 text-xs pt-2 text-gray-600 mb-1">
-                  <FiPhone size={11} className="text-teal-500 " /> +91 22 1234 5678
-                </div>
-                <div className="flex items-center gap-1.5 text-xs pt-2 text-gray-600 mb-3">
-                  <FiMail size={11} className="text-teal-500" /> support@asdcargomate.com
-                </div>
-                {/* <button className="w-full border border-gray-200 text-gray-700 text-xs font-medium py-2 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-1.5">
-                  <FiMessageSquare size={12} /> Chat with Expert
-                </button> */}
-              </div>
-          </div>
            <div className="min-w-0 mx-6"> 
              <img src={poster2}  className='w-full max-h-60 mb-4' />
             </div>

@@ -760,9 +760,7 @@ useEffect(() => {
                   <span className="text-xs sm:text-sm  font-medium text-[#071B60] text-right">{v}</span>
                 </div>
               ))}
-              {/* <button className="mt-3 w-full border border-teal-500 text-teal-600 text-xs sm:text-sm  font-medium py-2 rounded-lg hover:bg-teal-50">
-                View Full Route & Schedule
-              </button> */}
+             
             </div>
 
             <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -777,9 +775,7 @@ useEffect(() => {
                 <span className="text-sm  font-bold text-[#071B60]">Total Estimated Cost</span>
                 <span className="text-sm font-bold text-emerald-600">₹24,860</span>
               </div>
-              {/* <button className="mt-2 w-full border border-teal-600 text-teal-600 text-xs sm:text-sm  font-medium py-2 rounded-lg hover:bg-gray-50">
-                View Cost Breakdown
-              </button> */}
+              
             </div>
 
             <div className="bg-white  border border-gray-200 rounded-xl p-4">
