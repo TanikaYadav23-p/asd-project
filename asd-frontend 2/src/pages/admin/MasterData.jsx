@@ -903,7 +903,7 @@ const handleAddShipmentRow = () => {
             <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Master Data</h1>
             <p className="text-xs sm:text-sm text-gray-400 mt-1">Manage categories, types, and dropdown data</p>
           </div>
-          <div className="flex items-start justify-around gap-2"> 
+          {/* <div className="flex items-start justify-around gap-2"> 
              <button className="flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors shadow-sm whitespace-nowrap"> 
                 Upload Excel
             </button>
@@ -916,13 +916,12 @@ const handleAddShipmentRow = () => {
           >
             <FaPlus className="text-xs" /> Add Category
           </button>
-          </div>
+          </div> */}
          
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-4">
+        {/* <div className="flex flex-col lg:flex-row gap-4">
 
-          {/* LEFT */}
           <div className={`w-full lg:w-64 xl:w-72 flex-shrink-0 ${showRight ? "hidden lg:block" : "block"}`}>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
               <h2 className="text-sm font-semibold text-gray-700 mb-3">Data Categories</h2>
@@ -946,7 +945,6 @@ const handleAddShipmentRow = () => {
             </div>
           </div>
 
-          {/* RIGHT */}
           <div className={`flex-1 min-w-0 ${showRight ? "block" : "hidden lg:block"}`}>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5">
 
@@ -1041,7 +1039,7 @@ const handleAddShipmentRow = () => {
             </div>
           </div>
 
-        </div>
+        </div> */}
       </div>
 
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm my-6 w-full ">
