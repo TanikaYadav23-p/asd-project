@@ -1,12 +1,43 @@
 import React from 'react'
+import { NavLink } from "react-router-dom";
 import { BsStars, BsTwitterX, BsLinkedin, BsFacebook, BsInstagram } from "react-icons/bs";
 
 const footerLinks = {
-    Product: ["Features", "Pricing", "Use Cases", "Integrations", "API"],
-    Company: ["About us", "Careers", "Blog", "Press", "Contact"],
-    Legal: ["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR", "Compliance"],
-    Resources: ["Help Center", "Documentation", "Community", "Webinars", "Partners"],
+    Product: [
+      { label: "Features", path: "/features" },
+      { label: "Pricing", path: "/pricing" },
+      { label: "Use Cases", path: "/use-cases" },
+      { label: "Integrations", path: "/integrations" },
+      { label: "API", path: "/api" },
+    ],
+    Company: [
+      { label: "About us", path: "/about" },
+      { label: "Careers", path: "/careers" },
+      { label: "Blog", path: "/blog" },
+      { label: "Press", path: "/press" },
+      { label: "Contact", path: "/contact" },
+    ],
+    Legal: [
+      { label: "Privacy Policy", path: "/privacy-policy" },
+      { label: "Terms of Service", path: "/terms-of-service" },
+      { label: "Cookie Policy", path: "/cookie-policy" },
+      { label: "GDPR", path: "/gdpr" },
+      { label: "Compliance", path: "/compliance" },
+    ],
+    Resources: [
+      { label: "Help Center", path: "/help-center" },
+      { label: "Documentation", path: "/documentation" },
+      { label: "Community", path: "/community" },
+      { label: "Webinars", path: "/webinars" },
+      { label: "Partners", path: "/partners" },
+    ],
   };
+
+const bottomLinks = [
+  { label: "Privacy", path: "/privacy-policy" },
+  { label: "Terms", path: "/terms-of-service" },
+  { label: "Security", path: "/security" },
+];
 
 const Footer = () => {
   return (
@@ -36,11 +67,16 @@ const Footer = () => {
             <div key={heading}>
               <h4 className="text-white font-semibold text-sm mb-4">{heading}</h4>
               <ul className="space-y-2.5">
-                {links.map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-gray-400 hover:text-white text-xs transition-colors">
-                      {link}
-                    </a>
+                {links.map(({ label, path }) => (
+                  <li key={label}>
+                    <NavLink
+                      to={path}
+                      className={({ isActive }) =>
+                        `hover:text-white text-xs transition-colors ${isActive ? "text-white" : "text-gray-400"}`
+                      }
+                    >
+                      {label}
+                    </NavLink>
                   </li>
                 ))}
               </ul>
@@ -58,10 +94,16 @@ const Footer = () => {
          
 
           <div className="flex items-center gap-4">
-            {["Privacy", "Terms", "Security"].map((item) => (
-              <a key={item} href="#" className="text-gray-400 hover:text-white text-xs transition-colors">
-                {item}
-              </a>
+            {bottomLinks.map(({ label, path }) => (
+              <NavLink
+                key={label}
+                to={path}
+                className={({ isActive }) =>
+                  `hover:text-white text-xs transition-colors ${isActive ? "text-white" : "text-gray-400"}`
+                }
+              >
+                {label}
+              </NavLink>
             ))}
           </div>
         </div>

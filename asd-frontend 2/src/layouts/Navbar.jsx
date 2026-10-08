@@ -33,8 +33,8 @@ const Navbar = ({show, setShow}) => {
     { name: "Features ", path: "/#" },
     { name: "Pricing", path: "/#" },
     { name: "Resources", path: "/#" },
-    { name: "About", path: "/#" },
-    { name: "Contact", path: "/#" },
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" },
   ];
 
   return (

@@ -150,6 +150,9 @@ function AdManagement({ ads, onDelete, onAddNew }) {
                 Banner
               </th>
               <th className="py-4 px-6 text-sm font-semibold text-slate-500">
+                Click
+              </th>
+              <th className="py-4 px-6 text-sm font-semibold text-slate-500">
                 Start Date
               </th>
               <th className="py-4 px-6 text-sm font-semibold text-slate-500">
@@ -171,6 +174,9 @@ function AdManagement({ ads, onDelete, onAddNew }) {
                 </td>
                 <td className="py-4 px-6">
                   <Banner type={ad.banner} />
+                </td>
+                 <td className="py-4 text-center px-6">
+                  -
                 </td>
                 <td className="py-4 px-6 text-slate-600">{ad.start}</td>
                 <td className="py-4 px-6 text-slate-600">{ad.end}</td>

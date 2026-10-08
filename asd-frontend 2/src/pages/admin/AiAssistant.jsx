@@ -302,7 +302,7 @@ export default function AiAssistant() {
         
       </div>
 
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        {/* <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[600px]">
                 <thead>
@@ -349,7 +349,7 @@ export default function AiAssistant() {
                 <FaChevronDown className={`text-xs transition-transform ${showMore ? "rotate-180" : ""}`} />
               </button>
             </div>
-          </div>
+          </div> */}
     </div>
   );
 }

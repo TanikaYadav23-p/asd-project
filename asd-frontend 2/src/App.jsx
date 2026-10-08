@@ -15,14 +15,21 @@ import B2BDashboard from './pages/b2bDashboard/B2BDashboard'
 import UserDashboard from './pages/userDashboard/UserDashboard'
 import Chatbot from './components/Chatbot'
 import NotFound from "./pages/NotFound"
+import ScrollToTop from './components/ScrollToTop'
+import Contact from './pages/Contact'
+import About from './pages/About'
+
 
 function App() {
       
   return (
     <div>
+      <ScrollToTop />
         <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path='about' element={<About />} />
+          <Route path='contact' element={<Contact />} />
           <Route path='signup' element={<Signup/>} />
           <Route path='user-auth' element={<UserAuth/>} />
           <Route path='b2b-auth' element={<B2BAuth/>} />
