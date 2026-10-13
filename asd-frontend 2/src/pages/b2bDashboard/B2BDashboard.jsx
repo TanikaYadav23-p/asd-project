@@ -138,7 +138,7 @@ import API from "../../api/axios";
 import { LuChartNoAxesCombined, LuLightbulb ,  } from "react-icons/lu";
   import { MapContainer, TileLayer, CircleMarker } from "react-leaflet";
 
-
+import Chatbot from "../../components/Chatbot"
 import { RxCross1 } from "react-icons/rx";
 import { FaAngleRight, FaCalendarAlt, FaTimes  } from "react-icons/fa";
 import up from "../../assets/icon/up.png"
@@ -308,6 +308,11 @@ const sidebarSections = [
   {
     title: "Intelligence",
     items: [
+       {
+        icon: FaRobot,
+        label: "AI Chatbot",
+        badgeColor: "bg-teal-500",
+      },
       {
         icon: FiCpu,
         label: "Import Intelligence",
@@ -355,7 +360,7 @@ const sidebarSections = [
       {
         icon: FiCreditCard,
         label: "Settings",
-        badge: "Pro Plan",
+        badge: "",
         badgeColor: "bg-[#00BBA7]",
       },
     ],
@@ -474,30 +479,28 @@ const [accountSummary, setAccountSummary] = useState({});
                <button onClick={() => setMessage(true)} className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
                  <FiMail size={16} />
                </button>
-               {/* <button className="p-1.5 rounded-full hover:bg-gray-100 text-gray-600">
-                 <FiSun size={16} />
-               </button> */}
+             
                <div
-  className="flex items-center gap-2 ml-1 pl-2 py-2 border-l border-gray-200"
->
-  <div className="hidden sm:block leading-tight text-right">
-    <p className="text-xs sm:text-sm font-semibold text-gray-800">
-      {accountSummary?.user?.name}
-    </p>
+                className="flex items-center gap-2 ml-1 pl-2 py-2 border-l border-gray-200"
+              >
+                <div className="hidden sm:block leading-tight text-right">
+                  <p className="text-xs sm:text-sm font-semibold text-gray-800">
+                    {accountSummary?.user?.name}
+                  </p>
 
-    <p className="text-gray-400 text-xs sm:text-sm">
-      {accountSummary?.user?.roleId?.name}
-    </p>
-  </div>
+                  <p className="text-gray-400 text-xs sm:text-sm">
+                    {accountSummary?.user?.roleId?.name}
+                  </p>
+                </div>
 
-  <div className="h-8 w-8 sm:w-10 sm:h-10 bg-teal-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-    {accountSummary?.user?.name
-      ?.split(" ")
-      .map((word) => word[0])
-      .join("")
-      .toUpperCase()}
-  </div>
-</div>
+                <div className="h-8 w-8 sm:w-10 sm:h-10 bg-teal-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                  {accountSummary?.user?.name
+                    ?.split(" ")
+                    .map((word) => word[0])
+                    .join("")
+                    .toUpperCase()}
+                </div>
+              </div>
              </div>
            </header>
      
@@ -591,6 +594,8 @@ const [accountSummary, setAccountSummary] = useState({});
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden  ">  
         <main className="flex-1 overflow-y-auto bg-gray-50 p-3  ">
+
+          {activeTab === "AI Chatbot" && <Chatbot />}
           {activeTab === "Dashboard" && (
               <Dashboard setMainTab={setActiveTab} />
           )}

@@ -328,13 +328,9 @@ function CTASection() {
             Join of businesses transforming their trade operations with AI-powered intelligence
           </p>
    
-          <button className="bg-white hover:bg-gray-100 text-gray-900 font-semibold text-sm sm:text-base px-8 py-3 rounded-xl transition-colors shadow-lg">
-            Get Started Free
-          </button>
-   
-          <p className="text-gray-400 text-xs sm:text-sm">
+          {/* <p className="text-gray-400 text-xs sm:text-sm">
             No credit card required • Free 14-day trial • Cancel anytime
-          </p>
+          </p> */}
         </div>
       </section>
     );

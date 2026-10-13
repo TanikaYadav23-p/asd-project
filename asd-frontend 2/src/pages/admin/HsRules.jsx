@@ -2,11 +2,44 @@ import { useState, useRef } from "react";
 import {
   FaPlus, FaMagnifyingGlass, FaPen, FaFileImport, FaPaperPlane,
   FaChevronDown, FaXmark, FaRobot, FaShield, FaCircleCheck,
-  FaChevronRight, FaAngleDown
+  FaChevronRight, FaAngleDown, FaEye, FaTrash
 } from "react-icons/fa6";
 import API from "../../api/axios";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
+
+const ActionMenu = ({ onView, onDelete }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative inline-block text-left">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="border border-gray-200 rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-50 transition-colors"
+      >
+        <FaAngleDown className="text-xs" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 mt-1 w-32 bg-white border border-gray-100 rounded-lg shadow-lg z-20 overflow-hidden">
+            <button
+              onClick={() => { setOpen(false); onView && onView(); }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs text-gray-600 hover:bg-gray-50"
+            >
+              <FaEye className="text-xs" /> View
+            </button>
+            <button
+              onClick={() => { setOpen(false); onDelete && onDelete(); }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs text-red-500 hover:bg-red-50"
+            >
+              <FaTrash className="text-xs" /> Delete
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
 
 const Toggle = ({ checked, onChange }) => (
   <div onClick={() => onChange(!checked)}
@@ -35,6 +68,13 @@ const countryRules = [
   { country: "🇻🇳 Vietnam", status: "Restricted", statusColor: "bg-orange-100 text-orange-500", docs: "Invoice, Packing List, Import License", restriction: "Import license required", updated: "May 18, 2024" },
   { country: "🇩🇪 Germany", status: "Allowed", statusColor: "bg-teal-100 text-teal-600", docs: "Invoice, Packing List, Import License", restriction: "None", updated: "May 15, 2024" },
   { country: "🇨🇳 China", status: "Banned", statusColor: "bg-red-100 text-red-500", docs: "Invoice, Packing List, Import License", restriction: "Prohibited under national policy", updated: "May 10, 2024" },
+];
+
+const incentiveRules = [
+  { hsCode: "-", dest_country:"-" , fob_value:"-",  currency:"-", status: "Allowed", statusColor: "bg-teal-100 text-teal-600", docs: "Certificate of Origin, Invoice, Packing list"  },
+  { hsCode: "-",  dest_country: "-",fob_value:"-", currency:"",status: "Restricted", statusColor: "bg-orange-100 text-orange-500", docs: "Invoice, Packing List, Import License" },
+  { hsCode: "-", dest_country: "-", fob_value:"-", currency:"-",   status: "Allowed", statusColor: "bg-teal-100 text-teal-600", docs: "Invoice, Packing List, Import License" },
+  { hsCode: "-",dest_country: "-", fob_value : "-", currency:"", status: "Banned", statusColor: "bg-red-100 text-red-500", docs: "Invoice, Packing List, Import License",  },
 ];
 
 const relatedCodes = [
@@ -535,27 +575,36 @@ console.log("FOUND INDUSTRY CATEGORY:", industryCategory);// ✅ CHECK
                   <thead>
                     <tr className="bg-gray-50">
                       <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Country</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Hs code</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Origin country</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Destination country</th>
+                      
+
                       <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3">Import Status</th>
                       <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3">Required Documents</th>
                       <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3">Restrictions</th>
                       <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3">Last Updated</th>
-                      <th className="text-center text-xs font-semibold text-gray-500 px-3 py-3 rounded-r-xl">Actions</th>
+                      <th className="text-right text-xs font-semibold text-gray-500 px-3 py-3 rounded-r-xl">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {countryRules.map((c, i) => (
                       <tr key={c.country} className="border-t border-gray-100">
                         <td className="text-sm text-gray-700 px-3 py-3">{c.country}</td>
+                          <td className="text-sm text-gray-700 px-3 py-3">-</td>
+                          <td className="text-sm text-gray-700 px-3 py-3">-</td>
+                          <td className="text-sm text-gray-700 px-3 py-3">-</td>
                         <td className="px-3 py-3">
                           <span className={`text-xs px-2.5 py-1 rounded-lg font-medium ${c.statusColor}`}>{c.status}</span>
                         </td>
                         <td className="text-xs text-gray-500 px-3 py-3 max-w-[160px]">{c.docs}</td>
                         <td className="text-xs text-gray-500 px-3 py-3">{c.restriction}</td>
                         <td className="text-xs text-gray-500 px-3 py-3 whitespace-nowrap">{c.updated}</td>
-                        <td className="text-center px-3 py-3">
-                          <button className="border border-gray-200 rounded-lg px-2 py-1 text-gray-500 hover:bg-gray-50 transition-colors">
-                            <FaAngleDown className="text-xs" />
-                          </button>
+                        <td className="text-right px-3 py-3">
+                          <ActionMenu
+                            onView={() => console.log("View country rule", c)}
+                            onDelete={() => console.log("Delete country rule", c)}
+                          />
                         </td>
                       </tr>
                     ))}
@@ -566,6 +615,44 @@ console.log("FOUND INDUSTRY CATEGORY:", industryCategory);// ✅ CHECK
                 <p className="text-xs text-gray-400">Showing 4 of 4 countries</p>
                 <button className="text-xs text-teal-500 hover:text-teal-600 font-medium">View all</button>
               </div>
+            </div>
+            
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 shadow-sm">
+              <h2 className="text-sm font-semibold text-gray-800 mb-4">Incentives Rules</h2>
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[600px]">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Hs code</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Destination country</th>
+                      
+                      <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3"> Fob value </th>
+                       <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3">  Currency</th>
+
+                      <th className="text-right text-xs font-semibold text-gray-500 px-3 py-3"> Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {incentiveRules.map((c, i) => (
+                      <tr key={i} className="border-t border-gray-100">
+                      
+                          <td className="text-sm text-gray-700 px-3 py-3 text-left">{c.hsCode ?? "-"}</td>
+                          <td className="text-sm text-gray-700 px-3 py-3">{c.dest_country ?? "-"}</td>
+                          <td className="text-sm text-gray-700 px-3 py-3">{c.fob_value ?? "-"}</td>
+                          <td className="text-sm text-gray-700 px-3 py-3">{c.currency ?? "-"}</td>
+
+                        <td className="text-right px-3 py-3">
+                          <ActionMenu
+                            onView={() => console.log("View incentive rule", c)}
+                            onDelete={() => console.log("Delete incentive rule", c)}
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
             </div>
 
             {/* BOTTOM ACTIONS */}

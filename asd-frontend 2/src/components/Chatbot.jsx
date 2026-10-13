@@ -532,7 +532,7 @@ export default function CargoMateChat() {
   }
 
   return (
-    <div className="flex flex-col h-screen pt-14">
+    <div className="flex flex-col h-full pt-14">
       {/* <header className="flex items-center justify-between gap-3 px-3 sm:px-5 py-3 border-b border-gray-200 shrink-0">
         <div className="flex">
           <button onClick={() => setSidebarOpen(true)} className="lg:hidden">
