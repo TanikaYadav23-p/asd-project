@@ -139,6 +139,9 @@ function AddCountryRulePage({ onCancel, onSave }) {
 
   const [form, setForm] = useState({
     ruleName: "Electronics Import Restriction",
+    hsCode: "",
+    originCountry: "",
+    destinationCountry: "",
     ruleCode: "RUL-2025-000124",
     ruleType: "Import Restriction",
     status: true,
@@ -184,7 +187,7 @@ function AddCountryRulePage({ onCancel, onSave }) {
   };
 
   const collectData = () => ({
-    basicRuleInfo: { ruleName: form.ruleName, ruleCode: form.ruleCode, ruleType: form.ruleType, status: form.status ? "Active" : "Inactive" },
+    basicRuleInfo: { ruleName: form.ruleName, hsCode: form.hsCode, originCountry: form.originCountry, destinationCountry: form.destinationCountry, ruleCode: form.ruleCode, ruleType: form.ruleType, status: form.status ? "Active" : "Inactive" },
     countryConfig: { sourceCountry: form.sourceCountry, destCountry: form.destCountry, applicableRegion: form.applicableRegion, tradeZone: form.tradeZone },
     compliance: { requiredDocuments: docs, customsApproval: form.customsApproval, licenseRequired: form.licenseRequired, restrictedCategories: categories, complianceNotes: form.complianceNotes, uploadedFiles: uploadedFiles.map(f => f.name) },
     taxDuty: { customsDuty: form.customsDuty, importTax: form.importTax, exportTax: form.exportTax, vatGst: form.vatGst, currency: form.currency, penaltyCharges: form.penaltyCharges, calcFormula: form.calcFormula },
@@ -198,12 +201,14 @@ function AddCountryRulePage({ onCancel, onSave }) {
   
       const payload = {
         ruleName: data.basicRuleInfo.ruleName,
+        hsCode: data.basicRuleInfo.hsCode,
+        originCountry: data.basicRuleInfo.originCountry,
         ruleCode: data.basicRuleInfo.ruleCode,
         ruleType: data.basicRuleInfo.ruleType,
         status: data.basicRuleInfo.status.toLowerCase(),
         importRestrictions: data.compliance.complianceNotes,
         sourceCountry: data.countryConfig.sourceCountry,
-        destinationCountry: data.countryConfig.destCountry,
+        destinationCountry: data.basicRuleInfo.destinationCountry || data.countryConfig.destCountry,
         region: data.countryConfig.applicableRegion,
         tradeZone: data.countryConfig.tradeZone,
   
@@ -322,6 +327,21 @@ useEffect(() => {
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">Rule name</label>
                 <input className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all"
                   value={form.ruleName} onChange={e => set("ruleName", e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">HS Code</label>
+                <input className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all"
+                  value={form.hsCode} onChange={e => set("hsCode", e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Origin Country</label>
+                <input className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all"
+                  value={form.originCountry} onChange={e => set("originCountry", e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1.5">Destination Country</label>
+                <input className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all"
+                  value={form.destinationCountry} onChange={e => set("destinationCountry", e.target.value)} />
               </div>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">Rule name</label>
@@ -810,6 +830,10 @@ useEffect(() => {
                 <tr className="bg-teal-50">
                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3 rounded-l-xl">Country</th>
                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">Code</th>
+                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">HS Code</th>
+                    <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">Origin Country</th>
+                    <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">Destination Country</th>
+
                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">VAT/GST</th>
                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">Custom Duty</th>
                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">Import RESTRICTIONS</th>
@@ -824,6 +848,10 @@ useEffect(() => {
                   <tr key={row._id} className="border-t border-gray-100">
                     <td className="text-sm font-semibold text-gray-800 px-3 py-3">{row.destinationCountry?.name}</td>
                     <td className="text-sm text-gray-500 px-3 py-3">{row.destinationCountry?.code}</td>
+                     <td className="text-sm text-gray-500 px-3 py-3">-</td>
+                    <td className="text-sm text-gray-500 px-3 py-3">-</td>
+                    <td className="text-sm text-gray-500 px-3 py-3">-</td>
+
                     <td className="text-sm font-semibold text-gray-800 px-3 py-3">{row.taxRules?.vatGst}%</td>
                     <td className="text-sm text-gray-600 px-3 py-3">{row.taxRules?.customsDuty}</td>
                     <td className="text-xs sm:text-sm text-gray-600 px-3 py-3">{row.importRestrictions}</td>

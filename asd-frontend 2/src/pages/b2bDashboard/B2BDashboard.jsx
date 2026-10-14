@@ -184,10 +184,11 @@ import settings from "../../assets/icon/settings.png";
 import TradeIntelligenceImport from "./TradeIntelligenceImport";
 import ExportIntelligence from "./ExportIntelligence"
 import ShipmentDatabase from "./ShipmentDatabase";
-// import FreightCalculator from "../userDashboard/FreightCalculator";
-// import AiCargoMateAssistant from "../userDashboard/AiCargoMateAssistant";
-// import HSCodeLookup from "../userDashboard/HsCodeLookUp";
-// import IncentiveChecker from "../userDashboard/IncentiveChecker";
+
+import FreightCalculator from "../userDashboard/FreightCalculator";
+import AiCargoMateAssistant from "../userDashboard/AiCargoMateAssistant";
+import HSCodeLookup from "../userDashboard/HsCodeLookUp";
+import IncentiveChecker from "../userDashboard/IncentiveChecker";
 import alert from '../../assets/icon/alert.png'
 
 import graph from '../../assets/icon/graph.png'
@@ -205,12 +206,14 @@ import AlertNotification from "./AlertNotification";
 import Settings from "./Settings";
 
 
+
 import SelectRangeModal from "../../components/b2bComponent/SelectDateRange";
 import MarketIntelligencePopup from "../../components/b2bComponent/MarketIntelligence";
 
 import ShipmentForm from "../../components/ShipmentForm"
 import MessagesModal from "../../components/Messages";
 import NotificationsModal from "../../components/Notifications";
+import ShipmentPlanning from "../userDashboard/ShipmentPlanning";
 
 const iconMap = {
   shipment: Package,
@@ -323,6 +326,11 @@ const sidebarSections = [
       { icon: TbChartBar , label: "HS code Intelligence" },
       { icon: FiMap, label: "Shipment Database" },
 
+      { icon: FiHash, label: "HS Code Lookup" },
+      { icon: FiGift, label: "Incentive Checker" },
+      { icon: FiTruck, label: "Freight Calculator" },
+      { icon: FiMap, label: "Shipment Planning" },
+      
       { icon: FiTruck, label: "Risk Analysis" },
       { icon: FaRobot , label: "Ai Insight" },
     ],
@@ -615,11 +623,11 @@ const [accountSummary, setAccountSummary] = useState({});
            <ShipmentDatabase   />
           )}
 
-          {/* {activeTab === "AI CargoMate Assistant" && <AiCargoMateAssistant />}
-
+        {/* {activeTab === "AI CargoMate Assistant" && <AiCargoMateAssistant />} */}
         {activeTab === "HS Code Lookup" && <HSCodeLookup />}
         {activeTab === "Incentive Checker" && <IncentiveChecker />}
-        {activeTab === "Freight Calculator" && <FreightCalculator />} */}
+        {activeTab === "Freight Calculator" && <FreightCalculator />}
+        {activeTab === "Shipment Planning" && <ShipmentPlanning />}
 
              {activeTab === "Risk Analysis" && (
               <RiskAnalysis />

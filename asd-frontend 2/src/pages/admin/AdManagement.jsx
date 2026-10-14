@@ -120,11 +120,11 @@ function AdManagement({ ads, onDelete, onAddNew }) {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-slate-300 text-slate-700 font-medium text-sm">
+          {/* <button className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-slate-300 text-slate-700 font-medium text-sm">
             <Calendar size={16} />
             Run On Website
             <ChevronDown size={16} />
-          </button>
+          </button> */}
           <button
             onClick={onAddNew}
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-indigo-600 text-white font-semibold text-sm"
@@ -253,6 +253,7 @@ function NewPostForm({ onCancel, onSubmit }) {
     postText: "",
     targetStartDate: "",
     linkUrl: "",
+    location:"",
   });
   const [file, setFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
@@ -305,11 +306,65 @@ function NewPostForm({ onCancel, onSubmit }) {
       >
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-extrabold text-slate-900">
-            New Post Details
+            New Ad Details
           </h1>
           <button type="button" onClick={onCancel} className="sm:hidden">
             <X size={22} className="text-slate-500" />
           </button>
+        </div>
+
+         <div className="flex flex-col gap-2">
+          <label className="text-lg font-bold text-slate-900">
+            Enter ad location
+          </label>
+          <select
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            className="w-full rounded-full border border-slate-300 px-5 py-3.5 text-slate-500 outline-none bg-white"
+          >
+            <option value="" disabled>
+              Select sidebar tab
+            </option>
+            <optgroup label="User Dashboard - AI & Trade Tools">
+              <option value="User Dashboard - AI Chatbot">AI Chatbot</option>
+              <option value="User Dashboard - AI CargoMate Assistant">AI CargoMate Assistant</option>
+              <option value="User Dashboard - HS Code Lookup">HS Code Lookup</option>
+              <option value="User Dashboard - Incentive Checker">Incentive Checker</option>
+              <option value="User Dashboard - Freight Calculator">Freight Calculator</option>
+              <option value="User Dashboard - Shipment Planning">Shipment Planning</option>
+              <option value="User Dashboard - Saved">Saved</option>
+            </optgroup>
+            <optgroup label="User Dashboard - Account & Support">
+              <option value="User Dashboard - Subscription">Subscription</option>
+              <option value="User Dashboard - Notifications">Notifications</option>
+              <option value="User Dashboard - Help & Support">Help & Support</option>
+            </optgroup>
+            <optgroup label="B2B Dashboard">
+              <option value="B2B Dashboard - Dashboard">Dashboard</option>
+            </optgroup>
+            <optgroup label="B2B Dashboard - Intelligence">
+              <option value="B2B Dashboard - AI Chatbot">AI Chatbot</option>
+              <option value="B2B Dashboard - Import Intelligence">Import Intelligence</option>
+              <option value="B2B Dashboard - Export Intelligence">Export Intelligence</option>
+              <option value="B2B Dashboard - HS code Intelligence">HS code Intelligence</option>
+              <option value="B2B Dashboard - Shipment Database">Shipment Database</option>
+              <option value="B2B Dashboard - Risk Analysis">Risk Analysis</option>
+              <option value="B2B Dashboard - Ai Insight">Ai Insight</option>
+            </optgroup>
+            <optgroup label="B2B Dashboard - Manage">
+              <option value="B2B Dashboard - Shipments">Shipments</option>
+              <option value="B2B Dashboard - Documents">Documents</option>
+              <option value="B2B Dashboard - Invoices">Invoices</option>
+            </optgroup>
+            <optgroup label="B2B Dashboard - Reports & Tools">
+              <option value="B2B Dashboard - Reports">Reports</option>
+              <option value="B2B Dashboard - Alert Notifications">Alert Notifications</option>
+            </optgroup>
+            <optgroup label="B2B Dashboard - System">
+              <option value="B2B Dashboard - Settings">Settings</option>
+            </optgroup>
+          </select>
         </div>
 
         <div

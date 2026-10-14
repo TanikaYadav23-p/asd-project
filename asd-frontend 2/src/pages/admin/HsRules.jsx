@@ -70,12 +70,12 @@ const countryRules = [
   { country: "🇨🇳 China", status: "Banned", statusColor: "bg-red-100 text-red-500", docs: "Invoice, Packing List, Import License", restriction: "Prohibited under national policy", updated: "May 10, 2024" },
 ];
 
-const incentiveRules = [
-  { hsCode: "-", dest_country:"-" , fob_value:"-",  currency:"-", status: "Allowed", statusColor: "bg-teal-100 text-teal-600", docs: "Certificate of Origin, Invoice, Packing list"  },
-  { hsCode: "-",  dest_country: "-",fob_value:"-", currency:"",status: "Restricted", statusColor: "bg-orange-100 text-orange-500", docs: "Invoice, Packing List, Import License" },
-  { hsCode: "-", dest_country: "-", fob_value:"-", currency:"-",   status: "Allowed", statusColor: "bg-teal-100 text-teal-600", docs: "Invoice, Packing List, Import License" },
-  { hsCode: "-",dest_country: "-", fob_value : "-", currency:"", status: "Banned", statusColor: "bg-red-100 text-red-500", docs: "Invoice, Packing List, Import License",  },
-];
+// const incentiveRules = [
+//   { hsCode: "-", dest_country:"-" , fob_value:"-",  currency:"-", status: "Allowed", statusColor: "bg-teal-100 text-teal-600", docs: "Certificate of Origin, Invoice, Packing list"  },
+//   { hsCode: "-",  dest_country: "-",fob_value:"-", currency:"",status: "Restricted", statusColor: "bg-orange-100 text-orange-500", docs: "Invoice, Packing List, Import License" },
+//   { hsCode: "-", dest_country: "-", fob_value:"-", currency:"-",   status: "Allowed", statusColor: "bg-teal-100 text-teal-600", docs: "Invoice, Packing List, Import License" },
+//   { hsCode: "-",dest_country: "-", fob_value : "-", currency:"", status: "Banned", statusColor: "bg-red-100 text-red-500", docs: "Invoice, Packing List, Import License",  },
+// ];
 
 const relatedCodes = [
   { code: "090889990", name: "Coffee, not roasted", match: "92% match" },
@@ -153,6 +153,7 @@ const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3 rounded-l-xl">HS CODE</th>
                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">COMMODITY NAME</th>
                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">CATEGORY</th>
+                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">Product desc..</th>
                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">IMPORT DUTY</th>
                   <th className="text-left text-xs font-semibold text-teal-600 px-3 py-3">EXPORT RESTRICTIONS</th>
                   <th className="text-center text-xs font-semibold text-teal-600 px-3 py-3 rounded-r-xl">ACTIONS</th>
@@ -168,6 +169,7 @@ const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
                     <td className="px-3 py-3">
                       <span className="text-xs bg-purple-100 text-purple-600 px-2.5 py-1 rounded-lg font-medium">{row.category?.name || "-"}</span>
                     </td>
+                      <td className="text-sm text-center text-gray-700 px-3 py-3">--</td>
                     <td className="text-sm text-gray-700 px-3 py-3">{row.tradeInfo?.importDuty + "%" || "-"}</td>
                     <td className="px-3 py-3">
                       <span className={`text-xs whitespace-nowrap px-2.5 py-1 rounded-lg font-medium ${row.exportRestriction === "None" ? "bg-teal-100 text-teal-600" : "bg-orange-100 text-orange-500"}`}>
@@ -575,9 +577,9 @@ console.log("FOUND INDUSTRY CATEGORY:", industryCategory);// ✅ CHECK
                   <thead>
                     <tr className="bg-gray-50">
                       <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Country</th>
-                      <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Hs code</th>
+                      {/* <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Hs code</th>
                       <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Origin country</th>
-                      <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Destination country</th>
+                      <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3 rounded-l-xl">Destination country</th> */}
                       
 
                       <th className="text-left text-xs font-semibold text-gray-500 px-3 py-3">Import Status</th>
@@ -591,9 +593,9 @@ console.log("FOUND INDUSTRY CATEGORY:", industryCategory);// ✅ CHECK
                     {countryRules.map((c, i) => (
                       <tr key={c.country} className="border-t border-gray-100">
                         <td className="text-sm text-gray-700 px-3 py-3">{c.country}</td>
+                          {/* <td className="text-sm text-gray-700 px-3 py-3">-</td>
                           <td className="text-sm text-gray-700 px-3 py-3">-</td>
-                          <td className="text-sm text-gray-700 px-3 py-3">-</td>
-                          <td className="text-sm text-gray-700 px-3 py-3">-</td>
+                          <td className="text-sm text-gray-700 px-3 py-3">-</td> */}
                         <td className="px-3 py-3">
                           <span className={`text-xs px-2.5 py-1 rounded-lg font-medium ${c.statusColor}`}>{c.status}</span>
                         </td>
@@ -617,7 +619,7 @@ console.log("FOUND INDUSTRY CATEGORY:", industryCategory);// ✅ CHECK
               </div>
             </div>
             
-              <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 shadow-sm">
+              {/* <div className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 shadow-sm">
               <h2 className="text-sm font-semibold text-gray-800 mb-4">Incentives Rules</h2>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[600px]">
@@ -653,7 +655,7 @@ console.log("FOUND INDUSTRY CATEGORY:", industryCategory);// ✅ CHECK
                 </table>
               </div>
 
-            </div>
+            </div> */}
 
             {/* BOTTOM ACTIONS */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white rounded-2xl border border-gray-100 px-4 sm:px-5 py-4 shadow-sm">
@@ -673,74 +675,7 @@ console.log("FOUND INDUSTRY CATEGORY:", industryCategory);// ✅ CHECK
 
           </div>
 
-          {/* RIGHT - HS Code Summary */}
-          <div className="w-full xl:w-72 flex-shrink-0">
-            <div className="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm xl:sticky xl:top-6">
-              <h2 className="text-sm font-semibold text-gray-800 mb-1">HS Code Summary</h2>
-              <p className="text-xs text-gray-400 mb-3">HS Code Preview</p>
-
-              <div className="bg-teal-500 rounded-xl px-4 py-3 mb-4 text-center">
-                <p className="text-white font-bold text-lg tracking-wide">{form.hsCodeNumber || "090898790"}</p>
-                <p className="text-teal-100 text-xs mt-0.5">Coffee, not roasted, not decaffeinated</p>
-              </div>
-
-              <div className="flex flex-col gap-2 mb-4">
-                <div>
-                  <p className="text-xs text-gray-400">Category</p>
-                  <p className="text-xs font-medium text-gray-700">{form.productCategories || "Agricultural Products"}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Industry</p>
-                  <p className="text-xs font-medium text-gray-700">{form.industry || "Food & Beverages"}</p>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-100 pt-3 mb-4">
-                <p className="text-xs font-semibold text-gray-700 mb-2">Duty Summary</p>
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between"><span className="text-xs text-gray-400">Import Duty</span><span className="text-xs text-gray-700">{form.importDuty}%</span></div>
-                  <div className="flex justify-between"><span className="text-xs text-gray-400">Export Duty</span><span className="text-xs text-gray-700">{form.exportDuty}%</span></div>
-                  <div className="flex justify-between"><span className="text-xs text-gray-400">Gst/Tax</span><span className="text-xs text-gray-700">{form.gstTax}%</span></div>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-100 pt-3 mb-4">
-                <div className="flex items-center justify-between mb-1">
-                  <p className="text-xs font-semibold text-gray-700">Compliance Score</p>
-                  <span className="text-xs bg-orange-100 text-orange-500 px-2 py-0.5 rounded-lg font-medium">Complaint</span>
-                </div>
-                <p className="text-xs text-gray-400">No major compliance issues found</p>
-              </div>
-
-              <div className="border-t border-gray-100 pt-3 mb-4">
-                <p className="text-xs font-semibold text-gray-700 mb-2">AI Confidence Score</p>
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full border-4 border-teal-500 flex items-center justify-center">
-                    <span className="text-xs font-bold text-teal-600">92%</span>
-                  </div>
-                  <span className="text-xs text-teal-600 font-medium">High Confidence</span>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-100 pt-3 mb-4 flex flex-col gap-1">
-                <div className="flex justify-between"><span className="text-xs text-gray-400">Last Updated</span><span className="text-xs text-gray-600">May 22 2024 10:30 AM</span></div>
-                <div className="flex justify-between"><span className="text-xs text-gray-400">Created By</span><span className="text-xs text-gray-600">Sarah Johnson</span></div>
-              </div>
-
-              {showSavedBanner && (
-                <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl p-3 shadow-sm">
-                  <FaCircleCheck className="text-teal-500 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs font-semibold text-gray-700">HS Code saved successfully!</p>
-                    <p className="text-xs text-gray-400">You can publish it anytime</p>
-                  </div>
-                  <button onClick={() => setShowSavedBanner(false)} className="ml-auto text-gray-400 hover:text-gray-600">
-                    <FaXmark className="text-xs" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+        
 
         </div>
       </div>

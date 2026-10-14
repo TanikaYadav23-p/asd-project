@@ -11,7 +11,7 @@ const initialSchemes = [
 ];
 
 function AddSchemeModal({ onClose, onAdd }) {
-  const [form, setForm] = useState({ title: "", code: "", status: "Active", desc: "", benefits: "", applicants: "" });
+  const [form, setForm] = useState({ title: "", code: "", hsCode: "", destinationCountry: "", fobValue: "", status: "Active", desc: "", benefits: "", applicants: "" });
   const [errors, setErrors] = useState({});
   const set = (k, v) => { setForm(p => ({ ...p, [k]: v })); setErrors(p => ({ ...p, [k]: "" })); };
 
@@ -41,7 +41,10 @@ function AddSchemeModal({ onClose, onAdd }) {
           .map(b => b.trim())
           .filter(Boolean),
         status: form.status.toLowerCase(),
-        applicantsCount: Number(form.applicants || 0)
+        applicantsCount: Number(form.applicants || 0),
+        hsCode: form.hsCode,
+        destinationCountry: form.destinationCountry,
+        fobValue: form.fobValue
       });
   
       onClose();
@@ -55,7 +58,7 @@ function AddSchemeModal({ onClose, onAdd }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-base font-semibold text-gray-800">Add New Scheme</h3>
           <button onClick={onClose} className="w-7 h-7 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
@@ -74,6 +77,21 @@ function AddSchemeModal({ onClose, onAdd }) {
             <input className={`w-full border rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all ${errors.code ? "border-red-400" : "border-gray-200"}`}
               placeholder="e.g. EPCG- 2024" value={form.code} onChange={e => set("code", e.target.value)} />
             {errors.code && <p className="text-xs text-red-500 mt-1">{errors.code}</p>}
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">HS Code</label>
+            <input className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all"
+              placeholder="Enter HS code" value={form.hsCode} onChange={e => set("hsCode", e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">Destination Country</label>
+            <input className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all"
+              placeholder="Enter destination country" value={form.destinationCountry} onChange={e => set("destinationCountry", e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">FOB Value + Currency</label>
+            <input className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all"
+              placeholder="e.g. 5000 USD" value={form.fobValue} onChange={e => set("fobValue", e.target.value)} />
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">Status</label>
